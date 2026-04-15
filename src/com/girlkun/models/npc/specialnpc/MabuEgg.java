@@ -5,9 +5,9 @@ import com.girlkun.services.PetService;
 import com.girlkun.models.player.Player;
 import com.girlkun.utils.Util;
 import com.girlkun.network.io.Message;
-import com.girlkun.services.InventoryServiceNew;
 import com.girlkun.services.Service;
 import com.girlkun.utils.Logger;
+
 
 public class MabuEgg {
 
@@ -58,24 +58,20 @@ public class MabuEgg {
 
     public void openEgg(int gender) {
         if (this.player.pet != null) {
-            if (InventoryServiceNew.gI().getCountEmptyBody(this.player.pet) == 8) {
-                try {
-                    destroyEgg();
-                    Thread.sleep(4000);
-                    if (this.player.pet == null) {
-                        PetService.gI().createMabuPet(this.player, gender);
-                    } else {
-                        PetService.gI().changeMabuPet(this.player, gender);
-                    }
-                    ChangeMapService.gI().changeMapInYard(this.player, this.player.gender * 7, -1, Util.nextInt(300, 500));
-                    player.mabuEgg = null;
-                } catch (Exception e) {
+            try {
+                destroyEgg();
+                Thread.sleep(4000);
+                if (this.player.pet == null) {
+                    PetService.gI().createMabuPet(this.player, gender);
+                } else {
+                    PetService.gI().changeMabuPet(this.player, gender);
                 }
-            } else {
-                Service.getInstance().sendThongBao(player, "Vui lòng tháo hết đồ đệ tử");
+                ChangeMapService.gI().changeMapInYard(this.player, this.player.gender * 7, -1, Util.nextInt(300, 500));
+                player.mabuEgg = null;
+            } catch (Exception e) {
             }
         } else {
-            Service.getInstance().sendThongBao(player, "Yêu cầu phải có đệ tử");
+            Service.gI().sendThongBao(player, "Yêu cầu phải có đệ tử");
         }
     }
 
@@ -94,8 +90,8 @@ public class MabuEgg {
         this.timeDone -= ((d * 24 * 60 * 60 * 1000) + (h * 60 * 60 * 1000) + (m * 60 * 1000) + (s * 1000));
         this.sendMabuEgg();
     }
-
-    public void dispose() {
+    
+    public void dispose(){
         this.player = null;
     }
 }

@@ -12,12 +12,12 @@ public class ItemTime {
     //id item text
     public static final byte DOANH_TRAI = 0;
     public static final byte BAN_DO_KHO_BAU = 1;
-     public static final byte KHI_GASS= 2;
+
     public static final int TIME_ITEM = 600000;
-    public static final int TIME_BI_NGO = 1800000;
+    public static final int TIME_OPEN_POWER = 86400000;
     public static final int TIME_MAY_DO = 1800000;
-    public static final int TIME_MAY_DO2 = 1200000;
-    public static final int TIME_DUOI_KHI = 600000;
+    public static final int TIME_MAY_DO2 = 1800000;
+    public static final int TIME_EAT_MEAL = 600000;
 
     private Player player;
 
@@ -26,6 +26,11 @@ public class ItemTime {
     public boolean isUseGiapXen;
     public boolean isUseCuongNo;
     public boolean isUseAnDanh;
+    public boolean isUseBoHuyet2;
+    public boolean isUseBoKhi2;
+    public boolean isUseGiapXen2;
+    public boolean isUseCuongNo2;
+    public boolean isUseAnDanh2;
     
     public long lastTimeBoHuyet;
     public long lastTimeBoKhi;
@@ -33,45 +38,51 @@ public class ItemTime {
     public long lastTimeCuongNo;
     public long lastTimeAnDanh;
 
+    public long lastTimeBoHuyet2;
+    public long lastTimeBoKhi2;
+    public long lastTimeGiapXen2;
+    public long lastTimeCuongNo2;
+    public long lastTimeAnDanh2;
+    
+    
     public boolean isUseMayDo;
     public long lastTimeUseMayDo;//lastime de chung 1 cai neu time = nhau
     public boolean isUseMayDo2;
     public long lastTimeUseMayDo2;
     
-    public boolean isBiNgo;
-    public long lastTimeBiNgo;
+    public boolean isOpenPower;
+    public long lastTimeOpenPower;
 
     public boolean isUseTDLT;
     public long lastTimeUseTDLT;
     public int timeTDLT;
 
-    public boolean isDuoikhi;
-    public long lastTimeDuoikhi;
-    public int iconDuoi;
+    public boolean isEatMeal;
+    public long lastTimeEatMeal;
+    public int iconMeal;
 
     public ItemTime(Player player) {
         this.player = player;
     }
 
     public void update() {
-        if (isDuoikhi) {
-            if (Util.canDoWithTime(lastTimeDuoikhi, TIME_DUOI_KHI)) {
-                isDuoikhi = false;
-                Service.getInstance().point(player);
+        if (isEatMeal) {
+            if (Util.canDoWithTime(lastTimeEatMeal, TIME_EAT_MEAL)) {
+                isEatMeal = false;
+                Service.gI().point(player);
             }
         }
         if (isUseBoHuyet) {
             if (Util.canDoWithTime(lastTimeBoHuyet, TIME_ITEM)) {
                 isUseBoHuyet = false;
-                Service.getInstance().point(player);
-//                Service.getInstance().Send_Info_NV(this.player);
+                Service.gI().point(player);
             }
         }
         
         if (isUseBoKhi) {
             if (Util.canDoWithTime(lastTimeBoKhi, TIME_ITEM)) {
                 isUseBoKhi = false;
-                Service.getInstance().point(player);
+                Service.gI().point(player);
             }
         }
        
@@ -83,7 +94,7 @@ public class ItemTime {
         if (isUseCuongNo) {
             if (Util.canDoWithTime(lastTimeCuongNo, TIME_ITEM)) {
                 isUseCuongNo = false;
-                Service.getInstance().point(player);
+                Service.gI().point(player);
             }
         }
         if (isUseAnDanh) {
@@ -91,9 +102,44 @@ public class ItemTime {
                 isUseAnDanh = false;
             }
         }
-        if (isBiNgo) {
-            if (Util.canDoWithTime(lastTimeBiNgo, TIME_BI_NGO)) {
-                isBiNgo = false;
+       
+        if (isUseBoHuyet2) {
+            if (Util.canDoWithTime(lastTimeBoHuyet2, TIME_ITEM)) {
+                isUseBoHuyet2 = false;
+                Service.gI().point(player);
+            }
+        }
+        
+        if (isUseBoKhi2) {
+            if (Util.canDoWithTime(lastTimeBoKhi2, TIME_ITEM)) {
+                isUseBoKhi2 = false;
+                Service.gI().point(player);
+            }
+        }
+        if (isUseGiapXen2) {
+            if (Util.canDoWithTime(lastTimeGiapXen2, TIME_ITEM)) {
+                isUseGiapXen2 = false;
+            }
+        }
+        if (isUseCuongNo2) {
+            if (Util.canDoWithTime(lastTimeCuongNo2, TIME_ITEM)) {
+                isUseCuongNo2 = false;
+                Service.gI().point(player);
+            }
+        }
+        if (isUseAnDanh2) {
+            if (Util.canDoWithTime(lastTimeAnDanh2, TIME_ITEM)) {
+                isUseAnDanh2 = false;
+            }
+        }
+        if (isOpenPower) {
+            if (Util.canDoWithTime(lastTimeOpenPower, TIME_OPEN_POWER)) {
+                player.nPoint.limitPower++;
+                if (player.nPoint.limitPower > NPoint.MAX_LIMIT) {
+                    player.nPoint.limitPower = NPoint.MAX_LIMIT;
+                }
+                Service.gI().sendThongBao(player, "Giới hạn sức mạnh của bạn đã được tăng lên 1 bậc");
+                isOpenPower = false;
             }
         }
         if (isUseMayDo) {

@@ -4,7 +4,7 @@ import com.girlkun.models.player.Player;
 
 /**
  *
- *@Stole By Hoàng Việt 💖
+ *@Stole By Arriety 💖
  *
  */
 public interface IAtionNpc {

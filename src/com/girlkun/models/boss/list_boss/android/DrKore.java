@@ -22,12 +22,12 @@ public class DrKore extends Boss {
 
     @Override
     public void reward(Player plKill) {
-        int[] itemRan = new int[]{380, 381, 382, 383, 384, 385};
+        int[] itemRan = new int[]{381, 382, 383, 384, 385};
         int itemId = itemRan[2];
         if (Util.isTrue(15, 100)) {
-            ItemMap it = new ItemMap(this.zone, itemId, 1, this.location.x, this.zone.map.yPhysicInTop(this.location.x,
+            ItemMap it = new ItemMap(this.zone, itemId, 17, this.location.x, this.zone.map.yPhysicInTop(this.location.x,
                     this.location.y - 24), plKill.id);
-            Service.getInstance().dropItemMap(this.zone, it);
+            Service.gI().dropItemMap(this.zone, it);
         }
         TaskService.gI().checkDoneTaskKillBoss(plKill, this);
     }
@@ -53,7 +53,7 @@ public class DrKore extends Boss {
      @Override
     public void active() {
         super.active(); //To change body of generated methods, choose Tools | Templates.
-        if(Util.canDoWithTime(st,1500000)){
+        if(Util.canDoWithTime(st,900000)){
             this.changeStatus(BossStatus.LEAVE_MAP);
         }
     }
@@ -65,14 +65,14 @@ public class DrKore extends Boss {
     }
     private long st;
 
-   @Override
-    public double injured(Player plAtt, double damage, boolean piercing, boolean isMobAttack) {
+    @Override
+    public int injured(Player plAtt, int damage, boolean piercing, boolean isMobAttack) {
         if (plAtt != null) {
             switch (plAtt.playerSkill.skillSelect.template.id) {
                 case Skill.KAMEJOKO:
                 case Skill.MASENKO:
                 case Skill.ANTOMIC:
-                    PlayerService.gI().hoiPhuc(this, Util.DoubleGioihan(damage), 0);
+                    PlayerService.gI().hoiPhuc(this, damage, 0);
                     if (Util.isTrue(1, 5)) {
                         this.chat("Hấp thụ.. các ngươi nghĩ sao vậy?");
                     }
@@ -100,5 +100,6 @@ public class DrKore extends Boss {
 }
 
 /**
- * Vui lòng không sao chép mã nguồn này dưới mọi hình thức.
+ * Vui lòng không sao chép mã nguồn này dưới mọi hình thức. Hãy tôn trọng tác
+ * giả của mã nguồn này. Xin cảm ơn! - GirlBeo
  */

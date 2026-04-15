@@ -45,7 +45,7 @@ public class EffectSkillService {
             msg.writer().writeByte(8);
             msg.writer().writeInt((int) player.id);
             msg.writer().writeShort(skill.skillId);
-            Service.getInstance().sendMessAnotherNotMeInMap(player, msg);
+            Service.gI().sendMessAnotherNotMeInMap(player, msg);
             msg.cleanup();
         } catch (Exception e) {
             com.girlkun.utils.Logger.logException(EffectSkillService.class, e);
@@ -65,7 +65,7 @@ public class EffectSkillService {
                 msg.writer().writeInt((int) plTarget.id); //id player dính effect
                 msg.writer().writeInt((int) plUseSkill.id); //id player dùng skill
             }
-            Service.getInstance().sendMessAllPlayerInMap(plUseSkill, msg);
+            Service.gI().sendMessAllPlayerInMap(plUseSkill, msg);
             msg.cleanup();
         } catch (Exception e) {
             com.girlkun.utils.Logger.logException(EffectSkillService.class, e);
@@ -81,7 +81,7 @@ public class EffectSkillService {
             msg.writer().writeByte(effect); //loại hiệu ứng
             msg.writer().writeByte(mobTarget.id); //id mob dính effect
             msg.writer().writeInt((int) plUseSkill.id); //id player dùng skill
-            Service.getInstance().sendMessAllPlayerInMap(mobTarget.zone, msg);
+            Service.gI().sendMessAllPlayerInMap(mobTarget.zone, msg);
             msg.cleanup();
         } catch (Exception e) {
             com.girlkun.utils.Logger.logException(EffectSkillService.class, e);
@@ -165,21 +165,11 @@ public class EffectSkillService {
         player.effectSkill.isSocola = true;
         player.effectSkill.countPem1hp = 0;
     }
-    public void setBinh(Player player, long lastTimeBinh, int timeBinh) {
-        player.effectSkill.lastTimeBinh = lastTimeBinh;
-        player.effectSkill.timeBinh = timeBinh;
-        player.effectSkill.isBinh = true;
-    }
 
     //player trở lại thành người
     public void removeSocola(Player player) {
         player.effectSkill.isSocola = false;
-        Service.getInstance().Send_Caitrang(player);
-    }
-    //player trở lại thành người
-    public void removeBinh(Player player) {
-        player.effectSkill.isBinh = false;
-        Service.getInstance().Send_Caitrang(player);
+        Service.gI().Send_Caitrang(player);
     }
 
     //quái biến thành socola
@@ -190,23 +180,9 @@ public class EffectSkillService {
             msg.writer().writeByte(1);
             msg.writer().writeByte(mob.id); //mob id
             msg.writer().writeShort(4133); //icon socola
-            Service.getInstance().sendMessAllPlayerInMap(player, msg);
+            Service.gI().sendMessAllPlayerInMap(player, msg);
             msg.cleanup();
             mob.effectSkill.setSocola(System.currentTimeMillis(), timeSocola);
-        } catch (Exception e) {
-            com.girlkun.utils.Logger.logException(EffectSkillService.class, e);
-        }
-    }
-    public void sendMobToBinh(Player player, Mob mob, int timeBinh) {
-        Message msg;
-        try {
-            msg = new Message(-112);
-            msg.writer().writeByte(1);
-            msg.writer().writeByte(mob.id); //mob id
-            msg.writer().writeShort(14522); //icon socola
-            Service.getInstance().sendMessAllPlayerInMap(player, msg);
-            msg.cleanup();
-            mob.effectSkill.setBinh(System.currentTimeMillis(), timeBinh);
         } catch (Exception e) {
             com.girlkun.utils.Logger.logException(EffectSkillService.class, e);
         }
@@ -228,7 +204,7 @@ public class EffectSkillService {
 
     //Huýt sáo *****************************************************************
     //Hưởng huýt sáo
-    public void setStartHuytSao(Player player, long tiLeHP) {
+    public void setStartHuytSao(Player player, int tiLeHP) {
         player.effectSkill.tiLeHPHuytSao = tiLeHP;
         player.effectSkill.lastTimeHuytSao = System.currentTimeMillis();
     }
@@ -237,8 +213,8 @@ public class EffectSkillService {
     public void removeHuytSao(Player player) {
         player.effectSkill.tiLeHPHuytSao = 0;
         sendEffectPlayer(player, player, TURN_OFF_EFFECT, HUYT_SAO_EFFECT);
-        Service.getInstance().point(player);
-        Service.getInstance().Send_Info_NV(player);
+        Service.gI().point(player);
+        Service.gI().Send_Info_NV(player);
     }
 
     //**************************************************************************
@@ -258,7 +234,7 @@ public class EffectSkillService {
         player.effectSkill.timeMonkey = timeMonkey;
         player.effectSkill.lastTimeUpMonkey = System.currentTimeMillis();
         player.effectSkill.levelMonkey = (byte) player.playerSkill.skillSelect.point;
-        player.nPoint.setHp(player.nPoint.hp * 5);
+        player.nPoint.setHp(player.nPoint.hp * 2);
     }
 
     public void monkeyDown(Player player) {
@@ -270,12 +246,12 @@ public class EffectSkillService {
 
         sendEffectEndCharge(player);
         sendEffectMonkey(player);
-        Service.getInstance().setNotMonkey(player);
-        Service.getInstance().Send_Caitrang(player);
-        Service.getInstance().point(player);
+        Service.gI().setNotMonkey(player);
+        Service.gI().Send_Caitrang(player);
+        Service.gI().point(player);
         PlayerService.gI().sendInfoHpMp(player);
-        Service.getInstance().Send_Info_NV(player);
-        Service.getInstance().sendInfoPlayerEatPea(player);
+        Service.gI().Send_Info_NV(player);
+        Service.gI().sendInfoPlayerEatPea(player);
     }
     //**************************************************************************
     //Tái tạo năng lượng *******************************************************
@@ -309,7 +285,7 @@ public class EffectSkillService {
 
     public void breakShield(Player player) {
         removeShield(player);
-        Service.getInstance().sendThongBao(player, "Khiên năng lượng đã bị vỡ!");
+        Service.gI().sendThongBao(player, "Khiên năng lượng đã bị vỡ!");
         ItemTimeService.gI().removeItemTime(player, 3784);
     }
 
@@ -331,7 +307,7 @@ public class EffectSkillService {
                 msg.writer().writeInt((int) pl.id);
                 msg.writer().writeByte(timeStun / 1000);
             }
-            Service.getInstance().sendMessAllPlayerInMap(plUseSkill, msg);
+            Service.gI().sendMessAllPlayerInMap(plUseSkill, msg);
             msg.cleanup();
         } catch (Exception e) {
             com.girlkun.utils.Logger.logException(EffectSkillService.class, e);
@@ -347,7 +323,7 @@ public class EffectSkillService {
             msg.writer().writeByte(6);
             msg.writer().writeInt((int) player.id);
             msg.writer().writeShort(skill.skillId);
-            Service.getInstance().sendMessAllPlayerInMap(player, msg);
+            Service.gI().sendMessAllPlayerInMap(player, msg);
             msg.cleanup();
         } catch (Exception e) {
             com.girlkun.utils.Logger.logException(EffectSkillService.class, e);
@@ -363,7 +339,7 @@ public class EffectSkillService {
             msg.writer().writeByte(1);
             msg.writer().writeInt((int) player.id);
             msg.writer().writeShort(skill.skillId);
-            Service.getInstance().sendMessAllPlayerInMap(player, msg);
+            Service.gI().sendMessAllPlayerInMap(player, msg);
             msg.cleanup();
         } catch (Exception e) {
             com.girlkun.utils.Logger.logException(EffectSkillService.class, e);
@@ -377,7 +353,7 @@ public class EffectSkillService {
             msg.writer().writeByte(3);
             msg.writer().writeInt((int) player.id);
             msg.writer().writeShort(-1);
-            Service.getInstance().sendMessAllPlayerInMap(player, msg);
+            Service.gI().sendMessAllPlayerInMap(player, msg);
             msg.cleanup();
         } catch (Exception e) {
             com.girlkun.utils.Logger.logException(EffectSkillService.class, e);
@@ -392,7 +368,7 @@ public class EffectSkillService {
             msg.writer().writeByte(5);
             msg.writer().writeInt((int) player.id);
             msg.writer().writeShort(player.playerSkill.skillSelect.skillId);
-            Service.getInstance().sendMessAllPlayerInMap(player, msg);
+            Service.gI().sendMessAllPlayerInMap(player, msg);
             msg.cleanup();
         } catch (Exception e) {
             com.girlkun.utils.Logger.logException(EffectSkillService.class, e);
@@ -408,7 +384,7 @@ public class EffectSkillService {
             msg.writer().writeByte(6);
             msg.writer().writeInt((int) player.id);
             msg.writer().writeShort(skill.skillId);
-            Service.getInstance().sendMessAllPlayerInMap(player, msg);
+            Service.gI().sendMessAllPlayerInMap(player, msg);
             msg.cleanup();
         } catch (Exception e) {
             com.girlkun.utils.Logger.logException(EffectSkillService.class, e);

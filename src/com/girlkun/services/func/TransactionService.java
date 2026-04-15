@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class TransactionService implements Runnable {
 
-    private static final int TIME_DELAY_TRADE = 30000;
+    private static final int TIME_DELAY_TRADE = 1000;
 
     static final Map<Player, Trade> PLAYER_TRADE = new HashMap<Player, Trade>();
 
@@ -51,7 +51,6 @@ public class TransactionService implements Runnable {
             switch (action) {
                 case SEND_INVITE_TRADE:
                 case ACCEPT_TRADE:
-//                    if (pl.getSession().actived){
                     playerId = msg.reader().readInt();
                     plMap = pl.zone.getPlayerInMap(playerId);
                     if (plMap != null) {
@@ -69,7 +68,7 @@ public class TransactionService implements Runnable {
                                         checkLogout1 = PlayerDAO.checkLogout(con, pl);
                                         checkLogout2 = PlayerDAO.checkLogout(con, plMap);
                                     } catch (Exception e) {
-                                        System.out.println("76543");
+                                        e.printStackTrace();
                                     }
                                     if (checkLogout1) {
                                         Client.gI().kickSession(pl.getSession());
@@ -83,7 +82,7 @@ public class TransactionService implements Runnable {
                                     pl.iDMark.setPlayerTradeId((int) plMap.id);
                                     sendInviteTrade(pl, plMap);
                                 } else {
-                                    Service.getInstance().sendThongBao(pl, "Thử lại sau " +
+                                    Service.gI().sendThongBao(pl, "Thử lại sau " +
                                             TimeUtil.getTimeLeft(Math.max(pl.iDMark.getLastTimeTrade(), plMap.iDMark.getLastTimeTrade()), TIME_DELAY_TRADE / 1000));
                                 }
                             } else {
@@ -93,12 +92,9 @@ public class TransactionService implements Runnable {
                                 }
                             }
                         } else {
-                            Service.getInstance().sendThongBao(pl, "Không thể thực hiện");
+                            Service.gI().sendThongBao(pl, "Không thể thực hiện");
                         }
                     }
-//                    } else {
-//                        Service.getInstance().sendThongBao(pl, "Vui lòng mở thành viên để mở khóa tính năng giao dịch");
-//                    }
                     break;
                 case ADD_ITEM_TRADE:
                     if (trade != null) {
@@ -108,7 +104,7 @@ public class TransactionService implements Runnable {
                             quantity = 1;
                         }
                         if (index != -1 && quantity > Trade.QUANLITY_MAX) {
-                            Service.getInstance().sendThongBao(pl, "Đã quá giới hạn giao dịch...");
+                            Service.gI().sendThongBao(pl, "Đã quá giới hạn giao dịch...");
                             trade.cancelTrade();
                             break;
                         }
@@ -143,7 +139,7 @@ public class TransactionService implements Runnable {
                     break;
             }
         } catch (Exception e) {
-            System.out.println("234567876543");
+            e.printStackTrace();
             Logger.logException(this.getClass(), e);
         }
     }

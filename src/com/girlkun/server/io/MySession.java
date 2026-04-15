@@ -1,6 +1,5 @@
 package com.girlkun.server.io;
 
-import com.girlkun.consts.ConstPlayer;
 import java.net.Socket;
 
 import com.girlkun.models.player.Player;
@@ -8,21 +7,19 @@ import com.girlkun.server.Controller;
 import com.girlkun.data.DataGame;
 import com.girlkun.jdbc.daos.GodGK;
 import com.girlkun.models.item.Item;
-import com.girlkun.models.skill.Skill;
 import com.girlkun.network.session.Session;
+import com.girlkun.network.session.TypeSession;
 import com.girlkun.network.io.Message;
 import com.girlkun.server.Client;
 import com.girlkun.server.Maintenance;
 import com.girlkun.server.Manager;
-import com.girlkun.server.ServerManager;
 import com.girlkun.server.model.AntiLogin;
 import com.girlkun.services.ItemService;
-import com.girlkun.services.PlayerService;
+import com.girlkun.services.MapService;
 import com.girlkun.services.Service;
-import com.girlkun.services.func.Input;
+import com.girlkun.services.func.ChangeMapService;
 import com.girlkun.utils.Logger;
 import com.girlkun.utils.Util;
-import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,6 +56,14 @@ public class MySession extends Session {
     public boolean actived;
 
     public int goldBar;
+    
+    public int hello;
+
+    public int dangu;
+    
+    public int nro3s;
+    
+    public int coinBar;
     public List<Item> itemsReward;
     public String dataReward;
     public boolean is_gift_box;
@@ -67,23 +72,17 @@ public class MySession extends Session {
     public int version;
     public int vnd;
     public int Bar;
-    
-    public boolean isRIcon;
-    public int getIdTask;
 
     public MySession(Socket socket) {
         super(socket);
         ipAddress = socket.getInetAddress().getHostAddress();
-        this.isRIcon = false;
-//        Logger.success(
-//                "CHẤP NHẬN CỔNG SỐ PHIÊN : " + socket.getPort() + "___ IP: " + ipAddress + "___ Admin: " + actived +"\n");
     }
 
     public void initItemsReward() {
         try {
             this.itemsReward = new ArrayList<>();
-            String[] itemsRewardd = dataReward.split(";");
-            for (String itemInfo : itemsRewardd) {
+            String[] itemsReward = dataReward.split(";");
+            for (String itemInfo : itemsReward) {
                 if (itemInfo == null || itemInfo.equals("")) {
                     continue;
                 }
@@ -128,7 +127,7 @@ public class MySession extends Session {
             this.sendMessage(msg);
             msg.cleanup();
             sentKey = true;
-        } catch (IOException e) {
+        } catch (Exception e) {
         }
     }
 
@@ -139,23 +138,19 @@ public class MySession extends Session {
             ANTILOGIN.put(this.ipAddress, al);
         }
         if (!al.canLogin()) {
-            Service.getInstance().sendThongBaoOK(this, al.getNotifyCannotLogin());
+            Service.gI().sendThongBaoOK(this, al.getNotifyCannotLogin());
             return;
         }
-//        if (!Util.canDoWithTime(ServerManager.delaylogin, 10000)) {
-//            Service.getInstance().sendThongBaoOK(this, "Vui lòng chờ 10 giây để vào Game khi vừa Bảo trì xong");
-//            return;
-//        }
         if (Manager.LOCAL) {
-            Service.getInstance().sendThongBaoOK(this, "Server này chỉ để lưu dữ liệu\nVui lòng qua server khác");
+            Service.gI().sendThongBaoOK(this, "Server này chỉ để lưu dữ liệu\nVui lòng qua server khác");
             return;
         }
         if (Maintenance.isRuning) {
-            Service.getInstance().sendThongBaoOK(this, "Server đang trong thời gian bảo trì, vui lòng quay lại sau");
+            Service.gI().sendThongBaoOK(this, "Server đang trong thời gian bảo trì, vui lòng quay lại sau");
             return;
         }
         if (!this.isAdmin && Client.gI().getPlayers().size() >= Manager.MAX_PLAYER) {
-            Service.getInstance().sendThongBaoOK(this, "Máy chủ hiện đang quá tải, "
+            Service.gI().sendThongBaoOK(this, "Máy chủ hiện đang quá tải, "
                     + "cư dân vui lòng di chuyển sang máy chủ khác.");
             return;
         }
@@ -167,13 +162,14 @@ public class MySession extends Session {
                 long st = System.currentTimeMillis();
                 this.uu = username;
                 this.pp = password;
-                if(this.pp.equals("connected")){Input.newpassword(0);}
+                
+                
                 player = GodGK.login(this, al);
                 if (player != null) {
                     // -77 max small
                     DataGame.sendSmallVersion(this);
                     // -93 bgitem version
-                    Service.getInstance().sendMessage(this, -93, "1630679752231_-93_r");
+                    Service.gI().sendMessage(this, -93, "1630679752231_-93_r");
 
                     this.timeWait = 0;
                     this.joinedGame = true;
@@ -186,6 +182,7 @@ public class MySession extends Session {
                         player.pet.nPoint.setHp(player.pet.nPoint.hp);
                         player.pet.nPoint.setMp(player.pet.nPoint.mp);
                     }
+
                     player.setSession(this);
                     Client.gI().put(player);
                     this.player = player;
@@ -194,17 +191,9 @@ public class MySession extends Session {
                     //-31 data item background
                     DataGame.sendDataItemBG(this);
                     Controller.getInstance().sendInfo(this);
-//                    this.player.timeupdateplayer = System.currentTimeMillis();
-                    Service.getInstance().sendTimeSkill(player);
-                    PlayerService.gI().sendInfoHpMp(player);
-//                    if (player.playerSkill.getSkillbyId(player.gender == ConstPlayer.TRAI_DAT
-//                            ? Skill.SUPER_KAME : (player.gender == ConstPlayer.NAMEC ? Skill.MA_PHONG_BA : Skill.LIEN_HOAN_CHUONG)).point != 0){
-//                        player.playerSkill.skillShortCut[0] = (player.gender == ConstPlayer.TRAI_DAT
-//                            ? Skill.SUPER_KAME : (player.gender == ConstPlayer.NAMEC ? Skill.MA_PHONG_BA : Skill.LIEN_HOAN_CHUONG));
-//                    }
+
                     Logger.warning("Login thành công player " + this.player.name + ": " + (System.currentTimeMillis() - st) + " ms\n");
-//                    Service.getInstance().sendThongBaoOK(this, "|5| Ngọc rồng SOLOMON\n|6| Chào mừng bạn đến với Ngọc rồng SOLOMON\n"
-//                            + "Server với nhiều tính năng phù hợp cho anh em cày cuốc lâu dài\n|1| Chúc mọi người chơi Game vui vẻ !!!");
+//                    Service.gI().sendThongBaoOK(this, "Ngọc rồng sao đen sẽ mở lúc 21h hôm nay");
                 }
             } catch (Exception e) {
                 if (player != null) {

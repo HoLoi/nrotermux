@@ -6,13 +6,9 @@ import com.girlkun.models.boss.Boss;
 import com.girlkun.models.boss.BossID;
 import com.girlkun.models.boss.BossManager;
 import com.girlkun.models.map.MapMaBu.MapMaBu;
-import com.girlkun.models.map.bdkb.BanDoKhoBau;
-import com.girlkun.models.map.bdkb.BanDoKhoBauService;
-import com.girlkun.models.map.doanhtrai.DoanhTrai;
-import com.girlkun.models.map.bdkb.BanDoKhoBauService;
 import com.girlkun.models.map.blackball.BlackBallWar;
+import com.girlkun.models.map.doanhtrai.DoanhTrai;
 import com.girlkun.models.map.doanhtrai.DoanhTraiService;
-import com.girlkun.models.map.gas.Gas;
 import com.girlkun.models.mob.Mob;
 import com.girlkun.models.npc.Npc;
 import com.girlkun.models.npc.NpcFactory;
@@ -20,7 +16,6 @@ import com.girlkun.models.player.Player;
 import com.girlkun.server.Manager;
 import com.girlkun.services.Service;
 import com.girlkun.services.func.TopService;
-import com.girlkun.utils.Logger;
 import com.girlkun.utils.Util;
 
 import java.util.ArrayList;
@@ -58,7 +53,7 @@ public class Map implements Runnable {
         this.mapId = mapId;
         this.mapName = mapName;
         this.planetId = planetId;
-        this.planetName = Service.getInstance().get_HanhTinh(planetId);
+        this.planetName = Service.gI().get_HanhTinh(planetId);
         this.tileId = tileId;
         this.bgId = bgId;
         this.bgType = bgType;
@@ -71,8 +66,6 @@ public class Map implements Runnable {
             this.mapHeight = tileMap.length * SIZE;
             this.mapWidth = tileMap[0].length * SIZE;
         } catch (Exception ignored) {
-            ignored.printStackTrace();
-                System.out.println("        loi map ne");
         }
         this.initZone(zones, maxPlayer);
         this.initItem();
@@ -93,12 +86,6 @@ public class Map implements Runnable {
             case ConstMap.MAP_DOANH_TRAI:
                 nZone = DoanhTrai.AVAILABLE;
                 break;
-            case ConstMap.MAP_KHI_GAS:
-                nZone = Gas.MAX_AVAILABLE;
-                break;
-            case ConstMap.MAP_BAN_DO_KHO_BAU:
-                nZone = BanDoKhoBau.MAX_AVAILABLE;
-                break;
         }
 
         for (int i = 0; i < nZone; i++) {
@@ -107,12 +94,6 @@ public class Map implements Runnable {
             switch (this.type) {
                 case ConstMap.MAP_DOANH_TRAI:
                     DoanhTraiService.gI().addMapDoanhTrai(i, zone);
-                    break;
-                case ConstMap.MAP_KHI_GAS:
-                    Gas.addZone(i, zone);
-                    break;
-                case ConstMap.MAP_BAN_DO_KHO_BAU:
-                    BanDoKhoBau.addZone(i, zone);
                     break;
             }
         }
@@ -133,19 +114,15 @@ public class Map implements Runnable {
                 for (Zone zone : this.zones) {
                     zone.update();
                 }
-//                TopService.gI().updateTop();
                 long timeDo = System.currentTimeMillis() - st;
-                long delay = Math.max(1000 - timeDo, 0);
-                Thread.sleep(delay);
+                Thread.sleep(1000 - timeDo);
             } catch (Exception e) {
 //                Logger.logException(Map.class, e, "Lỗi update map " + this.mapName);
-                e.printStackTrace();
-                System.out.println("Lỗi update map " + this.mapName);
-            }// het that hehe het loi update map nha
+            }
         }
     }
 
-    public void initMob(byte[] mobTemp, byte[] mobLevel, double[] mobHp, short[] mobX, short[] mobY) {
+    public void initMob(byte[] mobTemp, byte[] mobLevel, int[] mobHp, short[] mobX, short[] mobY) {
         for (int i = 0; i < mobTemp.length; i++) {
             int mobTempId = mobTemp[i];
             Template.MobTemplate temp = Manager.getMobTemplateByTemp(mobTempId);
@@ -157,7 +134,7 @@ public class Map implements Runnable {
                 mob.point.setHpFull(mobHp[i]);
                 mob.location.x = mobX[i];
                 mob.location.y = mobY[i];
-                mob.point.sethp(Util.DoubleGioihan(mob.point.getHpFull()));
+                mob.point.sethp(mob.point.getHpFull());
                 mob.pDame = temp.percentDame;
                 mob.pTiemNang = temp.percentTiemNang;
                 mob.setTiemNang();
@@ -318,7 +295,6 @@ public class Map implements Runnable {
             }
             return rY;
         } catch (Exception e) {
-            System.out.println("        loi map nua ne");
             return y;
         }
     }

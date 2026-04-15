@@ -1,6 +1,6 @@
 package com.girlkun.models.player;
 
-import BoMong.BoMong;
+import com.arriety.card.Card;
 import com.girlkun.models.map.MapMaBu.MapMaBu;
 import com.girlkun.models.skill.PlayerSkill;
 
@@ -14,27 +14,19 @@ import com.girlkun.models.npc.specialnpc.MagicTree;
 import com.girlkun.consts.ConstPlayer;
 import com.girlkun.consts.ConstTask;
 import com.girlkun.models.npc.specialnpc.MabuEgg;
-import com.girlkun.models.npc.specialnpc.Timedua;
 import com.girlkun.models.mob.MobMe;
 import com.girlkun.data.DataGame;
-import static com.girlkun.jdbc.daos.PlayerDAO.updatePlayer;
-import com.girlkun.models.card.Card;
 import com.girlkun.models.clan.ClanMember;
-import com.girlkun.models.item.ItemTimeSieuCap;
-import com.girlkun.models.kygui.ItemKyGui;
-import com.girlkun.models.kygui.ShopKyGuiManager;
-//import com.girlkun.models.kygui.ShopKyGuiService;
 import com.girlkun.models.map.TrapMap;
 import com.girlkun.models.map.Zone;
-import com.girlkun.models.map.bdkb.BanDoKhoBauService;
 import com.girlkun.models.map.blackball.BlackBallWar;
-import com.girlkun.models.map.doanhtrai.DoanhTraiService;
-import com.girlkun.models.map.gas.GasService;
 import com.girlkun.models.matches.IPVP;
 import com.girlkun.models.matches.TYPE_LOSE_PVP;
+import com.girlkun.models.matches.TYPE_PVP;
+import com.girlkun.models.matches.pvp.DaiHoiVoThuat;
+import com.girlkun.models.npc.specialnpc.BillEgg;
 import com.girlkun.models.skill.Skill;
-//import com.girlkun.models.matches.pvp.DaiHoiVoThuat;
-//import com.girlkun.server.Manager;
+import com.girlkun.server.Manager;
 import com.girlkun.services.Service;
 import com.girlkun.server.io.MySession;
 import com.girlkun.models.task.TaskPlayer;
@@ -42,71 +34,26 @@ import com.girlkun.network.io.Message;
 import com.girlkun.server.Client;
 import com.girlkun.services.EffectSkillService;
 import com.girlkun.services.FriendAndEnemyService;
-import com.girlkun.services.InventoryServiceNew;
-import com.girlkun.services.ItemService;
 import com.girlkun.services.PetService;
 import com.girlkun.services.TaskService;
 import com.girlkun.services.func.ChangeMapService;
 import com.girlkun.services.func.ChonAiDay;
 import com.girlkun.services.func.CombineNew;
-//import com.girlkun.services.func.TaiXiu;
-//import com.girlkun.services.func.TopService;
+import com.girlkun.services.func.TopService;
 import com.girlkun.utils.Logger;
 import com.girlkun.utils.Util;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class Player {
-
-    public boolean muanhieu = false;
-    public long vangnhat = 0;
-    public long hngocnhat = 0;
-    public boolean resetdame = false;
-    public long lastTimeDame;
-    public double dametong = 0;
-    public byte countBDKB;
-    public boolean firstJoinBDKB;
-    public long lastimeJoinBDKB;
-    public int goldChallenge;
-    public boolean receivedWoodChest;
-    public List<String> textRuongGo = new ArrayList<>();
-
-    public long timeupdateplayer;
 
     public MySession session;
 
     public boolean beforeDispose;
-    public int soluongmuanhieu = 0;
-    public int idmuanhieu = -1;
-
-    public boolean autocso = false;
-    public boolean autoHP = false;
-    public boolean autoKI = false;
-    public boolean autoSD = false;
-    public boolean autoGiap = false;
-
-    public boolean autodau = false;
-
-    public boolean batco = false;
-    public boolean haveBeQuynh;
-    public int mapHoTong;
-    public long lastTimeHoTong;
-
-    public boolean titleitem;
-
-    public boolean titlett;
-    public boolean isTitleUse1;
-    public long lastTimeTitle1;
-    public boolean isTitleUse2;
-    public long lastTimeTitle2;
-    public boolean isTitleUse3;
-    public long lastTimeTitle3;
 
     public boolean isPet;
     public boolean isNewPet;
-    public boolean isTrieuhoipet;
-//    public boolean isNewPet1;
+    public boolean isNewPet1;
     public boolean isBoss;
     public int NguHanhSonPoint = 0;
     public IPVP pvp;
@@ -117,30 +64,25 @@ public class Player {
     public int mapIdBeforeLogout;
     public List<Zone> mapBlackBall;
     public List<Zone> mapMaBu;
-
+    public long limitgold = 0;
     public Zone zone;
     public Zone mapBeforeCapsule;
     public List<Zone> mapCapsule;
-    public List<Card> Cards = new ArrayList<>();
     public Pet pet;
     public NewPet newpet;
-    public Thu_TrieuHoi TrieuHoipet;
-    public NhiemvuChienthan chienthan;
-//    public NewPet newpet1;
+    public NewPet newpet1;
     public MobMe mobMe;
     public Location location;
     public SetClothes setClothes;
     public EffectSkill effectSkill;
     public MabuEgg mabuEgg;
-    public Timedua timedua;
+    public BillEgg billEgg;
     public TaskPlayer playerTask;
     public ItemTime itemTime;
-    public ItemTimeSieuCap itemTimesieucap;
     public Fusion fusion;
     public MagicTree magicTree;
     public IntrinsicPlayer playerIntrinsic;
     public Inventory inventory;
-    public Taixiu taixiu;
     public PlayerSkill playerSkill;
     public CombineNew combineNew;
     public IDMark iDMark;
@@ -151,9 +93,6 @@ public class Player {
     public RewardBlackBall rewardBlackBall;
     public EffectFlagBag effectFlagBag;
     public FightMabu fightMabu;
-
-    public SkillSpecial skillSpecial;
-    public BoMong achievement;
 
     public Clan clan;
     public ClanMember clanMember;
@@ -176,56 +115,26 @@ public class Player {
     public boolean justRevived;
     public long lastTimeRevived;
 
-    public boolean justRevived1;
-    public long lastTimeRevived1;
-
-    public long rankSieuHang;
-    public long numKillSieuHang;
-
-    public String TrieuHoiNamePlayer;
-    public int TrieuHoiCapBac = -1;
-    public String TenThuTrieuHoi;
-    public int TrieuHoiThucAn;
-    public long TrieuHoiDame;
-    public long TrieuHoiHP;
-    public long TrieuHoilastTimeThucan;
-    public int TrieuHoiLevel;
-    public long TrieuHoiExpThanThu;
-    public Player TrieuHoiPlayerAttack;
-    public double TrieuHoidamethanmeo;
-    public long Autothucan;
-    public boolean trangthai = false;
-
-    public long diemdanh;
-    public int vnd;
+    public int violate;
     public byte totalPlayerViolate;
     public long timeChangeZone;
     public long lastTimeUseOption;
-
-    public int bdkb_countPerDay;
-    public long bdkb_lastTimeJoin;
-    public boolean bdkb_isJoinBdkb;
 
     public short idNRNM = -1;
     public short idGo = -1;
     public long lastTimePickNRNM;
     public int goldNormar;
     public int goldVIP;
-    public int goldTai;
-    public int goldXiu;
     public long lastTimeWin;
     public boolean isWin;
+    public List<Card> Cards = new ArrayList<>();
     public short idAura = -1;
-    public String Hppl = "\n";
-    public String HpQuai = "\n";
-    public int levelWoodChest;
 
     public Player() {
         lastTimeUseOption = System.currentTimeMillis();
         location = new Location();
         nPoint = new NPoint(this);
         inventory = new Inventory();
-        taixiu = new Taixiu();
         playerSkill = new PlayerSkill(this);
         setClothes = new SetClothes(this);
         effectSkill = new EffectSkill(this);
@@ -241,13 +150,9 @@ public class Player {
         friends = new ArrayList<>();
         enemies = new ArrayList<>();
         itemTime = new ItemTime(this);
-        itemTimesieucap = new ItemTimeSieuCap(this);
         charms = new Charms();
         gift = new Gift(this);
         effectSkin = new EffectSkin(this);
-        skillSpecial = new SkillSpecial(this);
-        achievement = new BoMong(this);
-        chienthan = new NhiemvuChienthan();
     }
 
     //--------------------------------------------------------------------------
@@ -264,8 +169,8 @@ public class Player {
     }
 
     public void sendMessage(Message msg) {
-        if (this.session != null && msg != null) {
-            this.session.sendMessage(msg);
+        if (this.session != null) {
+            session.sendMessage(msg);
         }
     }
 
@@ -273,19 +178,8 @@ public class Player {
         return this.session;
     }
 
-    public void CreatePet(String NamePet) {
-        this.TenThuTrieuHoi = NamePet;
-        this.TrieuHoilastTimeThucan = System.currentTimeMillis();
-        this.TrieuHoiThucAn = 100;
-        this.TrieuHoiLevel = 0;
-        this.TrieuHoiExpThanThu = 0;
-        this.TrieuHoiCapBac = 0; //Util.nextInt(0, Util.nextInt(3, 10));
-        this.TrieuHoiDame = Util.GioiHannext(10000, 10000L + ((this.TrieuHoiCapBac + 1) * 10000L));
-        this.TrieuHoiHP = Util.GioiHannext(100000, 100000L + ((this.TrieuHoiCapBac + 1) * 50000L));
-    }
-
     public boolean isPl() {
-        return !isPet && !isBoss && !isNewPet && !isTrieuhoipet;// && !isNewPet1
+        return !isPet && !isBoss && !isNewPet && !isNewPet1;
     }
 
     public void update() {
@@ -299,7 +193,7 @@ public class Player {
                     if (fusion != null) {
                         fusion.update();
                     }
-                    if (effectSkill != null) {
+                    if (effectSkin != null) {
                         effectSkill.update();
                     }
                     if (mobMe != null) {
@@ -315,50 +209,22 @@ public class Player {
                         newpet.update();
                     }
 
-                    if (TrieuHoipet != null) {
-                        TrieuHoipet.update();
+                    if (newpet1 != null) {
+                        newpet1.update();
                     }
-//                    if (newpet1 != null) {
-//                        newpet1.update();
-//                    }
                     if (magicTree != null) {
                         magicTree.update();
                     }
                     if (itemTime != null) {
                         itemTime.update();
                     }
-                    if (itemTimesieucap != null) {
-                        itemTimesieucap.update();
-                    }
-                    if (this.lastTimeTitle1 != 0 && Util.canDoWithTime(this.lastTimeTitle1, 6000)) {
-                        lastTimeTitle1 = 0;
-                        isTitleUse1 = false;
-                    }
-                    if (this.lastTimeTitle2 != 0 && Util.canDoWithTime(this.lastTimeTitle2, 6000)) {
-                        lastTimeTitle2 = 0;
-                        isTitleUse2 = false;
-                    }
-
-                    if (this.lastTimeTitle3 != 0 && Util.canDoWithTime(this.lastTimeTitle3, 6000)) {
-                        lastTimeTitle3 = 0;
-                        isTitleUse3 = false;
-                    }
-                    GasService.gI().update(this);
-                    BanDoKhoBauService.gI().update(this);
-                    DoanhTraiService.gI().update(this);
                     BlackBallWar.gI().update(this);
                     MapMaBu.gI().update(this);
-                    TimeReset.gI().update(this); //time reset ngày
-                    if (!this.isBoss && this.iDMark != null && this.iDMark.isGoToGas() && Util.canDoWithTime(this.iDMark.getLastTimeGotoGas(), 6000)) {
-//                        ChangeMapService.gI().changeMapBySpaceShip(this, 149, -1, 163);
-                        ChangeMapService.gI().changeMapBySpaceShip(this, 149, -1, 163);
-                        this.iDMark.setGoToGas(false);
-                    }
-                    if (!this.isBoss && this.iDMark != null && this.iDMark.isGotoFuture() && Util.canDoWithTime(this.iDMark.getLastTimeGoToFuture(), 6000)) {
+                    if (!isBoss && this.iDMark.isGotoFuture() && Util.canDoWithTime(this.iDMark.getLastTimeGoToFuture(), 6000)) {
                         ChangeMapService.gI().changeMapBySpaceShip(this, 102, -1, Util.nextInt(60, 200));
                         this.iDMark.setGotoFuture(false);
                     }
-                    if (!this.isBoss && this.iDMark != null && this.iDMark.isGoToBDKB() && Util.canDoWithTime(this.iDMark.getLastTimeGoToBDKB(), 6000)) {
+                    if (this.iDMark.isGoToBDKB() && Util.canDoWithTime(this.iDMark.getLastTimeGoToBDKB(), 6000)) {
                         ChangeMapService.gI().changeMapBySpaceShip(this, 135, -1, 35);
                         this.iDMark.setGoToBDKB(false);
                     }
@@ -368,104 +234,43 @@ public class Player {
                             trap.doPlayer(this);
                         }
                     }
-                    if (this != null && this.isPl() && this.inventory != null && this.inventory.itemsBody != null && this.inventory.itemsBody.size() >= 8 && this.inventory.itemsBody.get(7) != null) {
+                    if (this.isPl() && this.inventory.itemsBody.get(7) != null) {
                         Item it = this.inventory.itemsBody.get(7);
-                        if (it != null && it.isNotNullItem() && this.newpet == null) {// && this.newpet1 == null
+                        if (it != null && it.isNotNullItem() && this.newpet == null && this.newpet1 == null) {
                             switch (it.template.id) {
                                 case 942:
                                     PetService.Pet2(this, 966, 967, 968);
-                                    Service.getInstance().point(this);
+                                    Service.gI().point(this);
                                     break;
                                 case 943:
                                     PetService.Pet2(this, 969, 970, 971);
-                                    Service.getInstance().point(this);
+                                    Service.gI().point(this);
                                     break;
                                 case 944:
                                     PetService.Pet2(this, 972, 973, 974);
-                                    Service.getInstance().point(this);
+                                    Service.gI().point(this);
                                     break;
                                 case 967:
                                     PetService.Pet2(this, 1050, 1051, 1052);
-                                    Service.getInstance().point(this);
+                                    Service.gI().point(this);
                                     break;
-//                                case 968:
-//                                    PetService.Pet2(this, 1183, 1184, 1185);
-//                                    Service.getInstance().point(this);
-//                                    break;
-                                case 1107:
+                                case 968:
                                     PetService.Pet2(this, 1183, 1184, 1185);
-                                    Service.getInstance().point(this);
-                                    break;
-                                case 1140:
-                                    PetService.Pet2(this, 1285, 1286, 1287);
-                                    Service.getInstance().point(this);
-                                    break;
-                                case 1133:
-                                    PetService.Pet2(this, 1261, 1262, 1263);
-                                    Service.getInstance().point(this);
-                                    break;
-                                case 1180:
-                                    PetService.Pet2(this, 1270, 1271, 1272);
-                                    Service.getInstance().point(this);
-                                    break;
-                                case 1181:
-                                    PetService.Pet2(this, 1273, 1274, 1275);
-                                    Service.getInstance().point(this);
-                                    break;
-                                case 1196:
-                                    PetService.Pet2(this, 1294, 1295, 1296);
-                                    Service.getInstance().point(this);
-                                    break;
-                                case 1197:
-                                    PetService.Pet2(this, 1297, 1298, 1299);
-                                    Service.getInstance().point(this);
-                                    break;
-                                case 1198:
-                                    PetService.Pet2(this, 1300, 1301, 1302);
-                                    Service.getInstance().point(this);
-                                    break;
-                                case 1221:
-                                    PetService.Pet2(this, 1333, 1334, 1335);
-                                    Service.getInstance().point(this);
-                                    break;
-                                case 1222:
-                                    PetService.Pet2(this, 1336, 1337, 1338);
-                                    Service.getInstance().point(this);
-                                    break;
-                                case 1223:
-                                    PetService.Pet2(this, 1339, 1340, 1341);
-                                    Service.getInstance().point(this);
-                                    break;
-                                case 1229:
-                                    PetService.Pet2(this, 1345, 1346, 1347);
-                                    Service.getInstance().point(this);
-                                    break;
-                                case 1230:
-                                    PetService.Pet2(this, 1348, 1349, 1350);
-                                    Service.getInstance().point(this);
+                                    Service.gI().point(this);
                                     break;
                             }
                         }
-                    } else if (this.isPl() && newpet != null && !this.inventory.itemsBody.get(7).isNotNullItem()) {// && newpet1 != null
+                    } else if (this.isPl() && newpet != null && newpet1 != null && !this.inventory.itemsBody.get(7).isNotNullItem()) {
                         newpet.dispose();
                         newpet = null;
-//                        newpet1.dispose();
-//                        newpet1 = null;
-                    }
-                    if (this.isPl() && this.TrieuHoipet == null && this.TrieuHoiCapBac >= 0
-                            && this.TrieuHoiCapBac <= 10) {
-                        PetService.Thu_TrieuHoi(this);
-                    } else if (this.isPl() && this.TrieuHoipet != null && this.TrieuHoiCapBac < 0
-                            && this.TrieuHoiCapBac > 10) {
-                        ChangeMapService.gI().exitMap(this.TrieuHoipet);
-                        TrieuHoipet.dispose();
-                        TrieuHoipet = null;
+                        newpet1.dispose();
+                        newpet1 = null;
                     }
                     if (this.isPl() && isWin && this.zone.map.mapId == 51 && Util.canDoWithTime(lastTimeWin, 2000)) {
                         ChangeMapService.gI().changeMapBySpaceShip(this, 52, 0, -1);
                         isWin = false;
                     }
-                    if (this.location != null && this.location.lastTimeplayerMove < System.currentTimeMillis() - 30 * 60 * 1000) {
+                    if (location.lastTimeplayerMove < System.currentTimeMillis() - 30 * 60 * 1000) {
                         Client.gI().kickSession(getSession());
                     }
                 } else {
@@ -473,54 +278,6 @@ public class Player {
                         Client.gI().kickSession(session);
                     }
                 }
-                if (Client.gI().getPlayer(this.name) != null) {
-                    this.achievement.plusCount(8);
-                }
-//                if((Client.gI().getPlayer(this.name) != null) && Util.canDoWithTime(this.timeupdateplayer, 900000)){
-//                    updatePlayer(this);
-//                    this.timeupdateplayer = System.currentTimeMillis();
-//                }
-                if (Util.canDoWithTime(this.lastTimeDame, 5000) && this.dametong != 0) {
-                    this.dametong = 0;
-                    this.resetdame = true;
-                }
-
-                //////////////////// HOÀN TRẢ KÝ GỬI SAU 2 NGÀY ////////////////////
-                Iterator<ItemKyGui> iterator1 = ShopKyGuiManager.gI().listItem.iterator();
-                int countit = 0;
-                while (iterator1.hasNext()) {
-                    ItemKyGui it = iterator1.next();
-                    if (it != null && it.isBuy == false && it.player_sell == this.id && this.session != null
-                            && it.thoigian <= System.currentTimeMillis() - 172800000) {
-                        countit++;
-                    }
-                }
-
-                Iterator<ItemKyGui> iterator = ShopKyGuiManager.gI().listItem.iterator();
-                while (iterator.hasNext()) {
-                    ItemKyGui it = iterator.next();
-                    if (it != null && it.isBuy == false && it.player_sell == this.id && this.session != null
-                            && it.thoigian <= System.currentTimeMillis() - 172800000) {
-
-                        if (InventoryServiceNew.gI().getCountEmptyBag(this) < countit) {
-                            Service.getInstance().sendThongBao(this, "Hành trang không đủ chỗ trống để hoàn trả vật phẩm kí gửi");
-                        } else {
-                            Item item = ItemService.gI().createNewItem(it.itemId);
-                            item.quantity = it.quantity;
-                            item.itemOptions.addAll(it.options);
-
-                            // Remove the current item using the iterator
-                            iterator.remove();
-
-                            InventoryServiceNew.gI().addItemBag(this, item);
-                            InventoryServiceNew.gI().sendItemBags(this);
-                            Service.getInstance().sendMoney(this);
-                            Service.getInstance().sendThongBao(this, "Vật phẩm kí đã quá 2 ngày. Vật phẩm đã được hoàn trả");
-                        }
-                    }
-                }
-                //////////////////////////////////////////////////////////////////////////////////////////
-
             } catch (Exception e) {
                 e.getStackTrace();
                 Logger.logException(Player.class, e, "Lỗi tại player: " + this.name);
@@ -538,65 +295,134 @@ public class Player {
      * {867, 878, 869}: ht c2 xayda
      */
     private static final short[][] idOutfitFusion = {
-        {380, 381, 382}, {383, 384, 385}, {391, 392, 393},// btc1
-        //        {1080, 1081, 1082}, {1086, 1087, 1088}, {1083, 1084, 1085}, // btc2
-        {1204, 1205, 1206}, {1207, 1208, 1209}, {1210, 1211, 1212}, //btc2
-        {1375, 1376, 1377}, {1372, 1373, 1374}, {1369, 1370, 1371}, //btc3
-        {1255, 1256, 1257}, {1249, 1250, 1251}, {1246, 1247, 1248} //btc4
+        {380, 381, 382}, //luong long
+        {383, 384, 385},// porata 
+        {391, 392, 393}, //hop the chung namec
+        {870, 871, 872},//trai dat c2
+        {873, 874, 875}, //namec c2
+        {867, 868, 869}, //xayda c2
+        {1143, 1144, 1145},
+        {1152, 1153, 1154},
+        {1149, 1150, 1151}
     };
 
-    public byte getAura() {
+    public byte getEffFront() {
         if (this.inventory.itemsBody.isEmpty() || this.inventory.itemsBody.size() < 10) {
             return -1;
         }
-        Item item = this.inventory.itemsBody.get(5);
-        if (!item.isNotNullItem()) {
+        int levelAo = 0;
+        Item.ItemOption optionLevelAo = null;
+        int levelQuan = 0;
+        Item.ItemOption optionLevelQuan = null;
+        int levelGang = 0;
+        Item.ItemOption optionLevelGang = null;
+        int levelGiay = 0;
+        Item.ItemOption optionLevelGiay = null;
+        int levelNhan = 0;
+        Item.ItemOption optionLevelNhan = null;
+        Item itemAo = this.inventory.itemsBody.get(0);
+        Item itemQuan = this.inventory.itemsBody.get(1);
+        Item itemGang = this.inventory.itemsBody.get(2);
+        Item itemGiay = this.inventory.itemsBody.get(3);
+        Item itemNhan = this.inventory.itemsBody.get(4);
+        for (Item.ItemOption io : itemAo.itemOptions) {
+            if (io.optionTemplate.id == 72) {
+                levelAo = io.param;
+                optionLevelAo = io;
+                break;
+            }
+        }
+        for (Item.ItemOption io : itemQuan.itemOptions) {
+            if (io.optionTemplate.id == 72) {
+                levelQuan = io.param;
+                optionLevelQuan = io;
+                break;
+            }
+        }
+        for (Item.ItemOption io : itemGang.itemOptions) {
+            if (io.optionTemplate.id == 72) {
+                levelGang = io.param;
+                optionLevelGang = io;
+                break;
+            }
+        }
+        for (Item.ItemOption io : itemGiay.itemOptions) {
+            if (io.optionTemplate.id == 72) {
+                levelGiay = io.param;
+                optionLevelGiay = io;
+                break;
+            }
+        }
+        for (Item.ItemOption io : itemNhan.itemOptions) {
+            if (io.optionTemplate.id == 72) {
+                levelNhan = io.param;
+                optionLevelNhan = io;
+                break;
+            }
+        }
+        if (optionLevelAo != null && optionLevelQuan != null && optionLevelGang != null && optionLevelGiay != null && optionLevelNhan != null
+                && levelAo >= 8 && levelQuan >= 8 && levelGang >= 8 && levelGiay >= 8 && levelNhan >= 8) {
+            return 8;
+        } else if (optionLevelAo != null && optionLevelQuan != null && optionLevelGang != null && optionLevelGiay != null && optionLevelNhan != null
+                && levelAo >= 7 && levelQuan >= 7 && levelGang >= 7 && levelGiay >= 7 && levelNhan >= 7) {
+            return 7;
+        } else if (optionLevelAo != null && optionLevelQuan != null && optionLevelGang != null && optionLevelGiay != null && optionLevelNhan != null
+                && levelAo >= 6 && levelQuan >= 6 && levelGang >= 6 && levelGiay >= 6 && levelNhan >= 6) {
+            return 6;
+        } else if (optionLevelAo != null && optionLevelQuan != null && optionLevelGang != null && optionLevelGiay != null && optionLevelNhan != null
+                && levelAo >= 5 && levelQuan >= 5 && levelGang >= 5 && levelGiay >= 5 && levelNhan >= 5) {
+            return 5;
+        } else if (optionLevelAo != null && optionLevelQuan != null && optionLevelGang != null && optionLevelGiay != null && optionLevelNhan != null
+                && levelAo >= 4 && levelQuan >= 4 && levelGang >= 4 && levelGiay >= 4 && levelNhan >= 4) {
+            return 4;
+        } else {
             return -1;
         }
-        switch (item.template.id) {
-            case 1204:
-                return 11;
-            case 1238:
-                return 11;
-            case 9500:
-                return 11;
-            case 9501:
-                return 11;
-            case 9502:
-                return 11;
-            default:
-                return -1;
-        }
-
     }
-
-    public byte getEffFront() {
-        return -1;
-    }
+// , {391, 392, 393} 391 laf đầu 392 là thân 393 là chân
+    private static final short[][] idFusion = {{380, 381, 382}, {383, 384, 385}, {391, 392, 393}}; // hợp thể bông tai thường
+    private static final short[][] idFusion2 = {{870, 871, 872}, {873, 874, 875}, {867, 868, 869}};//hợp thể bông tai cấp 2
+    private static final short[][] idFusion3 = {{1143, 1144, 1145}, {1152, 1153, 1154}, {1149, 1150, 1151}}; // hợp thể bông tai cấp 3 (thay id res vào cái ô td/nm/xd)
 
     public short getHead() {
         if (effectSkill != null && effectSkill.isMonkey) {
             return (short) ConstPlayer.HEADMONKEY[effectSkill.levelMonkey - 1];
         } else if (effectSkill != null && effectSkill.isSocola) {
             return 412;
-        } else if (effectSkill != null && effectSkill.isBinh) {
-            return 1321;
         } else if (fusion != null && fusion.typeFusion != ConstPlayer.NON_FUSION) {
             if (fusion.typeFusion == ConstPlayer.LUONG_LONG_NHAT_THE) {
-                return idOutfitFusion[this.gender == ConstPlayer.NAMEC ? 2 : 0][0];
+                return idFusion[this.gender == 1 ? 2 : 0][0];
             } else if (fusion.typeFusion == ConstPlayer.HOP_THE_PORATA) {
-                return idOutfitFusion[this.gender == ConstPlayer.NAMEC ? 2 : 1][0];
+                return idFusion[this.gender == 1 ? 2 : 1][0];
             } else if (fusion.typeFusion == ConstPlayer.HOP_THE_PORATA2) {
-                return idOutfitFusion[3 + this.gender][0];
-            } else if (fusion.typeFusion == ConstPlayer.HOP_THE_PORATA4) {
-                return idOutfitFusion[9 + this.gender][0];
+
+                switch (gender) {
+                    case 0:
+                        return idFusion2[0][0];
+                    case 1:
+                        return idFusion2[1][0];
+                    case 2:
+                        return idFusion2[2][0];
+
+                }
             } else if (fusion.typeFusion == ConstPlayer.HOP_THE_PORATA3) {
-                return idOutfitFusion[6 + this.gender][0];
+                switch (gender) {
+                    case 0:
+                        return idFusion3[0][0];
+                    case 1:
+                        return idFusion3[1][0];
+                    case 2:
+                        return idFusion3[2][0];
+
+                    default:
+                        break;
+
+                }
             }
         } else if (inventory != null && inventory.itemsBody.get(5).isNotNullItem()) {
-            int headd = inventory.itemsBody.get(5).template.head;
-            if (headd != -1) {
-                return (short) headd;
+            int head = inventory.itemsBody.get(5).template.head;
+            if (head != -1) {
+                return (short) head;
             }
         }
         return this.head;
@@ -607,19 +433,35 @@ public class Player {
             return 193;
         } else if (effectSkill != null && effectSkill.isSocola) {
             return 413;
-        } else if (effectSkill != null && effectSkill.isBinh) {
-            return 1322;
         } else if (fusion != null && fusion.typeFusion != ConstPlayer.NON_FUSION) {
             if (fusion.typeFusion == ConstPlayer.LUONG_LONG_NHAT_THE) {
-                return idOutfitFusion[this.gender == ConstPlayer.NAMEC ? 2 : 0][1];
+                return idFusion[this.gender == 1 ? 2 : 0][1];
             } else if (fusion.typeFusion == ConstPlayer.HOP_THE_PORATA) {
-                return idOutfitFusion[this.gender == ConstPlayer.NAMEC ? 2 : 1][1];
+                return idFusion[this.gender == 1 ? 2 : 1][1];
             } else if (fusion.typeFusion == ConstPlayer.HOP_THE_PORATA2) {
-                return idOutfitFusion[3 + this.gender][1];
-            } else if (fusion.typeFusion == ConstPlayer.HOP_THE_PORATA4) {
-                return idOutfitFusion[9 + this.gender][1];
+
+                switch (gender) {
+                    case 0:
+                        return idFusion2[0][1];
+                    case 1:
+                        return idFusion2[1][1];
+                    case 2:
+                        return idFusion2[2][1];
+
+                }
             } else if (fusion.typeFusion == ConstPlayer.HOP_THE_PORATA3) {
-                return idOutfitFusion[6 + this.gender][1];
+                switch (gender) {
+                    case 0:
+                        return idFusion3[0][1];
+                    case 1:
+                        return idFusion3[1][1];
+                    case 2:
+                        return idFusion3[2][1];
+
+                    default:
+                        break;
+
+                }
             }
         } else if (inventory != null && inventory.itemsBody.get(5).isNotNullItem()) {
             int body = inventory.itemsBody.get(5).template.body;
@@ -638,20 +480,37 @@ public class Player {
             return 194;
         } else if (effectSkill != null && effectSkill.isSocola) {
             return 414;
-        } else if (effectSkill != null && effectSkill.isBinh) {
-            return 1323;
         } else if (fusion != null && fusion.typeFusion != ConstPlayer.NON_FUSION) {
             if (fusion.typeFusion == ConstPlayer.LUONG_LONG_NHAT_THE) {
-                return idOutfitFusion[this.gender == ConstPlayer.NAMEC ? 2 : 0][2];
+                return idFusion[this.gender == 1 ? 2 : 0][2];
             } else if (fusion.typeFusion == ConstPlayer.HOP_THE_PORATA) {
-                return idOutfitFusion[this.gender == ConstPlayer.NAMEC ? 2 : 1][2];
+                return idFusion[this.gender == 1 ? 2 : 1][2];
             } else if (fusion.typeFusion == ConstPlayer.HOP_THE_PORATA2) {
-                return idOutfitFusion[3 + this.gender][2];
-            } else if (fusion.typeFusion == ConstPlayer.HOP_THE_PORATA4) {
-                return idOutfitFusion[9 + this.gender][2];
+
+                switch (gender) {
+                    case 0:
+                        return idFusion2[0][2];
+                    case 1:
+                        return idFusion2[1][2];
+                    case 2:
+                        return idFusion2[2][2];
+
+                }
             } else if (fusion.typeFusion == ConstPlayer.HOP_THE_PORATA3) {
-                return idOutfitFusion[6 + this.gender][2];
+                switch (gender) {
+                    case 0:
+                        return idFusion3[0][2];
+                    case 1:
+                        return idFusion3[1][2];
+                    case 2:
+                        return idFusion3[2][2];
+
+                    default:
+                        break;
+
+                }
             }
+
         } else if (inventory != null && inventory.itemsBody.get(5).isNotNullItem()) {
             int leg = inventory.itemsBody.get(5).template.leg;
             if (leg != -1) {
@@ -664,20 +523,37 @@ public class Player {
         return (short) (gender == 1 ? 60 : 58);
     }
 
+    public byte getAura() {
+        if (this.inventory.itemsBody.isEmpty() || this.inventory.itemsBody.size() < 10) {
+            return -1;
+        }
+        Item item = this.inventory.itemsBody.get(5);
+        if (!item.isNotNullItem()) {
+            return -1;
+        }
+        if (item.template.id == 1121) {
+            return 10;
+        } else if (item.template.id == 1128) {
+            return 1;
+        } else if (item.template.id == 1125) {
+            return 11;
+        } else if (item.template.id == 2092) {
+            return 11;
+        } else {
+            return -1;
+        }
+
+    }
+
     public short getFlagBag() {
         if (this.iDMark.isHoldBlackBall()) {
             return 31;
         } else if (this.idNRNM >= 353 && this.idNRNM <= 359) {
             return 30;
         }
-        if (this.inventory.itemsBody.size() == 12) {
+        if (this.inventory.itemsBody.size() == 11) {
             if (this.inventory.itemsBody.get(8).isNotNullItem()) {
                 return this.inventory.itemsBody.get(8).template.part;
-            }
-        }
-        if (this.isPet) {
-            if (this.inventory.itemsBody.get(7).isNotNullItem()) {
-                return this.inventory.itemsBody.get(7).template.part;
             }
         }
         if (TaskService.gI().getIdTask(this) == ConstTask.TASK_3_2) {
@@ -711,180 +587,23 @@ public class Player {
             }
         }
 
-//        for (Item item : inventory.itemsBag) {
-//            if (item.isNotNullItem()) {
-//                if (item.template.type == 24) {
-//                    if (item.template.gender == 3 || item.template.gender == this.gender) {
-//                        return item.template.id;
-//                    } else {
-//                        return -1;
-//                    }
-//                }
-//                if (item.template.type == 23) {
-//                    if (item.template.id < 500) {
-//                        return item.template.id;
-//                    } else {
-//                        return (short) DataGame.MAP_MOUNT_NUM.get(String.valueOf(item.template.id));
-//                    }
-//                }
-//            }
-//        }
-//        return -1;
-    }
-
-    public String tenskill9(int skill) {
-        switch (skill) {
-            case 2:
-                return "Cadic Liên hoàn chưởng";
-            case 1:
-                return "Ma Phong Ba";
-            case 0:
-                return "Super Kamejoko";
-            default:
-                return "";
-        }
-    }
-
-    public String nhiemvuchienthan(int nhiemvu) {
-        switch (nhiemvu) {
-            case 10:
-                this.chienthan.maxcount = 100;
-                return "Giết 100 Boss Thần Zeno";
-            case 9:
-                this.chienthan.maxcount = 10;
-                return "Giết 10 Boss Đôremon";
-            case 8:
-                this.chienthan.maxcount = 10;
-                return "Đi Bản đồ kho báu 10 lần";
-            case 7:
-                this.chienthan.maxcount = 10;
-                return "Đi map Khí Gas 10 lần";
-            case 6:
-                this.chienthan.maxcount = 5000;
-                return "Chưởng Chí mạng 5000 lần";
-            case 5:
-                this.chienthan.maxcount = 5000;
-                return "Hạ 5.000 Quái bay";
-            case 4:
-                this.chienthan.maxcount = 2000;
-                return "Nhặt 2000 Capsule Kì bí";
-            case 3:
-                this.chienthan.maxcount = 10;
-                return "Hộ tống Thành công Bunma 10 lần";
-            case 2:
-                this.chienthan.maxcount = 10;
-                return "Tìm được 10 Món đồ Thần linh bên Cold";
-            case 1:
-                this.chienthan.maxcount = 2000;
-                return "Giết 2.000 Sên 8";
-            default:
-                return "";
-        }
-    }
-
-    public String NameThanthu(int CapBac) {
-        switch (CapBac) {
-            case 10:
-                return "Đế Tiên";
-            case 9:
-                return "Vực Chủ Cảnh";
-            case 8:
-                return "Độ Kiếp Kỳ";
-            case 7:
-                return "Đại Thừa Kỳ";
-            case 6:
-                return "Hợp Thể Kỳ";
-            case 5:
-                return "Luyện Hư";
-            case 4:
-                return "Hóa Thần";
-            case 3:
-                return "Nguyên Anh";
-            case 2:
-                return "Kim Đan";
-            case 1:
-                return "Trúc Cơ";
-            case 0:
-                return "Luyện Khí";
-            default:
-                return "Phế Vật";
-        }
-    }
-
-    public String DaDotpha(int CapBac) {
-        switch (CapBac) {
-            case 9:
-                return "Đế Vương Thạch";
-            case 8:
-                return "Hỏa Hồn Thạch";
-            case 7:
-                return "Thiên Mệnh Thạch";
-            case 6:
-                return "Huyết Tinh Thạch";
-            case 5:
-                return "Linh Vân Thạch";
-            case 4:
-                return "Mịch Lâm Thạch";
-            default:
-                return "Thiên Nguyệt thạch";
-        }
-    }
-
-    public String TrieuHoiKiNang(int CapBac) {
-        switch (CapBac) {
-            case 10:
-                return "Tìm " + ((TrieuHoiLevel + 1) * 20) + " Hồng ngọc cho Chủ nhân\n"
-                        + "Tăng " + (TrieuHoiLevel + 1) + "% HP, KI, Giáp, SD, SD chí mạng cho Chủ nhân\n";
-            case 9:
-                return "Tìm " + ((TrieuHoiLevel + 1) * 20) + " Hồng ngọc cho Chủ nhân\n"
-                        + "Tăng " + ((TrieuHoiLevel + 1) / 2) + "% HP, KI, Giáp, SD, SD chí mạng cho Chủ nhân";
-            case 8:
-                return "Tìm " + ((TrieuHoiLevel + 1) * 10) + " Hồng ngọc cho Chủ nhân\n"
-                        + "Tăng " + ((TrieuHoiLevel + 1) / 5) + "% HP, KI, Giáp, SD cho Chủ nhân";
-            case 7:
-                return "Tăng " + ((TrieuHoiLevel + 1) / 5) + "% HP, KI, Giáp, SD cho Chủ nhân";
-            case 6:
-                return "Tăng " + ((TrieuHoiLevel + 1) / 3) + "% SD Chí mạng cho Chủ nhân";
-            case 5:
-                return "Tăng " + ((TrieuHoiLevel + 1) / 5) + "% SD cho Chủ nhân";
-            case 4:
-                return "Tăng " + ((TrieuHoiLevel + 1) * 30) + " HP, KI, SD, Giáp cho Chủ nhân";
-            case 3:
-                return "Tăng " + ((TrieuHoiLevel + 1) * 20) + " HP, KI\n" + ((TrieuHoiLevel + 1) * 10) + " SD cho Chủ nhân";
-            case 2:
-                return "Tăng " + ((TrieuHoiLevel + 1) * 10) + " Sức đánh cho Chủ nhân";
-            case 1:
-                return "Tăng " + ((TrieuHoiLevel + 1) * 20) + " KI cho Chủ nhân";
-            case 0:
-                return "Tăng " + ((TrieuHoiLevel + 1) * 20) + " HP cho Chủ nhân";
-            default:
-                return "Phế vật mà làm được gì !!!";
-        }
     }
 
     //--------------------------------------------------------------------------
-    public double injured(Player plAtt, double damage, boolean piercing, boolean isMobAttack) {
+    public int injured(Player plAtt, int damage, boolean piercing, boolean isMobAttack) {
         if (!this.isDie()) {
-            int TileChinhxac = 0;
             if (plAtt != null) {
-                TileChinhxac = plAtt.nPoint.tlchinhxac;
                 switch (plAtt.playerSkill.skillSelect.template.id) {
                     case Skill.KAMEJOKO:
                     case Skill.MASENKO:
                     case Skill.ANTOMIC:
-                    case Skill.DRAGON:
-                    case Skill.DEMON:
-                    case Skill.GALICK:
-                    case Skill.KAIOKEN:
-                    case Skill.LIEN_HOAN:
-                    case Skill.DE_TRUNG:
                         if (this.nPoint.voHieuChuong > 0) {
-                            com.girlkun.services.PlayerService.gI().hoiPhuc(this, 0, Util.DoubleGioihan(damage * this.nPoint.voHieuChuong / 100));
+                            com.girlkun.services.PlayerService.gI().hoiPhuc(this, 0, damage * this.nPoint.voHieuChuong / 100);
                             return 0;
                         }
                 }
             }
-            if (!piercing && Util.isTrue(this.nPoint.tlNeDon - TileChinhxac, 100)) {
+            if (!piercing && Util.isTrue(this.nPoint.tlNeDon, 100)) {
                 return 0;
             }
             damage = this.nPoint.subDameInjureWithDeff(damage);
@@ -895,12 +614,12 @@ public class Player {
                 damage = 1;
             }
             if (isMobAttack && this.charms.tdBatTu > System.currentTimeMillis() && damage >= this.nPoint.hp) {
-                damage = Util.DoubleGioihan(this.nPoint.hp - 1);
+                damage = this.nPoint.hp - 1;
             }
 
             this.nPoint.subHP(damage);
             if (isDie()) {
-                if (plAtt != null && this.zone.map.mapId == 129) {
+                if (this.zone.map.mapId == 112) {
                     plAtt.pointPvp++;
                 }
                 setDie(plAtt);
@@ -915,7 +634,7 @@ public class Player {
         //xóa phù
         if (this.effectSkin.xHPKI > 1) {
             this.effectSkin.xHPKI = 1;
-            Service.getInstance().point(this);
+            Service.gI().point(this);
         }
         //xóa tụ skill đặc biệt
         this.playerSkill.prepareQCKK = false;
@@ -930,10 +649,9 @@ public class Player {
         if (this.mobMe != null) {
             this.mobMe.mobMeDie();
         }
-        Service.getInstance().charDie(this);
+        Service.gI().charDie(this);
         //add kẻ thù
-        if (!this.isPet && !this.isNewPet && !this.isTrieuhoipet && !this.isBoss
-                && plAtt != null && !plAtt.isPet && !plAtt.isNewPet && !plAtt.isTrieuhoipet && !plAtt.isBoss) {// && !this.isNewPet1 && !plAtt.isNewPet1
+        if (!this.isPet && !this.isNewPet && !this.isNewPet1 && !this.isBoss && plAtt != null && !plAtt.isPet && !plAtt.isNewPet && !plAtt.isNewPet1 && !plAtt.isBoss) {
             if (!plAtt.itemTime.isUseAnDanh) {
                 FriendAndEnemyService.gI().addEnemy(this, plAtt);
             }
@@ -960,23 +678,9 @@ public class Player {
         return this.session.isAdmin;
     }
 
-    public boolean check99ThucAnHuyDiet() {
-        for (Item item : this.inventory.itemsBag) {
-            if (item != null && item.template != null && item.template.id >= 663 && item.template.id <= 667 && item.quantity >= 99) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public void setJustRevivaled() {
-        if (this.isPet) {
-            this.justRevived = true;
-            this.lastTimeRevived = System.currentTimeMillis();
-        } else if (this.isTrieuhoipet) {
-            this.justRevived1 = true;
-            this.lastTimeRevived1 = System.currentTimeMillis();
-        }
+        this.justRevived = true;
+        this.lastTimeRevived = System.currentTimeMillis();
     }
 
     public void preparedToDispose() {
@@ -992,15 +696,10 @@ public class Player {
             newpet.dispose();
             newpet = null;
         }
-
-        if (TrieuHoipet != null) {
-            TrieuHoipet.dispose();
-            TrieuHoipet = null;
+        if (newpet1 != null) {
+            newpet1.dispose();
+            newpet1 = null;
         }
-//        if (newpet1 != null) {
-//            newpet1.dispose();
-//            newpet1 = null;
-//        }
         if (mapBlackBall != null) {
             mapBlackBall.clear();
             mapBlackBall = null;
@@ -1010,6 +709,10 @@ public class Player {
         if (mapMaBu != null) {
             mapMaBu.clear();
             mapMaBu = null;
+        }
+        if (billEgg != null) {
+            billEgg.dispose();
+            billEgg = null;
         }
         zone = null;
         mapBeforeCapsule = null;
@@ -1034,22 +737,6 @@ public class Player {
             mabuEgg.dispose();
             mabuEgg = null;
         }
-        if (timedua != null) {
-            timedua.dispose();
-            timedua = null;
-        }
-        if (taixiu != null) {
-            taixiu.dispose();
-            taixiu = null;
-        }
-        if (chienthan != null) {
-            chienthan.dispose();
-            chienthan = null;
-        }
-        if (skillSpecial != null) {
-            skillSpecial.dispose();
-            skillSpecial = null;
-        }
         if (playerTask != null) {
             playerTask.dispose();
             playerTask = null;
@@ -1057,10 +744,6 @@ public class Player {
         if (itemTime != null) {
             itemTime.dispose();
             itemTime = null;
-        }
-        if (itemTimesieucap != null) {
-            itemTimesieucap.dispose();
-            itemTimesieucap = null;
         }
         if (fusion != null) {
             fusion.dispose();
@@ -1142,4 +825,3 @@ public class Player {
         return "0";
     }
 }
-//nplayer

@@ -8,7 +8,6 @@ import com.girlkun.services.TaskService;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class NpcManager {
 
     public static Npc getByIdAndMap(int id, int mapId) {
@@ -33,13 +32,11 @@ public class NpcManager {
         List<Npc> list = new ArrayList<>();
         if (player.zone != null) {
             for (Npc npc : player.zone.map.npcs) {
-                if (npc.tempId == ConstNpc.QUA_TRUNG && player.mabuEgg == null) {
+                if (npc.tempId == ConstNpc.QUA_TRUNG && player.mabuEgg == null && player.zone.map.mapId == (21 + player.gender)) {
                     continue;
-                }else if (npc.tempId == ConstNpc.DUA_HAU && player.timedua == null) {
+                } else if (npc.tempId == ConstNpc.QUA_TRUNG && player.billEgg == null && player.zone.map.mapId == 154) {
                     continue;
-                } else if(npc.tempId == ConstNpc.CALICK && TaskService.gI().getIdTask(player) < ConstTask.TASK_20_0){
-                    continue;
-                } else if(npc.tempId == ConstNpc.TRUNG_THU && Manager.SUKIEN != 1){
+                } else if (npc.tempId == ConstNpc.CALICK && TaskService.gI().getIdTask(player) < ConstTask.TASK_20_0) {
                     continue;
                 }
                 list.add(npc);

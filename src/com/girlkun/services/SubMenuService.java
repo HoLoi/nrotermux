@@ -43,7 +43,7 @@ public class SubMenuService {
                 }
                 break;
         }
-        Service.getInstance().hideWaitDialog(player);
+        Service.gI().hideWaitDialog(player);
     }
 
     public void showMenuForAdmin(Player player) {
@@ -53,7 +53,7 @@ public class SubMenuService {
     public void showSubMenu(Player player, SubMenu... subMenus) {
         Message msg;
         try {
-            msg = Service.getInstance().messageSubCommand((byte) 63);
+            msg = Service.gI().messageSubCommand((byte) 63);
             msg.writer().writeByte(subMenus.length);
             for (SubMenu subMenu : subMenus) {
                 msg.writer().writeUTF(subMenu.caption1);

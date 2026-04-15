@@ -7,7 +7,7 @@ import com.girlkun.utils.Util;
 
 /**
  *
- * @Stole By Hoàng Việt
+ * @Stole By Arriety
  */
 public class NewPet extends Player{
     
@@ -19,7 +19,7 @@ public class NewPet extends Player{
     public NewPet(Player master , short h,short b,short l) {
         this.master = master;
         this.isNewPet = true;
-//         this.isNewPet1 = true;
+         this.isNewPet1 = true;
         this.id = idb;
         idb--;
         this.head = h;
@@ -43,7 +43,7 @@ public class NewPet extends Player{
     }
     
     public void joinMapMaster() {
-        if(master == null || this == null || this.zone == null){
+        if(master == null){
             return;
         }
         this.location.x = master.location.x + Util.nextInt(-10, 10);
@@ -52,7 +52,6 @@ public class NewPet extends Player{
         this.zone.load_Me_To_Another(this);
     }
     
-    public long LasttimeHspet;
     private long lastTimeMoveIdle;
     private int timeMoveIdle;
     public boolean idle;
@@ -71,12 +70,8 @@ public class NewPet extends Player{
     public void update() {
         super.update();
         if (this.isDie()) {
-                if (System.currentTimeMillis() - LasttimeHspet > 10000) {
                 Service.gI().hsChar(this, nPoint.hpMax, nPoint.mpMax);
-            } else {
-                return;
             }
-        }
         if (master != null && (this.zone == null || this.zone != master.zone)) {
             joinMapMaster();
         }

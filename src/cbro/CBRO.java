@@ -7,7 +7,7 @@ package cbro;
 
 /**
  *
- * @Stole By Hoàng Việt
+ * @Stole By Arriety
  */
 public class CBRO {
 

@@ -9,7 +9,6 @@ import lombok.Data;
 @Data
 public class IDMark {
 
-    public int idItemUpTop;
     private int typeChangeMap; //capsule, ngọc rồng đen...
     private int indexMenu; //menu npc
     private int typeInput; //input
@@ -22,8 +21,7 @@ public class IDMark {
 
     private Shop shopOpen; //shop người chơi đang mở
     private String tagNameShop; //thẻ tên shop đang mở
-    private boolean goToGas;
-    private long lastTimeGotoGas;
+
     /**
      * loại tàu vận chuyển dùng ;0 - Không dùng ;1 - Tàu vũ trụ ;2 - Dịch chuyển
      * tức thời ;3 - Tàu tenis
@@ -33,6 +31,7 @@ public class IDMark {
     private long lastTimeBan;
     private boolean isBan;
 
+    private boolean isActive;
     //giao dịch
     private int playerTradeId = -1;
     private Player playerTrade;

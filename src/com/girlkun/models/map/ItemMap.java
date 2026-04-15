@@ -26,8 +26,6 @@ public class ItemMap {
 
     public boolean isBlackBall;
     public boolean isNamecBall;
-    public boolean isVetinh;
-    public boolean isDoanhTraiBall;
 
     public ItemMap(Zone zone, int tempId, int quantity, int x, int y, long playerId) {
         this.zone = zone;
@@ -44,7 +42,6 @@ public class ItemMap {
         this.options = new ArrayList<>();
         this.isBlackBall = ItemMapService.gI().isBlackBall(this.itemTemplate.id);
         this.isNamecBall = ItemMapService.gI().isNamecBall(this.itemTemplate.id);
-        this.isVetinh = ItemMapService.gI().isVetinh(this.itemTemplate.id);
         this.lastTimeMoveToPlayer = System.currentTimeMillis();
         this.zone.addItem(this);
     }
@@ -64,7 +61,6 @@ public class ItemMap {
         this.options = new ArrayList<>();
         this.isBlackBall = ItemMapService.gI().isBlackBall(this.itemTemplate.id);
         this.isNamecBall = ItemMapService.gI().isNamecBall(this.itemTemplate.id);
-        this.isVetinh = ItemMapService.gI().isVetinh(this.itemTemplate.id);
         this.lastTimeMoveToPlayer = System.currentTimeMillis();
         this.zone.addItem(this);
     }
@@ -80,7 +76,6 @@ public class ItemMap {
         this.options = itemMap.options;
         this.isBlackBall = itemMap.isBlackBall;
         this.isNamecBall = itemMap.isNamecBall;
-        this.isVetinh = itemMap.isVetinh;
         this.lastTimeMoveToPlayer = itemMap.lastTimeMoveToPlayer;
         this.createTime = System.currentTimeMillis();
         this.zone.addItem(this);
@@ -102,21 +97,10 @@ public class ItemMap {
             return;
         }
 
-        if (Util.canDoWithTime(createTime, 1800000) && this.isVetinh && !this.isNamecBall) {
+        if (Util.canDoWithTime(createTime, 20000)&& !this.isNamecBall) {
             if (this.zone.map.mapId != 21 && this.zone.map.mapId != 22
                     && this.zone.map.mapId != 23 && this.itemTemplate.id != 78) {
                 ItemMapService.gI().removeItemMapAndSendClient(this);
-            }
-        }
-
-        if (Util.canDoWithTime(createTime, 40000) && !this.isNamecBall && !this.isVetinh) {
-            if (this.isDoanhTraiBall && Util.canDoWithTime(createTime, 300_000)) {
-                ItemMapService.gI().removeItemMapAndSendClient(this);
-            } else {
-                if (this.zone.map.mapId != 21 && this.zone.map.mapId != 22
-                        && this.zone.map.mapId != 23 && this.itemTemplate.id != 78) {
-                    ItemMapService.gI().removeItemMapAndSendClient(this);
-                }
             }
         }
         if (Util.canDoWithTime(createTime, 15000)) {
@@ -129,7 +113,7 @@ public class ItemMap {
 
     private void reAppearItem() {
         ItemMapService.gI().sendItemMapDisappear(this);
-        Service.getInstance().dropItemMap(this.zone, this);
+        Service.gI().dropItemMap(this.zone, this);
     }
 
     public void dispose() {

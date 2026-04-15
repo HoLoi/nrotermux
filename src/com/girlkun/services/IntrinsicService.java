@@ -81,25 +81,25 @@ public class IntrinsicService {
     
     public void sattd(Player player) {
         NpcService.gI().createMenuConMeo(player, ConstNpc.menutd, -1,
-                                "chọn lẹ đi để tau đi chơi với ny", "Set\nKaioken", "Set\nGenki", "Set\nKamejoko", "Từ chối");
+                                "chọn lẹ đi để tau đi chơi với ny", "Set\nTaiyoken", "Set\nGenki", "Set\nkamejoko", "Từ chối");
                     
             }
     
     public void satnm(Player player) {
         NpcService.gI().createMenuConMeo(player, ConstNpc.menunm, -1,
-                                "chọn lẹ đi để tau đi chơi với ny", "Set\nGod KI", "Set\nLiên hoàn", "Set\nTrứng", "Từ chối");
+                                "chọn lẹ đi để tau đi chơi với ny", "Set\ngod ki", "Set\ngod dame", "Set\nsummon", "Từ chối");
                     
             }
     
     public void setxd(Player player) {
         NpcService.gI().createMenuConMeo(player, ConstNpc.menuxd, -1,
-                                "chọn lẹ đi để tau đi chơi với ny", "Set\ngod Galick", "Set\nMonkey", "Set\nGod HP", "Từ chối");
+                                "chọn lẹ đi để tau đi chơi với ny", "Set\ngod galick", "Set\nmonkey", "Set\ngod hp", "Từ chối");
                     
             }
 
     public void showConfirmOpen(Player player) {
         NpcService.gI().createMenuConMeo(player, ConstNpc.CONFIRM_OPEN_INTRINSIC, -1, "Bạn muốn đổi Nội Tại khác\nvới giá là "
-                + COST_OPEN[player.playerIntrinsic.countOpen > 7 ? 7:player.playerIntrinsic.countOpen] + " Tr vàng ?", "Mở\nNội Tại", "Từ chối");
+                + COST_OPEN[player.playerIntrinsic.countOpen] + " Tr vàng ?", "Mở\nNội Tại", "Từ chối");
     }
 
     public void showConfirmOpenVip(Player player) {
@@ -112,24 +112,24 @@ public class IntrinsicService {
         player.playerIntrinsic.intrinsic = new Intrinsic(listIntrinsic.get(Util.nextInt(1, listIntrinsic.size() - 1)));
         player.playerIntrinsic.intrinsic.param1 = (short) Util.nextInt(player.playerIntrinsic.intrinsic.paramFrom1, player.playerIntrinsic.intrinsic.paramTo1);
         player.playerIntrinsic.intrinsic.param2 = (short) Util.nextInt(player.playerIntrinsic.intrinsic.paramFrom2, player.playerIntrinsic.intrinsic.paramTo2);
-        Service.getInstance().sendThongBao(player, "Bạn nhận được Nội tại:\n" + player.playerIntrinsic.intrinsic.getName().substring(0, player.playerIntrinsic.intrinsic.getName().indexOf(" [")));
+        Service.gI().sendThongBao(player, "Bạn nhận được Nội tại:\n" + player.playerIntrinsic.intrinsic.getName().substring(0, player.playerIntrinsic.intrinsic.getName().indexOf(" [")));
         sendInfoIntrinsic(player);
     }
 
     public void open(Player player) {
         if (player.nPoint.power >= 10000000000L) {
-            int goldRequire = COST_OPEN[player.playerIntrinsic.countOpen > 7 ? 7:player.playerIntrinsic.countOpen] * 1000000;
+            int goldRequire = COST_OPEN[player.playerIntrinsic.countOpen] * 1000000;
             if (player.inventory.gold >= goldRequire) {
                 player.inventory.gold -= goldRequire;
                 PlayerService.gI().sendInfoHpMpMoney(player);
                 changeIntrinsic(player);
                 player.playerIntrinsic.countOpen++;
             } else {
-                Service.getInstance().sendThongBao(player, "Bạn không đủ vàng, còn thiếu "
+                Service.gI().sendThongBao(player, "Bạn không đủ vàng, còn thiếu "
                         + Util.numberToMoney(goldRequire - player.inventory.gold) + " vàng nữa");
             }
         } else {
-            Service.getInstance().sendThongBao(player, "Yêu cầu sức mạnh tối thiểu 10 tỷ");
+            Service.gI().sendThongBao(player, "Yêu cầu sức mạnh tối thiểu 10 tỷ");
         }
     }
 
@@ -142,11 +142,11 @@ public class IntrinsicService {
                 changeIntrinsic(player);
                 player.playerIntrinsic.countOpen = 0;
             } else {
-                Service.getInstance().sendThongBao(player, "Bạn không có đủ ngọc, còn thiếu "
+                Service.gI().sendThongBao(player, "Bạn không có đủ ngọc, còn thiếu "
                         + (gemRequire - player.inventory.gem) + " ngọc nữa");
             }
         } else {
-            Service.getInstance().sendThongBao(player, "Yêu cầu sức mạnh tối thiểu 10 tỷ");
+            Service.gI().sendThongBao(player, "Yêu cầu sức mạnh tối thiểu 10 tỷ");
         }
     }
 

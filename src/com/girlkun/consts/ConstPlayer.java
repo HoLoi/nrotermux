@@ -2,7 +2,7 @@ package com.girlkun.consts;
 
 /**
  *
- * @Stole By Hoàng Việt
+ * @Stole By Arriety
  *
  */
 public class ConstPlayer {
@@ -21,7 +21,8 @@ public class ConstPlayer {
     public static final byte NON_FUSION = 0;
     public static final byte LUONG_LONG_NHAT_THE = 4;
     public static final byte HOP_THE_PORATA = 6;
-    public static byte HOP_THE_PORATA2 = 8;
-    public static byte HOP_THE_PORATA3 = 10;
-    public static byte HOP_THE_PORATA4 = 12;
+    public static final byte HOP_THE_PORATA2 = 7;
+    public static final byte HOP_THE_PORATA3 = 7;
+    public static byte NAMEC1;
+  
 }

@@ -1,5 +1,6 @@
 package com.girlkun.consts;
 
+
 public class ConstNpc {
 
     public static final String CALICK_KE_CHUYEN = "20 năm trước bọn Android sát thủ đã đánh bại nhóm bảo vệ trái đất của Sôngoku và Cađíc, Pôcôlô ...\n"
@@ -15,7 +16,7 @@ public class ConstNpc {
             + "Khi nào chú cần sự giúp đỡ của cháu hãy đến đây nhé";
 
     public static final String HUONG_DAN_DOANH_TRAI = "1) Trại độc nhãn là nơi các ngươi không nên vào vì những tướng tá rất mạnh. Hahaha\n"
-            + "2) Trong trại độc nhãn, mỗi vị tướng đều giữ ngọc rồng từ 1 sao đến 2 sao, tùy lúc\n"
+            + "2) Trong trại độc nhãn, mỗi vị tướng đều giữ ngọc rồng từ 4 sao đến 6 sao, tùy lúc\n"
             + "3) Nếu ngươi thích chết thì cứ việc vào. Nhưng ta chỉ cho vào mỗi ngày một lần thôi, để ngươi khỏi phải chết nhiều, hahaha.\n"
             + "4) Các vị tướng trong trại rất mạnh nhé, các ngươi không đơn giản có thể đánh bại họ bằng cách bình thường như đánh quái được đâu\n"
             + "5) Muốn vào, ngươi phải đi cùng một người đồng đội cùng bang (phải đứng gần ngươi). Nhưng ta khuyên là nên đi 3-4 người cùng.\n"
@@ -32,13 +33,17 @@ public class ConstNpc {
             + "Cố gắng tồn tại và chiến đấu đến Boss cuối cùng\n"
             + "Càng vào sâu trong map sẽ có những vật phẩm đặc biệt";
     public static final String HUONG_DAN_DOI_SKH_VIP = "Nguyên liệu cần để làm SKH VIP là :\n"
-            + "1 món Hủy diệt + 2 món SKH thường và 1 đá ngũ sắc\n"
-            + "Lưu ý SKH VIP sẽ tạo ra dựa vào món Hủy diệt\n"
-            + "Ví dụ nguyên liệu gồm : Quần Xayda Hủy diệt + 2 món SKH thường ngẫu nhiên + 1 Đá ngũ sắc\n"
+            + "1 món Thiên Sứ và 2 món SKH thường\n"
+            + "Lưu ý SKH VIP sẽ tạo ra dưa vào món Thiên Sứ\n"
+            + "Ví dụ nguyên liệu gồm : Quần Xayda Thiên Tứ + 2 món SKH thường ngẫu nhiên\n"
             + "Bạn sẽ nhận lại được Quần Xayda với chỉ số SKH VIP";
-    public static final String HUONG_DAN_DO_TS = "Nguyên liệu cần để làm Dồ Thiên sứ là :\n"
-            + "1 Công thức theo Hành tinh mong muốn + 1 Đá cầu vòng + 999 Mảnh thiên sứ\n"
-            + "Lưu ý: Đồ thiên sứ sẽ ra hảnh tinh theo Thông tin của Công thức";
+    public static final String HUONG_DAN_CAY = "Cách để bạn có 1 lượng vàng lớn :\n"
+            + "Có thể cày ở nv bò mộng hàng ngày"
+            + "Lưu ý mỗi ngày có 20nv Nhiệm vụ càng khó lượng vàng nhận được càng nhiều \n"
+            + "Hoặc bạn có thể nạp lần đầu ở npc santa =)))\n"
+            + "1k VND = 1k coin ; 1k coin = 3 thỏi vàng";
+
+
     //npcid
     public static final byte ONG_GOHAN = 0;
     public static final byte ONG_PARAGUS = 1;
@@ -110,20 +115,21 @@ public class ConstNpc {
     public static final byte MR_POPO = 67;
     public static final byte PANCHY = 68;
     public static final byte THO_DAI_CA = 69;
-    public static final byte FIDE = 73;
-    public static final byte Jiren = 75;
-    public static final byte NPC_CHUYENSINH = 76;
-    public static final byte UUB = 77;
-    public static final byte ZAMASU = 79;
-    public static final byte MEO_THAN_TAI = 80;
-    public static final byte MI_NUONG = 82;
-    public static final byte CHIEN_THAN = 83;
+    public static final byte UNKOWN = 72;
+    public static final byte NGUOIHOADA = 79;
+    public static final byte SIEUNHAN = 82;
+    public static final byte NROTEA = 83;
+    public static final byte BLACKGOKU = 92;
+    public static final byte GOKUAC = 93;
+    public static final byte ROBOTSIUCAP = 94;
+    public static final byte KHI_DAU_MOI = 95;
     public static final byte TRUNG_LINH_THU = 97;
-    public static final byte ONG_GIA_NOEL = 98;
-    public static final byte CAY_THONG_NOEL = 78;
     public static final byte Monaito = 102;
-    public static final byte RUT_VANG = 103;
-    public static final byte RONG_XUONG = 84;
+    public static final byte Granola= 96;
+    public static final byte RONGBANG= 101;
+    public static final byte THIENBINN = 104;
+    
+
 
     //----------------------index menu------------------------------------------
     //menu o len tang map mabu
@@ -133,24 +139,17 @@ public class ConstNpc {
     public static final int IGNORE_MENU = 712002;
     public static final int BASE_MENU = 752002;
 
-    public static final int DOI_TIEN = 555;
-    public static final int MENU_DOITIEN1 = 556;
-    public static final int MENU_DOITIEN2 = 557;
-
     //index quy lão kamê
-    public static final int MENU_ACCPET_GO_TO_BDKB = 500;
-    public static final int MENU_OPEN_BDKB = 501;
-    public static final int MENU_OPENED_BDKB = 502;
-    public static final int QUY_DOI_HN = 503;
-    public static final int QUY_DOI_TV = 504;
+    public static final int MENU_OPEN_DBKB = 500;
+    public static final int MENU_OPENED_DBKB = 501;
+    public static final int MENU_ACCEPT_GO_TO_BDKB = 502;
     public static final int MENU_EVENT = 523;
     public static final int MENU_GIAO_BONG = 524;
     public static final int CONFIRM_DOI_THUONG_SU_KIEN = 525;
-     public static final int MENU_ACCPET_GO_TO_GAS = 538;
-    public static final int MENU_OPEN_GAS = 539;
-    public static final int MENU_OPENED_GAS = 540;
+
     //index than vu tru
     public static final int MENU_DI_CHUYEN = 500;
+
 
     //index menu ba hat mit
     public static final int MENU_PHA_LE_HOA_TRANG_BI = 500;
@@ -160,11 +159,19 @@ public class ConstNpc {
     public static final int MENU_PHAN_RA_DO_THAN_LINH = 504;
     public static final int MENU_NANG_CAP_DO_TS = 505;
     public static final int MENU_NANG_DOI_SKH_VIP = 506;
-    public static final int MENU_CHUYEN_HOA_DO_HUY_DIET = 507;
-    public static final int MENU_RANDOM_SKH = 508;
+
+     //index menu mabu Bill
+    public static final int CAN_NOT_OPEN_BILL = 500;
+    public static final int CAN_OPEN_BILL = 501;
+    public static final int CONFIRM_OPEN_BILL = 502;
+    public static final int CONFIRM_DESTROY_BILL = 503;
+    
+
+
 
     //index menu linh canh
     public static final int MENU_JOIN_DOANH_TRAI = 502;
+
 
     //index menu con meo
     public static final int MAKE_MATCH_PVP = 502;
@@ -183,23 +190,13 @@ public class ConstNpc {
     public static final int CONFIRM_REMOVE_ALL_ITEM_LUCKY_ROUND = 515;
     public static final int MENU_FIND_PLAYER = 516;
     public static final int CONFIRM_DISSOLUTION_CLAN = 517;
-    public static final int CONFIRM_ACTIVE = 518;
+//    public static final int CONFIRM_ACTIVE = 518;
     public static final int menutd = 519;
     public static final int menunm = 520;
     public static final int menuxd = 521;
     public static final int CONFIRM_TELE_NAMEC = 522;
-    public static final int MINI_GAME = 532;
+    public static final int RUT_VANG = 523;
     public static final int UP_TOP_ITEM = 527;
-    public static final int NpcThanThu = 528;
-    public static final int INFO_ALL = 529;
-    public static final int CHISODO = 530;
-    public static final int DOT_PHA_THANTHU = 531;
-    public static final int TAIXIU = 533;
-    public static final int BAN_NHIEU_THOI_VANG = 5701;
-    public static final int MUA_NHIEU = 5702;
-    public static final int CHISO_NHANH = 5703;
-    public static final int TUTORIAL_RONG_XUONG = 5704;
-    public static final int RONG_HALLOWEN = 5705;
 
     public static final int MENU_OPTION_USE_ITEM2000 = 2000;
     public static final int MENU_OPTION_USE_ITEM2001 = 2001;
@@ -210,19 +207,15 @@ public class ConstNpc {
     public static final int MENU_OPTION_USE_ITEM736 = 736;
     public static final int MENU_OPTION_USE_ITEM1105 = 1105;
 
+
     //index menu rong thieng
-//    public static final int SHENRON_NM = 507;
     public static final int SHENRON_CONFIRM = 501;
     public static final int SHENRON_1_1 = 502;
     public static final int SHENRON_1_2 = 503;
     public static final int SHENRON_2 = 504;
-//    public static final int SHENRON_3 = 505;
-    public static final int NAMEC_1 = 506;
+    public static final int SHENRON_3 = 505;
+     public static final int NAMEC_1 = 506;
 
-    //index menu rong xuong
-    public static final int HALLOWEN_CONFIRM = 507;
-    public static final int HALLOWEN_1_1 = 508;
-//    public static final int HALLOWEN_1_2 = 509;
     //index menu magic tree
     public static final int MAGIC_TREE_NON_UPGRADE_LEFT_PEA = 501;
     public static final int MAGIC_TREE_NON_UPGRADE_FULL_PEA = 502;
@@ -235,16 +228,18 @@ public class ConstNpc {
     public static final int CAN_OPEN_EGG = 501;
     public static final int CONFIRM_OPEN_EGG = 502;
     public static final int CONFIRM_DESTROY_EGG = 503;
-    //index menu mabu egg
-    public static final int CAN_NOT_OPEN_DUA = 500;
-    public static final int CAN_OPEN_DUA = 501;
-    public static final int CONFIRM_OPEN_DUA = 502;
-    public static final int CONFIRM_DESTROY_DUA = 503;
 
     //index menu npc nhà
     public static final int QUA_TAN_THU = 500;
     public static final int MENU_PHAN_THUONG = 501;
-    public static final int NAP_THE = 502;
+    public static final int NAP_THE = 5022;
+    public static final int VIETTEL = 5033;
+    public static final int MOBIFONE = 5044;
+    public static final int VINAPHONE = 5055;
+    public static final int QUY_DOI_THOI_VANG = 5066;
+    public static final int QUY_DOI_HONG_NGOC = 5077;
+    public static final int QUY_DOI = 5088;
+
 
     //index menu quốc vương
     public static final int OPEN_POWER_MYSEFT = 500;
@@ -272,12 +267,14 @@ public class ConstNpc {
     public static final int MENU_OPTION_PHU_HP = 501;
     public static final int MENU_OPTION_GO_HOME = 502;
 
+
     //index menu bò mộng
     public static final int MENU_OPTION_LEVEL_SIDE_TASK = 500;
     public static final int MENU_OPTION_PAY_SIDE_TASK = 501;
 
     //------------------------------shop id-------------------------------------
     //npcname_shoporder
+
     public static final int SHOP_BUNMA_QK_0 = 500;
     public static final int SHOP_DENDE_0 = 501;
     public static final int SHOP_APPULE_0 = 502;
@@ -290,12 +287,5 @@ public class ConstNpc {
     public static final int SIDE_BOX_LUCKY_ROUND = 509;
     public static final int SHOP_BUNMA_TL_0 = 510;
     public static final int SIDE_BOX_ITEM_REWARD = 511;
-    
-    public static final int RUONG_GO = 512;
 
 }
-
-/**
- * Code được viết bởi Hoàng Việt
- * Vui lòng không sao chép mã nguồn này dưới mọi hình thức.
- */

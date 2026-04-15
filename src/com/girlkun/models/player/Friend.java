@@ -2,7 +2,7 @@ package com.girlkun.models.player;
 
 /**
  *
- * @Stole By Hoàng Việt 💖
+ * @Stole By Arriety 💖
  *
  */
 public class Friend {

@@ -1,9 +1,7 @@
 package com.girlkun.models.clan;
 
 import com.girlkun.database.GirlkunDB;
-import com.girlkun.models.map.bdkb.BanDoKhoBau;
 import com.girlkun.models.map.doanhtrai.DoanhTrai;
-import com.girlkun.models.map.gas.Gas;
 import com.girlkun.services.ClanService;
 
 import java.util.ArrayList;
@@ -46,19 +44,11 @@ public class Clan {
     public boolean active;
     public int capsuleClan;
 
-    
-      public long timeOpenbdkb;
-    public Player playerOpenbdkb;
-    public BanDoKhoBau banDoKhoBau;
-    
-    public long doanhTrai_lastTimeOpen;
-    public boolean doanhTrai_haveGone;
-    public String doanhTrai_playerOpen;
-    public long timeOpenDoanhTrai;
+    public long lastTimeOpenDoanhTrai;
+    public boolean haveGoneDoanhTrai;
+    public String playerOpenDoanhTrai;
     public DoanhTrai doanhTrai;
-      public long timeOpenKhiGas;
-    public Player playerOpenKhiGas;
-    public Gas khiGas;
+
     public final List<ClanMember> members;
     public final List<Player> membersInGame;
 
@@ -66,7 +56,7 @@ public class Clan {
         this.id = NEXT_ID++;
         this.name = "";
         this.slogan = "";
-        this.maxMember = 20;
+        this.maxMember = 50;
         this.createTime = (int) (System.currentTimeMillis() / 1000);
         this.members = new ArrayList<>();
         this.membersInGame = new ArrayList<>();
@@ -111,10 +101,10 @@ public class Clan {
         return false;
     }
 
-    public void addSMTNClan(Player plOri, double param) {
+    public void addSMTNClan(Player plOri, long param) {
         for (Player pl : this.membersInGame) {
             if (!plOri.equals(pl) && plOri.zone.equals(pl.zone)) {
-                Service.getInstance().addSMTN(pl, (byte) 1, param, false);
+                Service.gI().addSMTN(pl, (byte) 1, param, false);
             }
         }
     }
@@ -146,7 +136,6 @@ public class Clan {
             }
             msg.cleanup();
         } catch (Exception e) {
-                System.out.println("        loi clan1");
         }
     }
 
@@ -191,7 +180,7 @@ public class Clan {
     public void sendFlagBagForAllMember() {
         for (Player pl : this.membersInGame) {
             if (pl != null) {
-                Service.getInstance().sendFlagBag(pl);
+                Service.gI().sendFlagBag(pl);
             }
         }
     }
@@ -291,8 +280,8 @@ public class Clan {
         PreparedStatement ps = null;
         try (Connection con = GirlkunDB.getConnection();) {
             ps = con.prepareStatement("insert into clan_sv" + Manager.SERVER
-                    + "(id, name, slogan, img_id, power_point, max_member, clan_point, level, members, doanh_trai) "
-                    + "values (?,?,?,?,?,?,?,?,?,?)");
+                    + "(id, name, slogan, img_id, power_point, max_member, clan_point, level, members) "
+                    + "values (?,?,?,?,?,?,?,?,?)");
             ps.setInt(1, this.id);
             ps.setString(2, this.name);
             ps.setString(3, this.slogan);
@@ -302,7 +291,6 @@ public class Clan {
             ps.setInt(7, this.capsuleClan);
             ps.setInt(8, this.level);
             ps.setString(9, member);
-            ps.setString(10, "[" + System.currentTimeMillis() + ",\"Việt\"]");
             ps.executeUpdate();
             ps.close();
         } catch (Exception e) {
@@ -311,7 +299,6 @@ public class Clan {
             try {
                 ps.close();
             } catch (Exception e) {
-                System.out.println("        loi clan2");
             }
         }
 
@@ -358,7 +345,6 @@ public class Clan {
             try {
                 ps.close();
             } catch (Exception e) {
-                System.out.println("        loi clan3");
             }
         }
     }

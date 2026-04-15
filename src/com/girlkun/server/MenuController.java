@@ -31,7 +31,7 @@ public class MenuController {
         if (npc != null) {
             npc.openBaseMenu(player);
         } else {
-            Service.getInstance().hideWaitDialog(player);
+            Service.gI().hideWaitDialog(player);
         }
     }
 
@@ -39,7 +39,6 @@ public class MenuController {
         TransactionService.gI().cancelTrade(player);
         switch (npcId) {
             case ConstNpc.RONG_THIENG:
-            case ConstNpc.RONG_XUONG:
             case ConstNpc.CON_MEO:
                 NpcManager.getNpc((byte) npcId).confirmMenu(player, select);
                 break;
@@ -51,9 +50,9 @@ public class MenuController {
                     npc = player.zone.map.getNpc(player, npcId);
                 }
                 if (npc != null) {
-                    npc.confirmMenu(player, select);
+                   npc.confirmMenu(player, select);
                 } else {
-                    Service.getInstance().hideWaitDialog(player);
+                    Service.gI().hideWaitDialog(player);
                 }
                 break;
         }

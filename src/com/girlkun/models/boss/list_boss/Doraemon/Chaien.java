@@ -18,33 +18,30 @@ public class Chaien extends Boss {
     public Chaien() throws Exception {
         super(BossID.CHAIEN, BossesData.CHAIEN);
     }
-    @Override
+     @Override
     public void reward(Player plKill) {
-        plKill.achievement.plusCount(3);
-        plKill.inventory.event++;
-        Service.getInstance().sendThongBao(plKill, "Bạn đã nhận được 1 điểm săn Boss");
-        int a = 0;
-        for (int i = 0; i < 20; i++) {
-            ItemMap it = new ItemMap(this.zone, 861, 50, this.location.x + a, this.zone.map.yPhysicInTop(this.location.x,
-                    this.location.y - 24), -1);
-            Service.getInstance().dropItemMap(this.zone, it);
-            a += 10;
-            playerTarger.batco = false;
+        int[] itemDos = new int[]{12000,555,559,560};
+        int[] NRs = new int[]{16,17,18};
+        int randomDo = new Random().nextInt(itemDos.length);
+        int randomNR = new Random().nextInt(NRs.length);
+        if (Util.isTrue(15, 100)) {
+            if (Util.isTrue(1, 50)) {
+                Service.gI().dropItemMap(this.zone, Util.ratiItem(zone, 1142, 1, this.location.x, this.location.y, plKill.id));
+                return;
+            }
+            Service.gI().dropItemMap(this.zone, Util.ratiItem(zone, itemDos[randomDo], 1, this.location.x, this.location.y, plKill.id));
+        } else  if (Util.isTrue(50, 100)){
+            Service.gI().dropItemMap(this.zone, new ItemMap(zone, NRs[randomNR], 1, this.location.x, zone.map.yPhysicInTop(this.location.x, this.location.y - 24), plKill.id));
         }
-        //   plKill.diemhotong += 1;
+        TaskService.gI().checkDoneTaskKillBoss(plKill, this);
     }
-
 
    @Override
     public void active() {
         super.active(); //To change body of generated methods, choose Tools | Templates.
-        if(Util.canDoWithTime(st,1500000)){
+        if(Util.canDoWithTime(st,900000)){
             this.changeStatus(BossStatus.LEAVE_MAP);
         }
-    }
-    @Override
-    public void moveToPlayer(Player player) {
-        this.moveTo(player.location.x, player.location.y);
     }
 
     @Override
@@ -67,32 +64,10 @@ public class Chaien extends Boss {
         }
         
     }
-       @Override
-    public double injured(Player plAtt, double damage, boolean piercing, boolean isMobAttack) {
-        if (!this.isDie()) {
-            if (!piercing && Util.isTrue(this.nPoint.tlNeDon - plAtt.nPoint.tlchinhxac, 1000)) {
-                this.chat("Xí hụt");
-                return 0;
-            }
-            damage = this.nPoint.subDameInjureWithDeff(damage);
-            if (!piercing && effectSkill.isShielding) {
-                if (damage > nPoint.hpMax) {
-                    EffectSkillService.gI().breakShield(this);
-                }
-                damage = 1;
-            }
-            this.nPoint.subHP(damage);
-            if (isDie()) {
-                this.setDie(plAtt);
-                die(plAtt);
-            }
-            return damage;
-        } else {
-            return 0;
-        }
-    }
+  
 }
 
 /**
- * Vui lòng không sao chép mã nguồn này dưới mọi hình thức.
+ * Vui lòng không sao chép mã nguồn này dưới mọi hình thức. Hãy tôn trọng tác
+ * giả của mã nguồn này. Xin cảm ơn! - GirlBeo
  */

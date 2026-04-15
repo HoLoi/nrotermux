@@ -18,7 +18,7 @@ import java.util.List;
 
 public class Trade {
 
-    public static final int TIME_TRADE = 300000;
+    public static final int TIME_TRADE = 180000;
     public static final int QUANLITY_MAX = 20000;
 
     private Player player1;
@@ -73,15 +73,15 @@ public class Trade {
             msg.writer().writeInt((int) player2.id);
             player1.sendMessage(msg);
             msg.cleanup();
-            Service.getInstance().hideWaitDialog(player1);
-            Service.getInstance().hideWaitDialog(player2);
+            Service.gI().hideWaitDialog(player1);
+            Service.gI().hideWaitDialog(player2);
         } catch (Exception ignored) {
         }
     }
 
     public void addItemTrade(Player pl, byte index, int quantity) {
 //        System.out.println("quantity: " + quantity);
-//        if (pl.getSession().actived) {
+        if (pl.getSession().actived) {
         if (true) {
             if (index == -1) {
                 if (pl.equals(this.player1)) {
@@ -99,9 +99,7 @@ public class Trade {
                 if (quantity > item.quantity || quantity < 0) {
                     return;
                 }
-                if (isItemCannotTran(item) == true) {
-                    removeItemTrade(pl, index);
-                } else {
+                 else {
                     if (quantity > 99) {
                         int n = quantity / 99;
                         int left = quantity % 99;
@@ -141,11 +139,13 @@ public class Trade {
                 }
             }
         } 
-//        else {
-//            Service.getInstance().sendThongBaoFromAdmin(pl,
-//                    "|5|VUI LÒNG KÍCH HOẠT TÀI KHOẢN TẠI\n|7|Liên Hệ Admin ADMIN\n|5|ĐỂ MỞ KHÓA TÍNH NĂNG GIAO DỊCH");
-//            removeItemTrade(pl, index);
-//        }
+        }else {
+           this.cancelTrade();
+            Service.gI().sendThongBaoFromAdmin(pl,
+                  "|5|VUI LÒNG Kích Hoạt Thành Viên!");
+            removeItemTrade(pl, index);
+        
+    }
     }
     private void removeItemTrade(Player pl, byte index) {
         Message msg;
@@ -155,7 +155,7 @@ public class Trade {
             msg.writer().write(index);
             pl.sendMessage(msg);
             msg.cleanup();
-            Service.getInstance().sendThongBao(pl, "Không thể giao dịch vật phẩm này");
+            Service.gI().sendThongBao(pl, "Không thể giao dịch vật phẩm này");
         } catch (Exception e) {
         }
     }
@@ -180,26 +180,24 @@ public class Trade {
         }
         switch (item.template.type) {
             case 27: //
-                if (item.template.id == 590 || item.template.id == 1129 || item.template.id == 921 || item.template.id == 1132) {
+                if (item.template.id != 457 && item.template.id == 590) {
                     return true;
-                }
-                else if (item.template.id == 457 || item.template.id == 1066 || item.template.id == 1067 || item.template.id == 1068 || item.template.id == 1069 || item.template.id == 1070
-                         || item.template.id == 1078 || item.template.id == 611 || item.template.id == 1132 || item.template.id == 2000 || item.template.id == 2001 || item.template.id != 2002 || item.template.id != 380) {
+                } else {
                     return false;
                 }
-                
-            case 5: //cải trang
+//            case 5: //cải trang
             case 6: //đậu thần
             case 7: //sách skill
             case 8: //vật phẩm nhiệm vụ
-            case 11: //flag bag
+//            case 11: //flag bag
             case 13: //bùa
             case 22: //vệ tinh
-            case 23: //ván bay
-            case 24: //ván bay vip
+//            case 23: //ván bay
+//            case 24: //ván bay vip
             case 28: //cờ
             case 31: //bánh trung thu, bánh tết
             case 32: //giáp tập luyện
+           
                 return true;
             default:
                 return false;
@@ -208,8 +206,8 @@ public class Trade {
 
     public void cancelTrade() {
         String notifiText = "Giao dịch bị hủy bỏ";
-        Service.getInstance().sendThongBao(player1, notifiText);
-        Service.getInstance().sendThongBao(player2, notifiText);
+        Service.gI().sendThongBao(player1, notifiText);
+        Service.gI().sendThongBao(player2, notifiText);
         closeTab();
         dispose();
     }
@@ -249,11 +247,7 @@ public class Trade {
                 msg.writer().writeByte(itemsTrade1.size());
                 for (Item item : itemsTrade1) {
                     msg.writer().writeShort(item.template.id);
-                    if (player2.getSession().version >= 225) {
-                        msg.writer().writeInt(item.quantity);
-                    } else {
-                        msg.writer().writeByte(item.quantity);
-                    }
+                    msg.writer().writeInt(item.quantity);
                     msg.writer().writeByte(item.itemOptions.size());
                     for (Item.ItemOption io : item.itemOptions) {
                         msg.writer().writeByte(io.optionTemplate.id);
@@ -266,11 +260,7 @@ public class Trade {
                 msg.writer().writeByte(itemsTrade2.size());
                 for (Item item : itemsTrade2) {
                     msg.writer().writeShort(item.template.id);
-                    if (player1.getSession().version >= 225) {
-                        msg.writer().writeInt(item.quantity);
-                    } else {
-                        msg.writer().writeByte(item.quantity);
-                    }
+                    msg.writer().writeInt(item.quantity);
                     msg.writer().writeByte(item.itemOptions.size());
                     for (Item.ItemOption io : item.itemOptions) {
                         msg.writer().writeByte(io.optionTemplate.id);
@@ -294,16 +284,6 @@ public class Trade {
 
     private void startTrade() {
         byte tradeStatus = SUCCESS;
-        if (goldTrade1 > 2000000000) {
-            tradeStatus = FAIL_GOLD_MAX1;
-        } else if (goldTrade2 > 2000000000) {
-            tradeStatus = FAIL_GOLD_MAX2;
-        }
-        if (goldTrade1 > 0 && player1.taixiu.MaxGoldTradeDay > 2000000000) {
-            tradeStatus = FAIL_2TY_GOLD_PLAYER1;
-        } else if (goldTrade2 > 0 && player2.taixiu.MaxGoldTradeDay > 2000000000) {
-            tradeStatus = FAIL_2TY_GOLD_PLAYER2;
-        }
         if (player1.inventory.gold + goldTrade2 > Inventory.LIMIT_GOLD) {
             tradeStatus = FAIL_MAX_GOLD_PLAYER1;
         } else if (player2.inventory.gold + goldTrade1 > Inventory.LIMIT_GOLD) {
@@ -334,8 +314,6 @@ public class Trade {
                     player2.inventory.gold -= goldTrade2;
                     player1.inventory.itemsBag = itemsBag1;
                     player2.inventory.itemsBag = itemsBag2;
-                    player1.taixiu.MaxGoldTradeDay += goldTrade2;
-                    player2.taixiu.MaxGoldTradeDay += goldTrade1;
 
                     InventoryServiceNew.gI().sendItemBags(player1);
                     InventoryServiceNew.gI().sendItemBags(player2);
@@ -357,47 +335,27 @@ public class Trade {
     private static final byte FAIL_MAX_GOLD_PLAYER2 = 2;
     private static final byte FAIL_NOT_ENOUGH_BAG_P1 = 3;
     private static final byte FAIL_NOT_ENOUGH_BAG_P2 = 4;
-    private static final byte FAIL_2TY_GOLD_PLAYER1 = 5;
-    private static final byte FAIL_2TY_GOLD_PLAYER2 = 6;
-    private static final byte FAIL_GOLD_MAX1 = 7;
-    private static final byte FAIL_GOLD_MAX2 = 8;
 
     private void sendNotifyTrade(byte status) {
         player1.iDMark.setLastTimeTrade(System.currentTimeMillis());
         player2.iDMark.setLastTimeTrade(System.currentTimeMillis());
         switch (status) {
             case SUCCESS:
-                Service.getInstance().sendThongBao(player1, "Giao dịch thành công");
-                Service.getInstance().sendThongBao(player2, "Giao dịch thành công");
+                Service.gI().sendThongBao(player1, "Giao dịch thành công");
+                Service.gI().sendThongBao(player2, "Giao dịch thành công");
                 break;
             case FAIL_MAX_GOLD_PLAYER1:
-                Service.getInstance().sendThongBao(player1, "Giao dịch thất bại do số lượng vàng sau giao dịch vượt tối đa");
-                Service.getInstance().sendThongBao(player2, "Giao dịch thất bại do số lượng vàng " + player1.name + " sau giao dịch vượt tối đa");
+                Service.gI().sendThongBao(player1, "Giao dịch thất bại do số lượng vàng sau giao dịch vượt tối đa");
+                Service.gI().sendThongBao(player2, "Giao dịch thất bại do số lượng vàng " + player1.name + " sau giao dịch vượt tối đa");
                 break;
             case FAIL_MAX_GOLD_PLAYER2:
-                Service.getInstance().sendThongBao(player2, "Giao dịch thất bại do số lượng vàng sau giao dịch vượt tối đa");
-                Service.getInstance().sendThongBao(player1, "Giao dịch thất bại do số lượng vàng " + player2.name + " sau giao dịch vượt tối đa");
+                Service.gI().sendThongBao(player2, "Giao dịch thất bại do số lượng vàng sau giao dịch vượt tối đa");
+                Service.gI().sendThongBao(player1, "Giao dịch thất bại do số lượng vàng " + player2.name + " sau giao dịch vượt tối đa");
                 break;
             case FAIL_NOT_ENOUGH_BAG_P1:
             case FAIL_NOT_ENOUGH_BAG_P2:
-                Service.getInstance().sendThongBao(player1, "Giao dịch thất bại do 1 trong 2 không đủ ô trống trong hành trang");
-                Service.getInstance().sendThongBao(player2, "Giao dịch thất bại do 1 trong 2 không đủ ô trống trong hành trang");
-                break;
-            case FAIL_2TY_GOLD_PLAYER1:
-                Service.getInstance().sendThongBao(player1, "Giao dịch thất bại do số lượng vàng giao dịch quá 2 Tỷ");
-                Service.getInstance().sendThongBao(player2, "Giao dịch thất bại do số lượng vàng " + player1.name + " sau giao dịch vượt quá 2 Tỷ");
-                break;
-            case FAIL_2TY_GOLD_PLAYER2:
-                Service.getInstance().sendThongBao(player2, "Giao dịch thất bại do số lượng vàng giao dịch quá 2 Tỷ");
-                Service.getInstance().sendThongBao(player1, "Giao dịch thất bại do số lượng vàng " + player2.name + " sau giao dịch vượt quá 2 Tỷ");
-                break;
-            case FAIL_GOLD_MAX1:
-                Service.getInstance().sendThongBao(player1, "Giao dịch thất bại do số lượng vàng giao dịch trong ngày tối đa 2 Tỷ");
-                Service.getInstance().sendThongBao(player2, "Giao dịch thất bại do số lượng vàng " + player1.name + " giao dịch trong ngày quá 2 Tỷ");
-                break;
-            case FAIL_GOLD_MAX2:
-                Service.getInstance().sendThongBao(player2, "Giao dịch thất bại do số lượng vàng giao dịch trong ngày tối đa 2 Tỷ");
-                Service.getInstance().sendThongBao(player1, "Giao dịch thất bại do số lượng vàng " + player2.name + " giao dịch trong ngày quá 2 Tỷ");
+                Service.gI().sendThongBao(player1, "Giao dịch thất bại do 1 trong 2 không đủ ô trống trong hành trang");
+                Service.gI().sendThongBao(player2, "Giao dịch thất bại do 1 trong 2 không đủ ô trống trong hành trang");
                 break;
         }
     }

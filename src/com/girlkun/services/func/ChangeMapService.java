@@ -3,26 +3,20 @@ package com.girlkun.services.func;
 import com.girlkun.consts.ConstMap;
 import com.girlkun.consts.ConstPlayer;
 import com.girlkun.consts.ConstTask;
-import com.girlkun.models.boss.list_boss.AnTrom;
-import com.girlkun.models.boss.list_boss.MiNuong;
-import com.girlkun.models.map.ItemMap;
 import com.girlkun.models.map.Map;
 import com.girlkun.models.map.MapMaBu.MapMaBu;
 import com.girlkun.models.map.WayPoint;
 import com.girlkun.models.map.Zone;
-import com.girlkun.models.map.bdkb.BanDoKhoBauService;
 import com.girlkun.models.map.blackball.BlackBallWar;
-import com.girlkun.models.map.challenge.MartialCongress;
 import com.girlkun.services.MapService;
 import com.girlkun.models.mob.Mob;
 import com.girlkun.models.player.Player;
 import com.girlkun.models.matches.TYPE_LOSE_PVP;
+import com.girlkun.models.matches.TYPE_PVP;
 import com.girlkun.services.Service;
 import com.girlkun.utils.Util;
 import com.girlkun.network.io.Message;
-import com.girlkun.server.Manager;
 import com.girlkun.services.EffectSkillService;
-import com.girlkun.services.NgocRongNamecService;
 import com.girlkun.services.PlayerService;
 import com.girlkun.services.TaskService;
 import com.girlkun.utils.Logger;
@@ -34,8 +28,7 @@ import java.util.List;
 public class ChangeMapService {
 
     private static final byte EFFECT_GO_TO_TUONG_LAI = 0;
-    private static final byte EFFECT_GO_TO_BDKG = 1;
-    private static final byte EFFECT_GO_TO_BDKB = 2;
+    private static final byte EFFECT_GO_TO_BDKB = 1;
 
     public static final byte AUTO_SPACE_SHIP = -1;
     public static final byte NON_SPACE_SHIP = 0;
@@ -44,7 +37,6 @@ public class ChangeMapService {
     public static final byte TENNIS_SPACE_SHIP = 3;
 
     private static ChangeMapService instance;
-    private boolean teleport;
 
     private ChangeMapService() {
 
@@ -62,7 +54,7 @@ public class ChangeMapService {
      */
     public void openChangeMapTab(Player pl) {
         List<Zone> list = null;
-        switch (pl.iDMark.getTypeChangeMap()) {
+       switch (pl.iDMark.getTypeChangeMap()) {
         }
         Message msg;
         try {
@@ -82,10 +74,6 @@ public class ChangeMapService {
                             msg.writer().writeUTF(zone.map.mapName);
                         }
                         msg.writer().writeUTF(zone.map.planetName);
-                    }
-                    if (pl.haveBeQuynh) {
-                        Service.getInstance().sendThongBao(pl, "Đang hộ tống Bunma không thể Capsule");
-                        return;
                     }
                 case ConstMap.CHANGE_BLACK_BALL:
                     list = (pl.mapBlackBall != null ? pl.mapBlackBall
@@ -119,33 +107,25 @@ public class ChangeMapService {
      * @param pl
      */
     public void openZoneUI(Player pl) {
-        if (pl.haveBeQuynh) {
-            Service.getInstance().sendThongBao(pl, "Đang Hộ tống Bunma không thể đổi khu");
-            return;
-        }
         if (pl.zone == null) {
-            Service.getInstance().sendThongBaoOK(pl, "Không thể đổi khu vực trong map này");
+            Service.gI().sendThongBaoOK(pl, "Không thể đổi khu vực trong map này");
             return;
         }
         if (!pl.isAdmin()) {
             if (MapService.gI().isMapOffline(pl.zone.map.mapId)) {
-                Service.getInstance().sendThongBaoOK(pl, "Không thể đổi khu vực trong map này");
-                return;
-            }
-             if (MapService.gI().isMapKhiGas(pl.zone.map.mapId)) {
-                Service.getInstance().sendThongBaoOK(pl, "Không thể đổi khu vực trong map này");
-                return;
-            }
-            if (MapService.gI().isMapBanDoKhoBau(pl.zone.map.mapId)) {
                 Service.gI().sendThongBaoOK(pl, "Không thể đổi khu vực trong map này");
                 return;
             }
             if (MapService.gI().isMapDoanhTrai(pl.zone.map.mapId)) {
-                Service.getInstance().sendThongBaoOK(pl, "Không thể đổi khu vực trong map này");
+                Service.gI().sendThongBaoOK(pl, "Không thể đổi khu vực trong map này");
                 return;
             }
             if (MapService.gI().isMapMaBu(pl.zone.map.mapId)) {
-                Service.getInstance().sendThongBaoOK(pl, "Không thể đổi khu vực trong map này");
+                Service.gI().sendThongBaoOK(pl, "Không thể đổi khu vực trong map này");
+                return;
+            }
+            if (pl.zone.map.mapId == 51) {
+                Service.gI().sendThongBaoOK(pl, "Không thể đổi khu vực trong map này");
                 return;
             }
         }
@@ -174,37 +154,25 @@ public class ChangeMapService {
      * @param zoneId
      */
     public void changeZone(Player pl, int zoneId) {
-        if (pl.haveBeQuynh) {
-            Service.getInstance().sendThongBao(pl, "Đang hộ tống Bunma không thể đổi khu");
-            return;
-        }
         if (pl.zone == null) {
-            Service.getInstance().sendThongBao(pl, "Không thể đổi khu vực trong map này");
+            Service.gI().sendThongBaoOK(pl, "Không thể đổi khu vực trong map này");
             return;
         }
         if (!pl.isAdmin() || !pl.isBoss) {
             if (MapService.gI().isMapOffline(pl.zone.map.mapId)) {
-                Service.getInstance().sendThongBao(pl, "Không thể đổi khu vực trong map này");
+                Service.gI().sendThongBaoOK(pl, "Không thể đổi khu vực trong map này");
                 return;
             }
             if (MapService.gI().isMapDoanhTrai(pl.zone.map.mapId)) {
-                Service.getInstance().sendThongBao(pl, "Không thể đổi khu vực trong map này");
-                return;
-            }
-             if (MapService.gI().isMapKhiGas(pl.zone.map.mapId)) {
-                Service.getInstance().sendThongBao(pl, "Không thể đổi khu vực trong map này");
+                Service.gI().sendThongBaoOK(pl, "Không thể đổi khu vực trong map này");
                 return;
             }
             if (MapService.gI().isMapMaBu(pl.zone.map.mapId)) {
-                Service.getInstance().sendThongBao(pl, "Không thể đổi khu vực trong map này");
+                Service.gI().sendThongBaoOK(pl, "Không thể đổi khu vực trong map này");
                 return;
             }
-            if (pl.zone.map.mapId == 129){
-                Service.gI().sendThongBao(pl, "Không thể đổi khu vực trong map này");
-                return;
-            }
-            if (MapService.gI().isMapBanDoKhoBau(pl.zone.map.mapId)) {
-                Service.gI().sendThongBao(pl, "Không thể đổi khu vực trong map này");
+            if (pl.zone.map.mapId == 51) {
+                Service.gI().sendThongBaoOK(pl, "Không thể đổi khu vực trong map này");
                 return;
             }
         }
@@ -214,17 +182,17 @@ public class ChangeMapService {
             if (zoneId >= 0 && zoneId <= map.zones.size() - 1) {
                 Zone zoneJoin = map.zones.get(zoneId);
                 if (zoneJoin != null && (zoneJoin.getNumOfPlayers() >= zoneJoin.maxPlayer && !pl.isAdmin() && !pl.isBoss)) {
-                    Service.getInstance().sendThongBao(pl, "Khu vực đã đầy");
+                    Service.gI().sendThongBaoOK(pl, "Khu vực đã đầy");
                     return;
                 }
                 if (zoneJoin != null) {
                     changeMap(pl, zoneJoin, -1, -1, pl.location.x, pl.location.y, NON_SPACE_SHIP);
                 }
             } else {
-                Service.getInstance().sendThongBao(pl, "Không thể thực hiện");
+                Service.gI().sendThongBao(pl, "Không thể thực hiện");
             }
         } else {
-            Service.getInstance().sendThongBao(pl, "Không thể đổi khu vực lúc này, vui lòng đợi "
+            Service.gI().sendThongBaoOK(pl, "Không thể đổi khu vực lúc này, vui lòng đợi "
                     + TimeUtil.getTimeLeft(pl.iDMark.getLastTimeChangeZone(), 10));
         }
     }
@@ -241,9 +209,9 @@ public class ChangeMapService {
         if (!pl.isAdmin() || !pl.isBoss) {
             if (pl.isDie()) {
                 if (pl.haveTennisSpaceShip) {
-                    Service.getInstance().hsChar(pl, pl.nPoint.hpMax, pl.nPoint.mpMax);
+                    Service.gI().hsChar(pl, pl.nPoint.hpMax, pl.nPoint.mpMax);
                 } else {
-                    Service.getInstance().hsChar(pl, 1, 1);
+                    Service.gI().hsChar(pl, 1, 1);
                 }
             } else {
                 if (pl.haveTennisSpaceShip) {
@@ -252,7 +220,7 @@ public class ChangeMapService {
                 }
             }
             if(pl.idNRNM != -1){
-                Service.getInstance().sendThongBaoOK(pl, "Không thể thực hiện khi có ngọc rồng namec");
+                Service.gI().sendThongBaoOK(pl, "Không thể thực hiện khi có ngọc rồng namec");
                 return;
             }
             changeMap(pl, null, mapId, zone, x, 5, AUTO_SPACE_SHIP);
@@ -262,9 +230,9 @@ public class ChangeMapService {
     public void changeMapBySpaceShip(Player pl, Zone zoneJoin, int x) {
         if (pl.isDie()) {
             if (pl.haveTennisSpaceShip) {
-                Service.getInstance().hsChar(pl, pl.nPoint.hpMax, pl.nPoint.mpMax);
+                Service.gI().hsChar(pl, pl.nPoint.hpMax, pl.nPoint.mpMax);
             } else {
-                Service.getInstance().hsChar(pl, 1, 1);
+                Service.gI().hsChar(pl, 1, 1);
             }
         } else {
             if (pl.haveTennisSpaceShip) {
@@ -273,7 +241,7 @@ public class ChangeMapService {
             }
         }
         if(pl.idNRNM != -1){
-            Service.getInstance().sendThongBaoOK(pl, "Không thể thực hiện khi có ngọc rồng namec");
+            Service.gI().sendThongBaoOK(pl, "Không thể thực hiện khi có ngọc rồng namec");
             return;
         }
         changeMap(pl, zoneJoin, -1, -1, x, 5, AUTO_SPACE_SHIP);
@@ -341,7 +309,7 @@ public class ChangeMapService {
      */
     public void changeMapYardrat(Player pl, Zone zoneJoin, int x, int y) {
         if(pl.idNRNM != -1){
-            Service.getInstance().sendThongBaoOK(pl, "Không thể thực hiện khi có ngọc rồng namec");
+            Service.gI().sendThongBaoOK(pl, "Không thể thực hiện khi có ngọc rồng namec");
             return;
         }
         changeMap(pl, zoneJoin, -1, -1, x, y, TELEPORT_YARDRAT);
@@ -356,10 +324,10 @@ public class ChangeMapService {
                 zoneJoin = MapService.gI().getMapCanJoin(pl, mapId, zoneId);
             }
         }
-        if (!pl.isBoss) {
-            zoneJoin = checkMapCanJoin(pl, zoneJoin);
-        }
+        zoneJoin = checkMapCanJoin(pl, zoneJoin);
         if (zoneJoin != null) {
+            boolean currMapIsCold = MapService.gI().isMapCold(pl.zone.map);
+            boolean nextMapIsCold = MapService.gI().isMapCold(zoneJoin.map);
             if (typeSpace == AUTO_SPACE_SHIP) {
                 spaceShipArrive(pl, (byte) 0, pl.haveTennisSpaceShip ? TENNIS_SPACE_SHIP : DEFAULT_SPACE_SHIP);
                 pl.iDMark.setIdSpaceShip(pl.haveTennisSpaceShip ? TENNIS_SPACE_SHIP : DEFAULT_SPACE_SHIP);
@@ -382,28 +350,24 @@ public class ChangeMapService {
             if (pl.pet != null) {
                 pl.pet.joinMapMaster();
             }
-            Service.getInstance().clearMap(pl);
+            Service.gI().clearMap(pl);
             zoneJoin.mapInfo(pl); //-24
             pl.zone.load_Me_To_Another(pl);
-            if (!pl.isBoss && !pl.isPet&& !pl.isNewPet&& !pl.isTrieuhoipet) {
+            if (!pl.isBoss && !pl.isPet&& !pl.isNewPet) {
                 pl.timeChangeZone = System.currentTimeMillis();
                 pl.zone.load_Another_To_Me(pl);
             }
             pl.iDMark.setIdSpaceShip(NON_SPACE_SHIP);
-            if (!pl.isBoss) {
-                boolean currMapIsCold = MapService.gI().isMapCold(pl.zone.map);
-                boolean nextMapIsCold = MapService.gI().isMapCold(zoneJoin.map);
-                if (currMapIsCold != nextMapIsCold) {
-                    if (!currMapIsCold && nextMapIsCold) {
-                        Service.getInstance().sendThongBao(pl, "Bạn đã đến hành tinh Cold");
-                        Service.getInstance().sendThongBao(pl, "Sức tấn công và HP của bạn bị giảm 50% vì quá lạnh");
-                    } else {
-                        Service.getInstance().sendThongBao(pl, "Bạn đã rời hành tinh Cold");
-                        Service.getInstance().sendThongBao(pl, "Sức tấn công và HP của bạn đã trở lại bình thường");
-                    }
-                    Service.gI().point(pl);
-                    Service.getInstance().Send_Info_NV(pl);
+            if (currMapIsCold != nextMapIsCold) {
+                if (!currMapIsCold && nextMapIsCold) {
+                    Service.gI().sendThongBao(pl, "Bạn đã đến hành tinh Cold");
+                    Service.gI().sendThongBao(pl, "Sức tấn công và HP của bạn bị giảm 50% vì quá lạnh");
+                } else {
+                    Service.gI().sendThongBao(pl, "Bạn đã rời hành tinh Cold");
+                    Service.gI().sendThongBao(pl, "Sức tấn công và HP của bạn đã trở lại bình thường");
                 }
+                Service.gI().point(pl);
+                Service.gI().Send_Info_NV(pl);
             }
             checkJoinSpecialMap(pl);
             checkJoinMapMaBu(pl);
@@ -414,8 +378,8 @@ public class ChangeMapService {
             } else if (pl.location.x <= 60) {
                 plX = 60;
             }
-            Service.getInstance().resetPoint(pl, plX, pl.location.y);
-            Service.getInstance().sendThongBaoOK(pl, "Không thể đến khu vực này");
+            Service.gI().resetPoint(pl, plX, pl.location.y);
+            Service.gI().sendThongBaoOK(pl, "Không thể đến khu vực này");
         }
     }
 
@@ -446,36 +410,18 @@ public class ChangeMapService {
         if (zoneJoin != null) {
             if(player.idNRNM != -1 && !Util.canDoWithTime(player.lastTimePickNRNM, 6000)){
                 resetPoint(player);
-                Service.getInstance().sendThongBao(player, "Ngọc rồng namec quá nặng vui lòng đợi một chút để qua map");
+                Service.gI().sendThongBao(player, "Ngọc rồng namec quá nặng vui lòng đợi một chút để qua map");
                 return;
             }
             if(player.idNRNM != -1){
                 player.lastTimePickNRNM = System.currentTimeMillis();
             }
-            if (MapService.gI().isMapNha(zoneJoin.map.mapId)) {
-                if (!player.isPet && !player.isBoss && player.idNRNM != -1) {
-                    ItemMap itemMap = new ItemMap(player.zone, player.idNRNM, 1, player.location.x, player.location.y, -1);
-                    Service.gI().dropItemMap(player.zone, itemMap);
-                    NgocRongNamecService.gI().pNrNamec[player.idNRNM - 353] = "";
-                    NgocRongNamecService.gI().idpNrNamec[player.idNRNM - 353] = -1;
-                    player.idNRNM = -1;
-                    PlayerService.gI().changeAndSendTypePK(player, ConstPlayer.NON_PK);
-                    Service.gI().sendFlagBag(player);
-                }
-            }
-            if(player.haveBeQuynh == true && !Util.canDoWithTime(player.lastTimeHoTong, 20000)){
-                resetPoint(player);
-                Service.getInstance().sendThongBao(player, "Đang Hộ tống Bunma không được chuyển map quá nhanh !!");
-                return;
-            }
-            if(player.haveBeQuynh == true){
-                player.lastTimeHoTong = System.currentTimeMillis();
-            }
             changeMap(player, zoneJoin, -1, -1, xGo, yGo, NON_SPACE_SHIP);
         } else {
             resetPoint(player);
-            Service.getInstance().sendThongBaoOK(player, "Không thể đến khu vực này");
+            Service.gI().sendThongBaoOK(player, "Không thể đến khu vực này");
         }
+        
     }
 
     public void resetPoint(Player player){
@@ -485,14 +431,14 @@ public class ChangeMapService {
         } else if (player.location.x <= 60) {
             x = 60;
         }
-        Service.getInstance().resetPoint(player, x, player.location.y);
+        Service.gI().resetPoint(player, x, player.location.y);
     }
     
     public void finishLoadMap(Player player) {
         sendEffectMapToMe(player);
         sendEffectMeToMap(player);
         TaskService.gI().checkDoneTaskGoToMap(player, player.zone);
-//        Logger.log(Logger.CYAN, player.name +  " VUA VAO " + player.zone.map.mapName + " khu " + player.zone.zoneId + "\n");
+        Logger.log(Logger.CYAN, "Bạn "  + player.name +  " đang ở " + player.zone.map.mapName + " khu " + player.zone.zoneId + "\n");
     }
 
     private void sendEffectMeToMap(Player player) {
@@ -504,7 +450,7 @@ public class ChangeMapService {
                 msg.writer().writeByte(0);
                 msg.writer().writeByte(33);
                 msg.writer().writeInt((int) player.id);
-                Service.getInstance().sendMessAnotherNotMeInMap(player, msg);
+                Service.gI().sendMessAnotherNotMeInMap(player, msg);
                 msg.cleanup();
             }
 
@@ -513,8 +459,8 @@ public class ChangeMapService {
                 msg.writer().writeByte(0);//type
                 msg.writer().writeInt((int) player.id);
                 msg.writer().writeShort(player.mobMe.tempId);
-                msg.writer().writeInt(Util.DoubleGioihan(player.mobMe.point.gethp()));// hp mob
-                Service.getInstance().sendMessAnotherNotMeInMap(player, msg);
+                msg.writer().writeInt(player.mobMe.point.gethp());// hp mob
+                Service.gI().sendMessAnotherNotMeInMap(player, msg);
                 msg.cleanup();
             }
             if (player.pet != null && player.pet.mobMe != null) {
@@ -522,8 +468,8 @@ public class ChangeMapService {
                 msg.writer().writeByte(0);//type
                 msg.writer().writeInt((int) player.pet.mobMe.id);
                 msg.writer().writeShort(player.pet.mobMe.tempId);
-                msg.writer().writeInt(Util.DoubleGioihan(player.pet.mobMe.point.gethp()));// hp mob
-                Service.getInstance().sendMessAnotherNotMeInMap(player, msg);
+                msg.writer().writeInt(player.pet.mobMe.point.gethp());// hp mob
+                Service.gI().sendMessAnotherNotMeInMap(player, msg);
                 msg.cleanup();
             }
         } catch (Exception e) {
@@ -551,14 +497,6 @@ public class ChangeMapService {
                     msg.writer().writeByte(1);
                     msg.writer().writeByte(mob.id); //b4
                     msg.writer().writeShort(4133);//b5
-                    player.sendMessage(msg);
-                    msg.cleanup();
-                }
-                if (mob.effectSkill.isBinh) {
-                    msg = new Message(-112);
-                    msg.writer().writeByte(1);
-                    msg.writer().writeByte(mob.id); //b4
-                    msg.writer().writeShort(14522);//b5
                     player.sendMessage(msg);
                     msg.cleanup();
                 }
@@ -637,7 +575,7 @@ public class ChangeMapService {
                         msg.writer().writeByte(0);//type
                         msg.writer().writeInt((int) pl.id);
                         msg.writer().writeShort(pl.mobMe.tempId);
-                        msg.writer().writeInt(Util.DoubleGioihan(pl.mobMe.point.gethp()));// hp mob
+                        msg.writer().writeInt(pl.mobMe.point.gethp());// hp mob
                         player.sendMessage(msg);
                         msg.cleanup();
                     }
@@ -655,13 +593,13 @@ public class ChangeMapService {
             msg.writer().writeByte(typeSpace);
             switch (typeSendMSG) {
                 case 0: //cho tất cả
-                    Service.getInstance().sendMessAllPlayerInMap(player, msg);
+                    Service.gI().sendMessAllPlayerInMap(player, msg);
                     break;
                 case 1: //cho bản thân
                     player.sendMessage(msg);
                     break;
                 case 2: //cho người chơi trong map
-                    Service.getInstance().sendMessAllPlayerIgnoreMe(player, msg);
+                    Service.gI().sendMessAllPlayerIgnoreMe(player, msg);
                     break;
             }
             msg.cleanup();
@@ -679,9 +617,7 @@ public class ChangeMapService {
             }
         }
         player.zone = zoneJoin;
-        if(player != null && player.zone != null){
-            player.zone.addPlayer(player);
-        }
+        player.zone.addPlayer(player);
     }
 
     public void exitMap(Player player) {
@@ -696,7 +632,7 @@ public class ChangeMapService {
             }
             if (player.effectSkin.xHPKI > 1) {
                 player.effectSkin.xHPKI = 1;
-                Service.getInstance().point(player);
+                Service.gI().point(player);
             }
             player.zone.removePlayer(player);
             if (!MapService.gI().isMapOffline(player.zone.map.mapId)) {
@@ -704,7 +640,7 @@ public class ChangeMapService {
                 try {
                     msg = new Message(-6);
                     msg.writer().writeInt((int) player.id);
-                    Service.getInstance().sendMessAnotherNotMeInMap(player, msg);
+                    Service.gI().sendMessAnotherNotMeInMap(player, msg);
                     msg.cleanup();
                     player.zone = null;
                 } catch (Exception e) {
@@ -714,34 +650,16 @@ public class ChangeMapService {
         }
     }
 
-    public void goToTuongLai(Player player) {
+   public void goToTuongLai(Player player) {
         if (!player.iDMark.isGotoFuture()) {
             player.iDMark.setLastTimeGoToFuture(System.currentTimeMillis());
             player.iDMark.setGotoFuture(true);
-            player.type = 0;
             spaceShipArrive(player, (byte) 1, DEFAULT_SPACE_SHIP);
             effectChangeMap(player, 60, EFFECT_GO_TO_TUONG_LAI);
         }
-    }   
-    public void goToGas(Player player) {
-        if (!player.iDMark.isGoToGas()) {
-             player.iDMark.setLastTimeGotoGas(System.currentTimeMillis());
-            player.iDMark.setGoToGas(true);
-            player.type = 1;
-            spaceShipArrive(player, (byte) 1, DEFAULT_SPACE_SHIP);
-            effectChangeMap(player, 60, EFFECT_GO_TO_BDKG);
-        }
     }
 
-    public void goToDBKB(Player player) {
-        if (!player.iDMark.isGoToBDKB()) {
-            player.iDMark.setLastTimeGoToBDKB(System.currentTimeMillis());
-            player.iDMark.setGoToBDKB(true);
-            player.type = 2;
-            spaceShipArrive(player, (byte) 1, DEFAULT_SPACE_SHIP);
-            effectChangeMap(player, 60, EFFECT_GO_TO_BDKG);
-        }
-    }
+  
 
     public void goToQuaKhu(Player player) {
         ChangeMapService.this.changeMapBySpaceShip(player, 24, -1, -1);
@@ -763,32 +681,22 @@ public class ChangeMapService {
         }
     }
 
-//    kiểm tra map có thể vào với nhiệm vụ hiện tại
+    //kiểm tra map có thể vào với nhiệm vụ hiện tại
     public Zone checkMapCanJoin(Player player, Zone zoneJoin) {
-        //dong map 
-//        if (zoneJoin.map.mapId == 154 || zoneJoin.map.mapId == 160) {
-//            return null;
-//        }
-        if (zoneJoin == null) {
+//        //dong map 
+        if (zoneJoin.map.mapId == 154 || zoneJoin.map.mapId == 160) {
             return null;
         }
-        if (zoneJoin.map.mapId == -1) {
-            return null;
+        if (player.isPet || player.isBoss || player.getSession() != null && player.isAdmin()) {
+            return zoneJoin;
         }
-//        if (player instanceof MiNuong || player instanceof AnTrom) {
-//            return zoneJoin;
-//        }
-//        if (player.isPet || player.isBoss || player.getSession() != null && player.isAdmin()) {
-//            return zoneJoin;
-//        }
 
-        if ( player != null && zoneJoin != null && player.isPl() && !player.isAdmin()) {
+        if (zoneJoin != null) {
             switch (zoneJoin.map.mapId) {
                 case 1: //đồi hoa cúc
                 case 8: //đồi nấm tím
                 case 15: //đồi hoang
                     if (TaskService.gI().getIdTask(player) < ConstTask.TASK_2_0) {
-                        Service.gI().sendThongBao(player, "Vui lòng hoàn thành nhiệm vụ trước khi tới đây!");
                         return null;
                     }
                     break;
@@ -796,7 +704,6 @@ public class ChangeMapService {
                 case 43: //vách moori
                 case 44: //vách kakarot
                     if (TaskService.gI().getIdTask(player) < ConstTask.TASK_3_1) {
-                        Service.gI().sendThongBao(player, "Vui lòng hoàn thành nhiệm vụ trước khi tới đây!");
                         return null;
                     }
                     break;
@@ -804,7 +711,6 @@ public class ChangeMapService {
                 case 9: //thị trấn moori
                 case 16: //làng plane
                     if (TaskService.gI().getIdTask(player) < ConstTask.TASK_4_0) {
-                        Service.gI().sendThongBao(player, "Vui lòng hoàn thành nhiệm vụ trước khi tới đây!");
                         return null;
                     }
                     break;
@@ -812,7 +718,6 @@ public class ChangeMapService {
                 case 25: //trạm tàu vũ trụ namếc
                 case 26: //trạm tàu vũ trụ xayda
                     if (TaskService.gI().getIdTask(player) < ConstTask.TASK_6_0) {
-                        Service.gI().sendThongBao(player, "Vui lòng hoàn thành nhiệm vụ trước khi tới đây!");
                         return null;
                     }
                     break;
@@ -820,7 +725,6 @@ public class ChangeMapService {
                 case 11: //thung lũng maima
                 case 17: //rừng nguyên sinh
                     if (TaskService.gI().getIdTask(player) < ConstTask.TASK_7_0) {
-                        Service.gI().sendThongBao(player, "Vui lòng hoàn thành nhiệm vụ trước khi tới đây!");
                         return null;
                     }
                     break;
@@ -831,7 +735,6 @@ public class ChangeMapService {
                 case 35: //rừng cọ
                 case 36: //rừng đá
                     if (TaskService.gI().getIdTask(player) < ConstTask.TASK_14_0) {
-                        Service.gI().sendThongBao(player, "Vui lòng hoàn thành nhiệm vụ trước khi tới đây!");
                         return null;
                     }
                     break;
@@ -839,7 +742,6 @@ public class ChangeMapService {
                 case 34: //đông nam guru
                 case 38: //bờ vực đen
                     if (TaskService.gI().getIdTask(player) < ConstTask.TASK_15_0) {
-                        Service.gI().sendThongBao(player, "Vui lòng hoàn thành nhiệm vụ trước khi tới đây!");
                         return null;
                     }
                     break;
@@ -847,7 +749,6 @@ public class ChangeMapService {
                 case 10: //thung lũng namếc
                 case 19: //thành phố vegeta
                     if (TaskService.gI().getIdTask(player) < ConstTask.TASK_16_0) {
-                        Service.gI().sendThongBao(player, "Vui lòng hoàn thành nhiệm vụ trước khi tới đây!");
                         return null;
                     }
                     break;
@@ -859,7 +760,6 @@ public class ChangeMapService {
                 case 64: //núi dây leo
                 case 65: //núi cây quỷ
                     if (TaskService.gI().getIdTask(player) < ConstTask.TASK_18_0) {
-                        Service.gI().sendThongBao(player, "Vui lòng hoàn thành nhiệm vụ trước khi tới đây!");
                         return null;
                     }
                     break;
@@ -872,23 +772,20 @@ public class ChangeMapService {
                 case 76: //núi đá
                 case 77: //rừng đá
                     if (TaskService.gI().getIdTask(player) < ConstTask.TASK_19_0) {
-                        Service.gI().sendThongBao(player, "Vui lòng hoàn thành nhiệm vụ trước khi tới đây!");
                         return null;
                     }
                     break;
-                case 79: //núi khỉ đỏ
                 case 81: //hang quỷ chim
                 case 82: //núi khỉ đen
                 case 83: //hang khỉ đen
+                case 79: //núi khỉ đỏ
                     if (TaskService.gI().getIdTask(player) < ConstTask.TASK_20_1) {
-                        Service.gI().sendThongBao(player, "Vui lòng hoàn thành nhiệm vụ trước khi tới đây!");
-                        zoneJoin = null;
+                        return null;
                     }
                     break;
                 case 80: //núi khỉ vàng
                     if (TaskService.gI().getIdTask(player) < ConstTask.TASK_21_1) {
-                        Service.gI().sendThongBao(player, "Vui lòng hoàn thành nhiệm vụ trước khi tới đây!");
-                        zoneJoin = null;
+                        return null;
                     }
                     break;
                 case 105: //cánh đồng tuyết
@@ -898,7 +795,6 @@ public class ChangeMapService {
                 case 109: //rừng băng
                 case 110: //hang băng
                     if (TaskService.gI().getIdTask(player) < ConstTask.TASK_21_4) {
-                        Service.gI().sendThongBao(player, "Vui lòng hoàn thành nhiệm vụ trước khi tới đây!");
                         return null;
                     }
                     break;
@@ -911,55 +807,18 @@ public class ChangeMapService {
                 case 98: //ngọn núi phía bắc
                 case 99: //thung lũng phía bắc
                 case 100: //thị trấn ginder
-                case 104:
                     if (TaskService.gI().getIdTask(player) < ConstTask.TASK_20_0) {
-                        Service.gI().sendThongBao(player, "Vui lòng hoàn thành nhiệm vụ trước khi tới đây!");
                         return null;
                     }
                     break;
                 case 103: //võ đài xên
-                case 145:
                     if (TaskService.gI().getIdTask(player) < ConstTask.TASK_25_0) {
-                        Service.gI().sendThongBao(player, "Vui lòng hoàn thành nhiệm vụ trước khi tới đây!");
                         return null;
                     }
-                    break;
-                  case 142: //thị trấn ginder
-                    if (player.getSession().player.nPoint.power <= 130000000000L) {
-                        Service.getInstance().sendThongBao(player, "Yêu cầu sức mạnh trên 130 tỷ");
-                        return null;
-                    }
-                    break;
-                 case 144: //thị trấn ginder
-                    if(!player.inventory.haveOption(player.inventory.itemsBody, 5, 33)) {
-                        Service.getInstance().sendThongBao(player, "Yêu cầu có cải trang dịch chuyển tức thời");
-                        return null;
-                    }
-                    break;
-                 case 169:
-                    if (TaskService.gI().getIdTask(player) < ConstTask.TASK_24_0) {
-                        Service.gI().sendThongBao(player, "Vui lòng hoàn thành nhiệm vụ trước khi tới đây!");
-                        return null;
-                    }
-                    this.teleport = false;
-                    break;
-                 case 146:
-                    if (TaskService.gI().getIdTask(player) < ConstTask.TASK_24_0) {
-                        Service.gI().sendThongBao(player, "Vui lòng hoàn thành nhiệm vụ trước khi tới đây!");
-                        return null;
-                    }
-                    this.teleport = false;
-                    break;
-                case 155:
-                    if (player.setClothes.setDHD != 5) {
-                        Service.gI().sendThongBao(player, "Vui lòng mang 5 món đồ hủy diệt để đến map này!");
-                        return null;
-                    }
-                    this.teleport = false;
                     break;
             }
         }
-        if (zoneJoin != null && player != null && player.isPl()) {
+        if (zoneJoin != null) {
             switch (player.gender) {
                 case ConstPlayer.TRAI_DAT:
                     if (zoneJoin.map.mapId == 22 || zoneJoin.map.mapId == 23) {
@@ -1013,44 +872,5 @@ public class ChangeMapService {
             }
         }
     }
-    public Zone getZoneJoinByMapIdAndZoneId(Player player, int mapId, int zoneId) {
-        Map map = getMapById(mapId);
-        Zone zoneJoin = null;
-        try {
-            if (map != null) {
-                zoneJoin = map.zones.get(zoneId);
-            }
-        } catch (Exception e) {
-            System.out.println("99999");
-        }
-        return zoneJoin;
-    }
-     public Map getMapById(int mapId) {
-        for (Map map : Manager.MAPS) {
-            if (map.mapId == mapId) {
-                return map;
-            }
-        }
-        return null;
-    }
-
-    public Zone getMapCanJoin(Player player, int mapId) {
-        if (MapService.gI().isMapOffline(player.zone.map.mapId)) {
-            return getZoneJoinByMapIdAndZoneId(player, mapId, 0);
-        }
-        Zone mapJoin = null;
-        Map map = getMapById(mapId);
-        for (Zone zone : map.zones) {
-            if (zone.getNumOfPlayers() < Zone.PLAYERS_TIEU_CHUAN_TRONG_MAP) {
-                mapJoin = zone;
-                break;
-            }
-        }
-        return mapJoin;
-    }
-
-    public void changeMapNonSpaceship(Player player, int mapid, int x, int y) {
-        Zone zone = getMapCanJoin(player, mapid);
-        ChangeMapService.gI().changeMap(player, zone, -1, -1, x, y, NON_SPACE_SHIP);
-    }
+   
 }

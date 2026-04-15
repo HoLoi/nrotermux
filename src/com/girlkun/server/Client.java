@@ -24,11 +24,6 @@ import java.util.List;
 import java.util.Map;
 import com.girlkun.models.matches.pvp.DaiHoiVoThuat;
 import com.girlkun.models.matches.pvp.DaiHoiVoThuatService;
-import com.girlkun.models.player.TimeReset;
-import static com.girlkun.models.player.TimeReset.CLOSE_RESET;
-import static com.girlkun.models.player.TimeReset.TIME_RESET;
-import com.girlkun.services.func.GoiRongXuong;
-
 
 public class Client implements Runnable {
 
@@ -82,7 +77,7 @@ public class Client implements Runnable {
             try {
                 GirlkunDB.executeUpdate("update account set last_time_logout = ? where id = ?", new Timestamp(System.currentTimeMillis()), session.userId);
             } catch (Exception e) {
-                System.out.println("bbbbb");
+                e.printStackTrace();
             }
         }
         ServerManager.gI().disconnect(session);
@@ -95,12 +90,12 @@ public class Client implements Runnable {
         this.players.remove(player);
         if (!player.beforeDispose) {
             DaiHoiVoThuatService.gI(DaiHoiVoThuat.gI().getDaiHoiNow()).removePlayerWait(player);  
-            DaiHoiVoThuatService.gI(DaiHoiVoThuat.gI().getDaiHoiNow()).removePlayer(player); 
+            DaiHoiVoThuatService.gI(DaiHoiVoThuat.gI().getDaiHoiNow()).removePlayer(player);  
             player.beforeDispose = true;
             player.mapIdBeforeLogout = player.zone.map.mapId;
             if(player.idNRNM != -1){
                 ItemMap itemMap = new ItemMap(player.zone, player.idNRNM, 1, player.location.x, player.location.y, -1);
-                Service.getInstance().dropItemMap(player.zone, itemMap);
+                Service.gI().dropItemMap(player.zone, itemMap);
                 NgocRongNamecService.gI().pNrNamec[player.idNRNM - 353] = "";
                 NgocRongNamecService.gI().idpNrNamec[player.idNRNM - 353] = -1;
                 player.idNRNM = -1;
@@ -124,10 +119,6 @@ public class Client implements Runnable {
                     && SummonDragon.gI().playerSummonShenron.id == player.id) {
                 SummonDragon.gI().isPlayerDisconnect = true;
             }
-            if (GoiRongXuong.gI().playerRongXuong != null
-                    && GoiRongXuong.gI().playerRongXuong.id == player.id) {
-                GoiRongXuong.gI().isPlayerDisconnect = true;
-            }
             if (player.mobMe != null) {
                 player.mobMe.mobMeDie();
             }
@@ -137,18 +128,6 @@ public class Client implements Runnable {
                 }
                 ChangeMapService.gI().exitMap(player.pet);
             }
-            if (player.newpet != null) {
-                if (player.newpet.mobMe != null) {
-                    player.newpet.mobMe.mobMeDie();
-                }
-                ChangeMapService.gI().exitMap(player.newpet);
-            }
-            if (player.TrieuHoipet != null) {
-                if (player.TrieuHoipet.mobMe != null) {
-                    player.TrieuHoipet.mobMe.mobMeDie();
-                }
-                ChangeMapService.gI().exitMap(player.TrieuHoipet);
-            }
         }
         PlayerDAO.updatePlayer(player);
     }
@@ -157,7 +136,6 @@ public class Client implements Runnable {
         if (session != null) {
             this.remove(session);
             session.disconnect();
-//            System.out.println("     kick seesion     " + session.id);
         }
     }
 
@@ -217,14 +195,8 @@ public class Client implements Runnable {
             try {
                 long st = System.currentTimeMillis();
                 update();
-                if ((st > TIME_RESET && st < CLOSE_RESET)) {
-                    GirlkunDB.executeUpdate("UPDATE player SET Tai_xiu = JSON_REPLACE(JSON_REPLACE(JSON_REPLACE(Tai_xiu, '$[0]', 0), '$[4]', 0), '$[5]', 0)");
-                    System.out.println("==================RESET DAY THANH CONG===============");
-                    Thread.sleep(800);
-                }
                 Thread.sleep(800 - (System.currentTimeMillis() - st));
             } catch (Exception e) {
-//                System.out.println("      loi run Client");
             }
         }
     }
@@ -236,6 +208,6 @@ public class Client implements Runnable {
         txt += "players_userId: " + players_userId.size() + "\n";
         txt += "players_name: " + players_name.size() + "\n";
         txt += "players: " + players.size() + "\n";
-        Service.getInstance().sendThongBao(player, txt);
+        Service.gI().sendThongBao(player, txt);
     }
 }
