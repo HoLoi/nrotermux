@@ -28,6 +28,7 @@ import com.girlkun.services.func.TopService;
 import com.girlkun.utils.Logger;
 import com.girlkun.utils.TimeUtil;
 import com.girlkun.utils.Util;
+import java.awt.GraphicsEnvironment;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -80,14 +81,7 @@ public class ServerManager {
         long delay = 500;
         delaylogin = System.currentTimeMillis();
         isRunning = true;
-        JFrame frame = new JFrame("Ngọc rồng Tabi");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        ImageIcon icon = new ImageIcon("C:\\Users\\vt220\\Desktop\\CBRO Potara\\data\\girlkun\\icon\\icon.png");
-        frame.setIconImage(icon.getImage());
-        JPanel panel = new panel();
-        frame.add(panel);
-        frame.pack();
-        frame.setVisible(true);
+        initControlPanel();
         activeCommandLine();
         activeGame();
         activeServerSocket();
@@ -130,6 +124,25 @@ public class ServerManager {
             java.util.logging.Logger.getLogger(BossManager.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+
+    private void initControlPanel() {
+        try {
+            if (GraphicsEnvironment.isHeadless()) {
+                Logger.warning("Moi truong headless - bo qua giao dien quan ly server\n");
+                return;
+            }
+            JFrame frame = new JFrame("Ngọc rồng Tabi");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            ImageIcon icon = new ImageIcon("data/girlkun/icon/icon.png");
+            frame.setIconImage(icon.getImage());
+            JPanel panel = new panel();
+            frame.add(panel);
+            frame.pack();
+            frame.setVisible(true);
+        } catch (Exception e) {
+            Logger.warning("Khong the khoi tao giao dien server, tiep tuc che do headless\n");
+        }
     }
 
     private void act() throws Exception {
