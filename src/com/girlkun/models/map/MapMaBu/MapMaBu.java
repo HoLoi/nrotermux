@@ -45,6 +45,7 @@ public class MapMaBu {
                 TIME_OPEN_MABU = TimeUtil.getTime(TimeUtil.getTimeNow("dd/MM/yyyy") + " " + HOUR_OPEN_MAP_MABU + ":" + MIN_OPEN_MAP_MABU + ":" + SECOND_OPEN_MAP_MABU, "dd/MM/yyyy HH:mm:ss");
                 TIME_CLOSE_MABU = TimeUtil.getTime(TimeUtil.getTimeNow("dd/MM/yyyy") + " " + HOUR_CLOSE_MAP_MABU + ":" + MIN_CLOSE_MAP_MABU + ":" + SECOND_CLOSE_MAP_MABU, "dd/MM/yyyy HH:mm:ss");
             } catch (Exception ignored) {
+                System.out.println("        loi map mabu");
             }
         }
     }
@@ -52,7 +53,7 @@ public class MapMaBu {
 
     private void kickOutOfMapMabu(Player player) {
         if (MapService.gI().isMapMaBu(player.zone.map.mapId)) {
-            Service.gI().sendThongBao(player, "Trận đại chiến đã kết thúc, tàu vận chuyển sẽ đưa bạn về nhà");
+            Service.getInstance().sendThongBao(player, "Trận đại chiến đã kết thúc, tàu vận chuyển sẽ đưa bạn về nhà");
             ChangeMapService.gI().changeMapBySpaceShip(player, player.gender + 21, -1, 250);
         }
     }
@@ -72,27 +73,29 @@ public class MapMaBu {
             List<Player> players = player.zone.getPlayers();
             for (Player pl : players) {
                 if (pl.clan != null && !player.equals(pl) && player.clan.equals(pl.clan) && !player.isBoss) {
-                    Service.gI().changeFlag(player, Util.nextInt(9, 10));
+                    Service.getInstance().changeFlag(player, Util.nextInt(9, 10));
                     changed = true;
                     break;
                 }
             }
         }
         if (!changed && !player.isBoss) {
-            Service.gI().changeFlag(player, Util.nextInt(9, 10));
+            Service.getInstance().changeFlag(player, Util.nextInt(9, 10));
         }
     }
 
     public void update(Player player) {
-        if (player.zone == null || !MapService.gI().isMapBlackBallWar(player.zone.map.mapId)) {
+        if (player.zone == null || !MapService.gI().isMapMaBu(player.zone.map.mapId)) {
+            return;
+        }
             try {
                 long now = System.currentTimeMillis();
-                if (now < TIME_OPEN_MABU || now > TIME_CLOSE_MABU) {
-                    ketthucmabu(player);
-                }
+//                if (now < TIME_OPEN_MABU || now > TIME_CLOSE_MABU) {
+//                    ketthucmabu(player);
+//                }
             } catch (Exception ignored) {
+                System.out.println("        loi update map mabu");
             }
-        }
 
     }
 }

@@ -2,7 +2,7 @@ package com.girlkun.models.player;
 
 /**
  *
- * @Stole By Arriety 💖
+ * @Stole By Hoàng Việt 💖
  *
  */
 public class Gift {

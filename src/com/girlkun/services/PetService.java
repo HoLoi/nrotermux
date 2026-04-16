@@ -4,6 +4,7 @@ import com.girlkun.consts.ConstPlayer;
 import com.girlkun.models.player.NewPet;
 import com.girlkun.models.player.Pet;
 import com.girlkun.models.player.Player;
+import com.girlkun.models.player.Thu_TrieuHoi;
 import com.girlkun.services.func.ChangeMapService;
 import com.girlkun.utils.SkillUtil;
 import com.girlkun.utils.Util;
@@ -27,7 +28,7 @@ public class PetService {
                     player.pet.nPoint.limitPower = limitPower[0];
                 }
                 Thread.sleep(1000);
-                Service.gI().chatJustForMe(player, player.pet, "Xin hãy thu nhận làm đệ tử");
+                Service.getInstance().chatJustForMe(player, player.pet, "Xin hãy thu nhận làm đệ tử");
             } catch (Exception e) {
             }
         }).start();
@@ -41,7 +42,7 @@ public class PetService {
                     player.pet.nPoint.limitPower = limitPower[0];
                 }
                 Thread.sleep(1000);
-                Service.gI().chatJustForMe(player, player.pet, "Xin hãy thu nhận làm đệ tử");
+                Service.getInstance().chatJustForMe(player, player.pet, "Xin hãy thu nhận làm đệ tử");
             } catch (Exception e) {
             }
         }).start();
@@ -55,7 +56,7 @@ public class PetService {
                     player.pet.nPoint.limitPower = limitPower[0];
                 }
                 Thread.sleep(1000);
-                Service.gI().chatJustForMe(player, player.pet, "Oa oa oa...");
+                Service.getInstance().chatJustForMe(player, player.pet, "Oa oa oa...");
             } catch (Exception e) {
             }
         }).start();
@@ -69,7 +70,7 @@ public class PetService {
                     player.pet.nPoint.limitPower = limitPower[0];
                 }
                 Thread.sleep(1000);
-                Service.gI().chatJustForMe(player, player.pet, "Oa oa oa...");
+                Service.getInstance().chatJustForMe(player, player.pet, "Oa oa oa...");
             } catch (Exception e) {
             }
         }).start();
@@ -82,7 +83,7 @@ public class PetService {
                     player.pet.nPoint.limitPower = limitPower[0];
                 }
                 Thread.sleep(1000);
-                Service.gI().chatJustForMe(player, player.pet, "Thần hủy diệt hiện thân tất cả quỳ xuống...");
+                Service.getInstance().chatJustForMe(player, player.pet, "Thần hủy diệt hiện thân tất cả quỳ xuống...");
             } catch (Exception e) {
             }
         }).start();
@@ -96,7 +97,7 @@ public class PetService {
                     player.pet.nPoint.limitPower = limitPower[0];
                 }
                 Thread.sleep(1000);
-                Service.gI().chatJustForMe(player, player.pet, "Thần hủy diệt hiện thân tất cả quỳ xuống...");
+                Service.getInstance().chatJustForMe(player, player.pet, "Thần hủy diệt hiện thân tất cả quỳ xuống...");
             } catch (Exception e) {
             }
         }).start();
@@ -108,7 +109,7 @@ public class PetService {
                     player.pet.nPoint.limitPower = limitPower[0];
                 }
                 Thread.sleep(1000);
-                Service.gI().chatJustForMe(player, player.pet, "Sư Phụ SooMe hiện thân tụi m quỳ xuống...");
+                Service.getInstance().chatJustForMe(player, player.pet, "Sư Phụ Broly hiện thân tụi mày quỳ xuống...");
             } catch (Exception e) {
             }
         }).start();
@@ -122,7 +123,7 @@ public class PetService {
                     player.pet.nPoint.limitPower = limitPower[0];
                 }
                 Thread.sleep(1000);
-                Service.gI().chatJustForMe(player, player.pet, "Sư Phụ SooMe hiện thân tụi m quỳ xuống...");
+                Service.getInstance().chatJustForMe(player, player.pet, "Sư Phụ Broly hiện thân tụi mày quỳ xuống...");
             } catch (Exception e) {
             }
         }).start();
@@ -190,7 +191,8 @@ public class PetService {
         player.pet.dispose();
         player.pet = null;
         createBerusPet(player, gender, limitPower);
-    } public void changePicPet(Player player) {
+    }
+    public void changePicPet(Player player) {
         byte limitPower = player.pet.nPoint.limitPower;
         if (player.fusion.typeFusion != ConstPlayer.NON_FUSION) {
             player.pet.unFusion();
@@ -213,14 +215,14 @@ public class PetService {
     }
     public void changeNamePet(Player player, String name) {
         try {
-            if (!InventoryServiceNew.gI().isExistItemBag(player, 400)) {
-                Service.gI().sendThongBao(player, "Bạn cần thẻ đặt tên đệ tử, mua tại Santa");
+            if (!InventoryServiceNew.gI().KtraItemBag(player, 400)) {
+                Service.getInstance().sendThongBao(player, "Bạn cần thẻ đặt tên đệ tử, mua tại Santa");
                 return;
             } else if (Util.haveSpecialCharacter(name)) {
-                Service.gI().sendThongBao(player, "Tên không được chứa ký tự đặc biệt");
+                Service.getInstance().sendThongBao(player, "Tên không được chứa ký tự đặc biệt");
                 return;
             } else if (name.length() > 10) {
-                Service.gI().sendThongBao(player, "Tên quá dài");
+                Service.getInstance().sendThongBao(player, "Tên quá dài");
                 return;
             }
             ChangeMapService.gI().exitMap(player.pet);
@@ -229,7 +231,7 @@ public class PetService {
             new Thread(() -> {
                 try {
                     Thread.sleep(1000);
-                    Service.gI().chatJustForMe(player, player.pet, "Cảm ơn sư phụ đã đặt cho con tên " + name);
+                    Service.getInstance().chatJustForMe(player, player.pet, "Cảm ơn sư phụ đã đặt cho con tên " + name);
                 } catch (Exception e) {
                 }
             }).start();
@@ -259,20 +261,30 @@ public class PetService {
         petData[4] = Util.nextInt(0, 2); //crit
         return petData;
     }
-     private int[] getDataPetPic() {
-        int[] hpmp = {1800, 1900, 2000, 2100, 2200,2300};
+    private int[] getDataPetBerus() {
+        int[] hpmp = {1700, 1800, 1900, 2000, 2100, 2200};
         int[] petData = new int[5];
-        petData[0] = Util.nextInt(40, 115) * 20; //hp
-        petData[1] = Util.nextInt(40, 115) * 20; //mp
-        petData[2] = Util.nextInt(70, 140); //dame
+        petData[0] = Util.nextInt(40, 110) * 20; //hp
+        petData[1] = Util.nextInt(40, 110) * 20; //mp
+        petData[2] = Util.nextInt(50, 130); //dame
         petData[3] = Util.nextInt(9, 50); //def
         petData[4] = Util.nextInt(0, 2); //crit
+        return petData;
+    }
+     private int[] getDataPetPic() {
+        int[] hpmp = {2000, 2100, 2200, 2300, 2400,2500};
+        int[] petData = new int[5];
+        petData[0] = Util.nextInt(40, 125) * 20; //hp
+        petData[1] = Util.nextInt(40, 125) * 20; //mp
+        petData[2] = Util.nextInt(80, 160); //dame
+        petData[3] = Util.nextInt(10, 60); //def
+        petData[4] = Util.nextInt(2, 5); //crit
         return petData;
     }
     private void createNewPet(Player player, boolean isMabu, boolean isBerus,boolean isPic, byte... gender) {
         int[] data = isMabu ? isPic ?  getDataPetMabu():getDataPetPic() : getDataPetNormal();
         Pet pet = new Pet(player);
-        pet.name = "$" + (isMabu ? "Mabư" : isBerus ? "Berus" : isPic ? "Pic" : "Đệ tử");
+        pet.name = "$" + (isMabu ? "Mabư" : isBerus ? "Berus" : isPic ? "Super Broly Huyền Thoại" : "Đệ tử");
         pet.gender = (gender != null && gender.length != 0) ? gender[0] : (byte) Util.nextInt(0, 2);
         pet.id = -player.id;
         pet.nPoint.power = isMabu || isBerus|| isPic ? 1500000 : 2000;
@@ -284,7 +296,7 @@ public class PetService {
         pet.nPoint.dameg = data[2];
         pet.nPoint.defg = data[3];
         pet.nPoint.critg = data[4];
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 8; i++) {
             pet.inventory.itemsBody.add(ItemService.gI().createItemNull());
         }
         pet.playerSkill.skills.add(SkillUtil.createSkill(Util.nextInt(0, 2) * 2, 1));
@@ -296,42 +308,65 @@ public class PetService {
     }
 
     public static void Pet2(Player pl, int h, int b, int l) {
-        if (pl.newpet != null &&pl.newpet1 != null) {
+        if (pl.newpet != null ) {//&&pl.newpet1 != null
             pl.newpet.dispose();
-            pl.newpet1.dispose();
+//            pl.newpet1.dispose();
         }
         pl.newpet = new NewPet(pl, (short) h, (short) b, (short) l);
-        pl.newpet1 = new NewPet(pl, (short) h, (short) b, (short) l);
+//        pl.newpet1 = new NewPet(pl, (short) h, (short) b, (short) l);
         pl.newpet.name = "$";
-        pl.newpet1.name = "$";
+//        pl.newpet1.name = "$";
         pl.newpet.gender = pl.gender;
-          pl.newpet1.gender = pl.gender;
+//          pl.newpet1.gender = pl.gender;
         pl.newpet.nPoint.tiemNang = 1;
-         pl.newpet1.nPoint.tiemNang = 1;
+//         pl.newpet1.nPoint.tiemNang = 1;
         pl.newpet.nPoint.power = 1;
-        pl.newpet1.nPoint.power = 1;
+//        pl.newpet1.nPoint.power = 1;
         pl.newpet.nPoint.limitPower = 1;
-         pl.newpet1.nPoint.limitPower = 1;
-        pl.newpet.nPoint.hpg = 500000000;
-        pl.newpet1.nPoint.hpg = 500000000;
-        pl.newpet.nPoint.mpg = 500000000;
-        pl.newpet1.nPoint.mpg = 500000000;
-        pl.newpet.nPoint.hp = 500000000;
-        pl.newpet.nPoint.mp = 500000000;
+//         pl.newpet1.nPoint.limitPower = 1;
+        pl.newpet.nPoint.hpg = 500;
+//        pl.newpet1.nPoint.hpg = 500;
+        pl.newpet.nPoint.mpg = 500;
+//        pl.newpet1.nPoint.mpg = 500;
+        pl.newpet.nPoint.hp = 500;
+        pl.newpet.nPoint.mp = 500;
         pl.newpet.nPoint.dameg = 1;
         pl.newpet.nPoint.defg = 1;
         pl.newpet.nPoint.critg = 1;
         pl.newpet.nPoint.stamina = 1;
         pl.newpet.nPoint.setBasePoint();
         pl.newpet.nPoint.setFullHpMp();
-        pl.newpet1.nPoint.hp = 500000000;
-        pl.newpet1.nPoint.mp = 500000000;
-        pl.newpet1.nPoint.dameg = 1;
-        pl.newpet1.nPoint.defg = 1;
-        pl.newpet1.nPoint.critg = 1;
-        pl.newpet1.nPoint.stamina = 1;
-        pl.newpet1.nPoint.setBasePoint();
-        pl.newpet1.nPoint.setFullHpMp();
+//        pl.newpet1.nPoint.hp = 500000000;
+//        pl.newpet1.nPoint.mp = 500000000;
+//        pl.newpet1.nPoint.dameg = 1;
+//        pl.newpet1.nPoint.defg = 1;
+//        pl.newpet1.nPoint.critg = 1;
+//        pl.newpet1.nPoint.stamina = 1;
+//        pl.newpet1.nPoint.setBasePoint();
+//        pl.newpet1.nPoint.setFullHpMp();
+    }
+    public static void Thu_TrieuHoi(Player pl) {
+        if (pl.TrieuHoipet != null) {
+            pl.TrieuHoipet.dispose();
+        }
+        pl.TrieuHoipet = new Thu_TrieuHoi(pl);
+        pl.TrieuHoipet.name ="$" + "["+ pl.NameThanthu(pl.TrieuHoiCapBac) + "] "+ pl.TenThuTrieuHoi;
+        pl.TrieuHoipet.gender = pl.gender;
+        pl.TrieuHoipet.nPoint.tiemNang = 1;
+        pl.TrieuHoipet.nPoint.power = 1;
+        pl.TrieuHoipet.nPoint.limitPower = 1;
+        pl.TrieuHoipet.nPoint.hpg = pl.TrieuHoiHP;
+        pl.TrieuHoipet.nPoint.mpg = 500000000;
+        pl.TrieuHoipet.nPoint.hp = pl.TrieuHoiHP;
+        pl.TrieuHoipet.nPoint.mp = 500000000;
+        pl.TrieuHoipet.nPoint.dameg = pl.TrieuHoiDame;
+        pl.TrieuHoipet.nPoint.defg = 1;
+        pl.TrieuHoipet.nPoint.critg = 1;
+        pl.TrieuHoipet.nPoint.stamina = 10000;
+        pl.TrieuHoipet.nPoint.maxStamina = 10000;
+        pl.TrieuHoipet.playerSkill.skills.add(SkillUtil.createSkill(17, 7));
+        pl.TrieuHoipet.nPoint.setBasePoint();
+        pl.TrieuHoipet.nPoint.setFullHpMp();
     }
  
     //--------------------------------------------------------------------------

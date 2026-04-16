@@ -172,8 +172,8 @@ public class GifSequenceWriter {
             writer.close();
             output.close();
         } else {
-            System.out.println(
-                    "Usage: java GifSequenceWriter [list of gif files] [output file]");
+//            System.out.println(
+//                    "Usage: java GifSequenceWriter [list of gif files] [output file]");
         }
     }
 }

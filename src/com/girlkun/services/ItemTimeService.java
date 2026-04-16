@@ -3,6 +3,16 @@ package com.girlkun.services;
 import com.girlkun.consts.ConstPlayer;
 import com.girlkun.models.item.Item;
 import static com.girlkun.models.item.ItemTime.*;
+import static com.girlkun.models.item.ItemTimeSieuCap.TIME_EAT_MEAL;
+import static com.girlkun.models.item.ItemTimeSieuCap.TIME_ITEM3;
+import static com.girlkun.models.item.ItemTimeSieuCap.TIME_XI_MUOI;
+import static com.girlkun.models.item.ItemTimeSieuCap.TIME_TRUNGTHU;
+import static com.girlkun.models.item.ItemTimeSieuCap.TIME_KEO;
+import com.girlkun.models.map.bdkb.BanDoKhoBau;
+import static com.girlkun.models.map.bdkb.BanDoKhoBau.TIME_KHI_BAN_DO_KHO_BAU;
+import com.girlkun.models.map.doanhtrai.DoanhTrai;
+import com.girlkun.models.map.gas.Gas;
+import static com.girlkun.models.map.gas.Gas.KHI_GAS;
 import com.girlkun.models.player.Fusion;
 import com.girlkun.models.player.Player;
 import com.girlkun.network.io.Message;
@@ -23,6 +33,7 @@ public class ItemTimeService {
     //gửi cho client
     public void sendAllItemTime(Player player) {
         sendTextDoanhTrai(player);
+        sendTextGas(player);
         sendTextBanDoKhoBau(player);
         if (player.fusion.typeFusion == ConstPlayer.LUONG_LONG_NHAT_THE) {
             sendItemTime(player, player.gender == ConstPlayer.NAMEC ? 3901 : 3790,
@@ -44,36 +55,48 @@ public class ItemTimeService {
         if (player.itemTime.isUseAnDanh) {
             sendItemTime(player, 2760, (int) ((TIME_ITEM - (System.currentTimeMillis() - player.itemTime.lastTimeAnDanh)) / 1000));
         }
-        if (player.itemTime.isUseBoHuyet2) {
-            sendItemTime(player, 10715, (int) ((TIME_ITEM - (System.currentTimeMillis() - player.itemTime.lastTimeBoHuyet2)) / 1000));
-        }
-        if (player.itemTime.isUseBoKhi2) {
-            sendItemTime(player, 10712, (int) ((TIME_ITEM - (System.currentTimeMillis() - player.itemTime.lastTimeBoKhi2)) / 1000));
-        }
-        if (player.itemTime.isUseGiapXen2) {
-            sendItemTime(player, 10714, (int) ((TIME_ITEM - (System.currentTimeMillis() - player.itemTime.lastTimeGiapXen2)) / 1000));
-        }
-        if (player.itemTime.isUseCuongNo2) {
-            sendItemTime(player, 10716, (int) ((TIME_ITEM - (System.currentTimeMillis() - player.itemTime.lastTimeCuongNo2)) / 1000));
-        }
-        
-        if (player.itemTime.isUseAnDanh2) {
-            sendItemTime(player, 10717, (int) ((TIME_ITEM - (System.currentTimeMillis() - player.itemTime.lastTimeAnDanh2)) / 1000));
-        }
-        if (player.itemTime.isOpenPower) {
-            sendItemTime(player, 3783, (int) ((TIME_OPEN_POWER - (System.currentTimeMillis() - player.itemTime.lastTimeOpenPower)) / 1000));
+        if (player.itemTime.isBiNgo) {
+            sendItemTime(player, 5138, (int) ((TIME_BI_NGO - (System.currentTimeMillis() - player.itemTime.lastTimeBiNgo)) / 1000));
         }
         if (player.itemTime.isUseMayDo) {
             sendItemTime(player, 2758, (int) ((TIME_MAY_DO - (System.currentTimeMillis() - player.itemTime.lastTimeUseMayDo)) / 1000));
         }
-                if (player.itemTime.isUseMayDo2) {//2758 icon// cai nay time co cho bằng cái máy dò kia ko
-            sendItemTime(player, 16004, (int) ((TIME_MAY_DO2 - (System.currentTimeMillis() - player.itemTime.lastTimeUseMayDo2)) / 1000));
+        if (player.itemTime.isUseMayDo2) {
+            sendItemTime(player, 11274, (int) ((TIME_MAY_DO2 - (System.currentTimeMillis() - player.itemTime.lastTimeUseMayDo2)) / 1000));
         }
-        if (player.itemTime.isEatMeal) {
-            sendItemTime(player, player.itemTime.iconMeal, (int) ((TIME_EAT_MEAL - (System.currentTimeMillis() - player.itemTime.lastTimeEatMeal)) / 1000));
+        if (player.itemTime.isDuoikhi) {
+            sendItemTime(player, player.itemTime.iconDuoi, (int) ((TIME_DUOI_KHI - (System.currentTimeMillis() - player.itemTime.lastTimeDuoikhi)) / 1000));
         }
         if (player.itemTime.isUseTDLT) {
             sendItemTime(player, 4387,player.itemTime.timeTDLT / 1000);
+        }
+        if (player.itemTimesieucap.isUseBoHuyet3) {
+            sendItemTime(player, 10714, (int) ((TIME_ITEM3 - (System.currentTimeMillis() - player.itemTimesieucap.lastTimeBoHuyet3)) / 1000));
+        }
+        if (player.itemTimesieucap.isUseBoKhi3) {
+            sendItemTime(player, 10715, (int) ((TIME_ITEM3 - (System.currentTimeMillis() - player.itemTimesieucap.lastTimeBoKhi3)) / 1000));
+        }
+        if (player.itemTimesieucap.isUseGiapXen3) {
+            sendItemTime(player, 10712, (int) ((TIME_ITEM3 - (System.currentTimeMillis() - player.itemTimesieucap.lastTimeGiapXen3)) / 1000));
+        }
+        if (player.itemTimesieucap.isUseCuongNo3) {
+            sendItemTime(player, 10716, (int) ((TIME_ITEM3 - (System.currentTimeMillis() - player.itemTimesieucap.lastTimeCuongNo3)) / 1000));
+        }
+        
+        if (player.itemTimesieucap.isUseAnDanh3) {
+            sendItemTime(player, 10717, (int) ((TIME_ITEM3 - (System.currentTimeMillis() - player.itemTimesieucap.lastTimeAnDanh3)) / 1000));
+        }
+        if (player.itemTimesieucap.isKeo) {
+            sendItemTime(player, 8243, (int) ((TIME_KEO - (System.currentTimeMillis() - player.itemTimesieucap.lastTimeKeo)) / 1000));
+        }
+        if (player.itemTimesieucap.isUseXiMuoi) {
+            sendItemTime(player, 10904, (int) ((TIME_XI_MUOI - (System.currentTimeMillis() - player.itemTimesieucap.lastTimeUseXiMuoi)) / 1000));
+        }
+        if (player.itemTimesieucap.isUseTrungThu) {
+            sendItemTime(player, player.itemTimesieucap.iconBanh, (int) ((TIME_TRUNGTHU - (System.currentTimeMillis() - player.itemTimesieucap.lastTimeUseBanh)) / 1000));
+        }
+        if (player.itemTimesieucap.isEatMeal) {
+            sendItemTime(player, player.itemTimesieucap.iconMeal, (int) ((TIME_EAT_MEAL - (System.currentTimeMillis() - player.itemTimesieucap.lastTimeMeal)) / 1000));
         }
     }
 
@@ -121,21 +144,39 @@ public class ItemTimeService {
     }
 
     public void sendTextDoanhTrai(Player player) {
-//        if (player.clan != null && !player.clan.haveGoneDoanhTrai
-//                && player.clan.timeOpenDoanhTrai != 0) {
-//            int secondPassed = (int) ((System.currentTimeMillis() - player.clan.timeOpenDoanhTrai) / 1000);
-//            int secondsLeft = (DoanhTrai.TIME_DOANH_TRAI / 1000) - secondPassed;
-//            sendTextTime(player, DOANH_TRAI, "Doanh trại độc nhãn", secondsLeft);
-//        }
+        if (player.clan != null && !player.clan.doanhTrai_haveGone
+                && player.clan.timeOpenDoanhTrai != 0) {
+            int secondPassed = (int) ((System.currentTimeMillis() - player.clan.timeOpenDoanhTrai) / 1000);
+            int secondsLeft = (DoanhTrai.TIME_DOANH_TRAI / 1000) - secondPassed;
+            sendTextTime(player, DOANH_TRAI, "Doanh trại độc nhãn", secondsLeft);
+            if (secondsLeft <=0 || secondsLeft > 1800){
+                removeTextDoanhTrai(player);
+            }
+        }
     }
-
+    
+    public void sendTextGas(Player player) {
+        if (player.clan != null
+                && player.clan.timeOpenKhiGas != 0) {
+            int secondPassed = (int) ((System.currentTimeMillis() - player.clan.timeOpenKhiGas) / 1000);
+            int secondsLeft = (Gas.TIME_KHI_GAS / 1000) - secondPassed;
+            sendTextTime(player, KHI_GASS, "Khí Gas Hủy Diệt: ", secondsLeft);
+            if (secondsLeft <=0 || secondsLeft > 1800){
+                removeTextKhiGas(player);
+            }
+        }
+    }
+    
     public void sendTextBanDoKhoBau(Player player) {
-//        if (player.clan != null
-//                && player.clan.timeOpenBanDoKhoBau != 0) {
-//            int secondPassed = (int) ((System.currentTimeMillis() - player.clan.timeOpenBanDoKhoBau) / 1000);
-//            int secondsLeft = (BanDoKhoBau.TIME_BAN_DO_KHO_BAU / 1000) - secondPassed;
-//            sendTextTime(player, BAN_DO_KHO_BAU, "Bản đồ kho báu", secondsLeft);
-//        }
+        if (player.clan != null
+                && player.clan.timeOpenbdkb != 0) {
+            int secondPassed = (int) ((System.currentTimeMillis() - player.clan.timeOpenbdkb) / 1000);
+            int secondsLeft = (BanDoKhoBau.TIME_KHI_BAN_DO_KHO_BAU / 1000) - secondPassed;
+            sendTextTime(player, BAN_DO_KHO_BAU, "Bản đồ kho báu: ", secondsLeft);
+            if (secondsLeft <=0 || secondsLeft > 1800){
+                removeTextbdkb(player);
+            }
+        }
     }
 
     public void removeTextDoanhTrai(Player player) {
@@ -145,8 +186,14 @@ public class ItemTimeService {
     public void removeTextTime(Player player, byte id) {
         sendTextTime(player, id, "", 0);
     }
+       public void removeTextKhiGas(Player player) {
+        removeTextTime(player, KHI_GASS );
+    }
+       public void removeTextbdkb(Player player) {
+        removeTextTime(player, BAN_DO_KHO_BAU );
+    }
 
-    private void sendTextTime(Player player, byte id, String text, int seconds) {
+     public void sendTextTime(Player player, byte id, String text, int seconds) {
         Message msg;
         try {
             msg = new Message(65);
@@ -158,7 +205,6 @@ public class ItemTimeService {
         } catch (Exception e) {
         }
     }
-
     public void sendItemTime(Player player, int itemId, int time) {
         Message msg;
         try {

@@ -3,6 +3,8 @@ package com.girlkun.models.boss;
 import com.girlkun.consts.ConstPlayer;
 import com.girlkun.models.boss.iboss.IBossNew;
 import com.girlkun.models.boss.iboss.IBossOutfit;
+import com.girlkun.models.boss.list_boss.AnTrom;
+import com.girlkun.models.boss.list_boss.MiNuong;
 import com.girlkun.models.boss.list_boss.NRD.*;
 import com.girlkun.models.map.Zone;
 import com.girlkun.models.player.Player;
@@ -18,11 +20,10 @@ import com.girlkun.services.func.ChangeMapService;
 import com.girlkun.utils.SkillUtil;
 import com.girlkun.utils.Util;
 
-
 public class Boss extends Player implements IBossNew, IBossOutfit {
 
     public int currentLevel = -1;
-    protected final BossData[] data;
+    public final BossData[] data;
 
     public BossStatus bossStatus;
 
@@ -30,6 +31,8 @@ public class Boss extends Player implements IBossNew, IBossOutfit {
 
     protected long lastTimeRest;
     protected int secondsRest;
+
+    public int mapHoTong;
 
     protected long lastTimeChatS;
     protected int timeChatS;
@@ -44,7 +47,7 @@ public class Boss extends Player implements IBossNew, IBossOutfit {
 
     protected long lastTimeTargetPlayer;
     protected int timeTargetPlayer;
-    protected Player playerTarger;
+    public Player playerTarger;
 
     protected Boss parentBoss;
     public Boss[][] bossAppearTogether;
@@ -83,8 +86,8 @@ public class Boss extends Player implements IBossNew, IBossOutfit {
         this.name = String.format(data.getName(), Util.nextInt(0, 100));
         this.gender = data.getGender();
         this.nPoint.mpg = 7_5_2002;
-        this.nPoint.dameg = data.getDame();
-        this.nPoint.hpg = data.getHp()[Util.nextInt(0, data.getHp().length - 1)];
+        this.nPoint.dameg = (long) data.getDame();
+        this.nPoint.hpg = (long) data.getHp()[Util.nextInt(0, data.getHp().length - 1)];
         this.nPoint.hp = nPoint.hpg;
         this.nPoint.calPoint();
         this.initSkill();
@@ -172,13 +175,24 @@ public class Boss extends Player implements IBossNew, IBossOutfit {
 
     @Override
     public Player getPlayerAttack() {
-        if (this.playerTarger != null && (this.playerTarger.isDie() || !this.zone.equals(this.playerTarger.zone))) {
-            this.playerTarger = null;
-        }
-        if (this.playerTarger == null || Util.canDoWithTime(this.lastTimeTargetPlayer, this.timeTargetPlayer)) {
-            this.playerTarger = this.zone.getRandomPlayerInMap();
+        if (this instanceof AnTrom && (this.playerTarger == this.pet || this.playerTarger == this.TrieuHoipet || this.playerTarger == this.newpet || Util.canDoWithTime(this.lastTimeTargetPlayer, this.timeTargetPlayer))) {
+            this.playerTarger = this.zone.getRandomPlayerInMapPlayer();
             this.lastTimeTargetPlayer = System.currentTimeMillis();
-            this.timeTargetPlayer = Util.nextInt(5000, 7000);
+            this.timeTargetPlayer = Util.nextInt(1000, 2000);
+        } else {
+            if (this.playerTarger != null && (this.playerTarger.isDie() || !this.zone.equals(this.playerTarger.zone))) {
+                this.playerTarger = null;
+            }
+            if (this.playerTarger != null && this.playerTarger.effectSkin != null && this.playerTarger.effectSkin.isVoHinh) {
+                this.playerTarger = null;
+                this.lastTimeTargetPlayer = System.currentTimeMillis();
+                this.timeTargetPlayer = Util.nextInt(1000, 2000);
+            }
+            if (this.playerTarger == null || Util.canDoWithTime(this.lastTimeTargetPlayer, this.timeTargetPlayer)) {
+                this.playerTarger = this.zone.getRandomPlayerInMap();
+                this.lastTimeTargetPlayer = System.currentTimeMillis();
+                this.timeTargetPlayer = Util.nextInt(5000, 7000);
+            }
         }
         return this.playerTarger;
     }
@@ -294,7 +308,7 @@ public class Boss extends Player implements IBossNew, IBossOutfit {
             } else {
                 ChangeMapService.gI().changeMap(this, this.zone, this.location.x, this.location.y);
             }
-            Service.gI().sendFlagBag(this);
+            Service.getInstance().sendFlagBag(this);
             this.notifyJoinMap();
         }
     }
@@ -315,9 +329,16 @@ public class Boss extends Player implements IBossNew, IBossOutfit {
     }
 
     protected void notifyJoinMap() {
-        if (this.id >= -22 && this.id <= -20) return;
-        if (this.zone.map.mapId == 140||MapService.gI().isMapMaBu(this.zone.map.mapId) || MapService.gI().isMapBlackBallWar(this.zone.map.mapId))
+//        if (this.id >= -22 && this.id <= -20) return;
+        if (this.zone.map.mapId == 140 || MapService.gI().isMapMaBu(this.zone.map.mapId)
+                || MapService.gI().isMapDoanhTrai(this.zone.map.mapId)
+                || MapService.gI().isMapKhiGas(this.zone.map.mapId)
+                || MapService.gI().isMapBanDoKhoBau(this.zone.map.mapId)
+                || MapService.gI().isMapBlackBallWar(this.zone.map.mapId)
+                || this instanceof MiNuong
+                || this instanceof AnTrom) {
             return;
+        }
         ServerNotify.gI().notify("BOSS " + this.name + " vừa xuất hiện tại " + this.zone.map.mapName);
     }
 
@@ -397,7 +418,7 @@ public class Boss extends Player implements IBossNew, IBossOutfit {
                                     Util.nextInt(10) % 2 == 0 ? pl.location.y : pl.location.y - Util.nextInt(0, 50));
                         }
                     }
-                    SkillService.gI().useSkill(this, pl, null);
+                    SkillService.gI().useSkill(this, pl, null, null);
                     checkPlayerDie(pl);
                 } else {
                     if (Util.isTrue(1, 2)) {
@@ -406,6 +427,7 @@ public class Boss extends Player implements IBossNew, IBossOutfit {
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
+                System.out.println("loi ne    22    ClassCastException ");
             }
         }
     }
@@ -413,7 +435,7 @@ public class Boss extends Player implements IBossNew, IBossOutfit {
     @Override
     public void checkPlayerDie(Player player) {
         if (player.isDie()) {
-
+            this.chat("Chừa nha con!!!");
         }
     }
 
@@ -429,11 +451,23 @@ public class Boss extends Player implements IBossNew, IBossOutfit {
 
     @Override
     public void die(Player plKill) {
-        if (plKill != null) {
+
+        if (plKill != null
+                && (this.zone.map.mapId != 140 || !MapService.gI().isMapMaBu(this.zone.map.mapId)
+                || !MapService.gI().isMapDoanhTrai(this.zone.map.mapId)
+                || !MapService.gI().isMapKhiGas(this.zone.map.mapId)
+                || !MapService.gI().isMapBanDoKhoBau(this.zone.map.mapId)
+                || !MapService.gI().isMapBlackBallWar(this.zone.map.mapId) || !(this instanceof MiNuong)
+                || !(this instanceof AnTrom))) {
             reward(plKill);
             ServerNotify.gI().notify(plKill.name + " vừa tiêu diệt được " + this.name + ", ghê chưa ghê chưa..");
+            this.changeStatus(BossStatus.DIE);
+        } else {
+            if (plKill != null) {
+                reward(plKill);
+            }
+            this.changeStatus(BossStatus.DIE);
         }
-        this.changeStatus(BossStatus.DIE);
     }
 
     @Override
@@ -474,7 +508,14 @@ public class Boss extends Player implements IBossNew, IBossOutfit {
             this.lastZone = this.zone;
             this.changeStatus(BossStatus.RESPAWN);
         } else {
-            ChangeMapService.gI().spaceShipArrive(this, (byte) 2, ChangeMapService.DEFAULT_SPACE_SHIP);
+            if (this.id != BossID.SOI_HEC_QUYN && this.id != BossID.O_DO && this.id != BossID.CHA_PA && this.id != BossID.CHAN_XU
+                    && this.id != BossID.JACKY_CHUN && this.id != BossID.LIU_LIU && this.id != BossID.PON_PUT
+                    && this.id != BossID.TAU_PAY_PAY && this.id != BossID.THIEN_XIN_HANG
+                    && this.id != BossID.THIEN_XIN_HANG_CLONE
+                    && this.id != BossID.THIEN_XIN_HANG_CLONE1 && this.id != BossID.THIEN_XIN_HANG_CLONE2 && this.id != BossID.THIEN_XIN_HANG_CLONE3
+                    && this.id != BossID.XINBATO && this.id != BossID.YAMCHA) {
+                ChangeMapService.gI().spaceShipArrive(this, (byte) 2, ChangeMapService.DEFAULT_SPACE_SHIP);
+            }
             ChangeMapService.gI().exitMap(this);
             this.lastZone = null;
             this.lastTimeRest = System.currentTimeMillis();
@@ -483,11 +524,24 @@ public class Boss extends Player implements IBossNew, IBossOutfit {
         this.wakeupAnotherBossWhenDisappear();
     }
     //end loop
+//    public void leaveMapDHVT() {
+//        if (this.currentLevel < this.data.length - 1) {
+//            this.lastZone = this.zone;
+//            this.changeStatus(BossStatus.RESPAWN);
+//        } else {
+////            ChangeMapService.gI().spaceShipArrive(this, (byte) 2, ChangeMapService.DEFAULT_SPACE_SHIP);
+//            ChangeMapService.gI().exitMap(this);
+//            this.lastZone = null;
+//            this.lastTimeRest = System.currentTimeMillis();
+//            this.changeStatus(BossStatus.REST);
+//        }
+//        this.wakeupAnotherBossWhenDisappear();
+//    }
 
     @Override
-    public int injured(Player plAtt, int damage, boolean piercing, boolean isMobAttack) {
+    public double injured(Player plAtt, double damage, boolean piercing, boolean isMobAttack) {
         if (!this.isDie()) {
-            if (!piercing && Util.isTrue(this.nPoint.tlNeDon, 1000)) {
+            if (!piercing && Util.isTrue(this.nPoint.tlNeDon - plAtt.nPoint.tlchinhxac, 1000)) {
                 this.chat("Xí hụt");
                 return 0;
             }
@@ -522,16 +576,19 @@ public class Boss extends Player implements IBossNew, IBossOutfit {
     }
 
     public void chat(String text) {
-        Service.gI().chat(this, text);
+        Service.getInstance().chat(this, text);
     }
 
     protected boolean chat(int prefix, String textChat) {
         if (prefix == -1) {
             this.chat(textChat);
         } else if (prefix == -2) {
+            if (this.zone == null) {
+                return false;
+            }
             Player plMap = this.zone.getRandomPlayerInMap();
             if (plMap != null && !plMap.isDie() && Util.getDistance(this, plMap) <= 600) {
-                Service.gI().chat(plMap, textChat);
+                Service.getInstance().chat(plMap, textChat);
             } else {
                 return false;
             }
@@ -558,9 +615,15 @@ public class Boss extends Player implements IBossNew, IBossOutfit {
 
     @Override
     public void wakeupAnotherBossWhenAppear() {
-        System.out.println(this.name + ":" + this.zone.map.mapName + " khu vực " + this.zone.zoneId + "(" + this.zone.map.mapId + ")");
-        if (!MapService.gI().isMapMaBu(this.zone.map.mapId) && MapService.gI().isMapBlackBallWar(this.zone.map.mapId)) {
-            System.out.println("BOSS " + this.name + " : " + this.zone.map.mapName + " khu vực " + this.zone.zoneId + "(" + this.zone.map.mapId + ")");
+//        if (!(this instanceof AnTrom)
+//                && !(this instanceof MiNuong)) {
+//            System.out.println(this.name + ":" + this.zone.map.mapName + " khu vực " + this.zone.zoneId + "(" + this.zone.map.mapId + ")");
+//        }
+        if (!MapService.gI().isMapMaBu(this.zone.map.mapId)
+                && !MapService.gI().isMapBlackBallWar(this.zone.map.mapId)
+                && !(this instanceof AnTrom)
+                && !(this instanceof MiNuong)) {
+            System.out.println("BOSS  " + this.name + "  :  " + this.zone.map.mapName + " khu vực " + this.zone.zoneId + "(" + this.zone.map.mapId + ")");
         }
         if (this.bossAppearTogether == null || this.bossAppearTogether[this.currentLevel] == null) {
             return;
@@ -583,15 +646,16 @@ public class Boss extends Player implements IBossNew, IBossOutfit {
             }
         }
     }
+
     @Override
     public void wakeupAnotherBossWhenDisappear() {
 //        System.out.println("wake up boss when disappear");
-        System.out.println("Boss " + this.name + " vừa bị tiêu diệt");
+//        System.out.println("Boss " + this.name + " die.......");
     }
 
 }
 
 /**
- * Vui lòng không sao chép mã nguồn này dưới mọi hình thức. Hãy tôn trọng tác
- * giả của mã nguồn này. Xin cảm ơn! - GirlBeo
+ * Code được viết bởi Hoàng Việt Vui lòng không sao chép mã nguồn này dưới mọi
+ * hình thức.
  */

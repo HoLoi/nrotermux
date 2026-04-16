@@ -12,6 +12,7 @@ import com.girlkun.models.map.ItemMap;
 import com.girlkun.models.map.Zone;
 import com.girlkun.models.mob.Mob;
 import com.girlkun.models.npc.Npc;
+import static com.girlkun.models.player.Inventory.LIMIT_GOLD;
 import com.girlkun.models.task.SideTaskTemplate;
 import com.girlkun.models.task.SubTaskMain;
 import com.girlkun.models.task.TaskMain;
@@ -90,7 +91,7 @@ public class TaskService {
         rewardDoneTask(player);
         player.playerTask.taskMain = TaskService.gI().getTaskMainById(player, player.playerTask.taskMain.id + 1);
         sendTaskMain(player);
-        Service.gI().sendThongBao(player, "Nhiệm vụ tiếp theo của bạn là "
+        Service.getInstance().sendThongBao(player, "Nhiệm vụ tiếp theo của bạn là "
                 + player.playerTask.taskMain.subTasks.get(player.playerTask.taskMain.index).name);
     }
 
@@ -119,7 +120,7 @@ public class TaskService {
 
     //gửi thông tin nhiệm vụ hiện tại
     public void sendInfoCurrentTask(Player player) {
-        Service.gI().sendThongBao(player, "Nhiệm vụ hiện tại của bạn là "
+        Service.getInstance().sendThongBao(player, "Nhiệm vụ hiện tại của bạn là "
                 + player.playerTask.taskMain.subTasks.get(player.playerTask.taskMain.index).name);
     }
 
@@ -182,14 +183,14 @@ public class TaskService {
                 return (doneTask(player, ConstTask.TASK_22_0)
                         || doneTask(player, ConstTask.TASK_22_4)
                         || doneTask(player, ConstTask.TASK_23_4)
+                        || doneTask(player, ConstTask.TASK_24_4)
                         || doneTask(player, ConstTask.TASK_25_5)
                         || doneTask(player, ConstTask.TASK_26_4)
                         || doneTask(player, ConstTask.TASK_27_4)
                         || doneTask(player, ConstTask.TASK_28_5)
                         || doneTask(player, ConstTask.TASK_31_4)
                         || doneTask(player, ConstTask.TASK_29_4)
-                        || doneTask(player, ConstTask.TASK_30_5)
-                        || doneTask(player, ConstTask.TASK_24_4));
+                        || doneTask(player, ConstTask.TASK_30_5));
             
                         
         }
@@ -198,21 +199,21 @@ public class TaskService {
 
     //kiểm tra hoàn thành nhiệm vụ gia nhập bang hội
     public void checkDoneTaskJoinClan(Player player) {
-        if (!player.isBoss && !player.isPet) {
+        if (player.isPl()) {
             doneTask(player, ConstTask.TASK_13_0);
         }
     }
 
     //kiểm tra hoàn thành nhiệm vụ lấy item từ rương
     public void checkDoneTaskGetItemBox(Player player) {
-        if (!player.isBoss && !player.isPet) {
+        if (player.isPl()) {
             doneTask(player, ConstTask.TASK_0_3);
         }
     }
 
     //kiểm tra hoàn thành nhiệm vụ sức mạnh
     public void checkDoneTaskPower(Player player, long power) {
-        if (!player.isBoss && !player.isPet) {
+        if (player.isPl()) {
             if (power >= 20000) {
                 doneTask(player, ConstTask.TASK_5_0);
             }
@@ -236,7 +237,7 @@ public class TaskService {
 
     //kiểm tra hoàn thành nhiệm vụ khi player sử dụng tiềm năng
     public void checkDoneTaskUseTiemNang(Player player) {
-        if (!player.isBoss && !player.isPet) {
+        if (player.isPl()) {
             doneTask(player, ConstTask.TASK_3_0);
         }
     }
@@ -302,14 +303,14 @@ public class TaskService {
 
     //kiểm tra hoàn thành nhiệm vụ khi nhặt item
     public void checkDoneTaskPickItem(Player player, ItemMap item) {
-        if (!player.isBoss && !player.isPet && item != null) {
+        if (player.isPl() && item != null && item.itemTemplate != null) {
             switch (item.itemTemplate.id) {
                 case 73: //đùi gà
                     doneTask(player, ConstTask.TASK_2_0);
                     break;
                 case 78: //em bé
                     doneTask(player, ConstTask.TASK_3_1);
-                    Service.gI().sendFlagBag(player);
+                    Service.getInstance().sendFlagBag(player);
                     break;
                   case 380: //đùi gà
                     doneTask(player, ConstTask.TASK_26_3);
@@ -319,7 +320,7 @@ public class TaskService {
                     break;
 //                case 16: //em bé
 //                    doneTask(player, ConstTask.TASK_28_3);
-//                    Service.gI().sendFlagBag(player);
+//                    Service.getInstance().sendFlagBag(player);
 //                    break; 
                  case 992: //em bé
                     doneTask(player, ConstTask.TASK_31_0);
@@ -332,14 +333,19 @@ public class TaskService {
                     break; 
                   case 725: //em bé
                     doneTask(player, ConstTask.TASK_31_3);
-                    break;     
+                    break;
+                  case 861:
+                    if (player.isPl() && item.itemTemplate.id == 861) {
+                        player.achievement.plusCount(15);
+                    }
+                    break;
             }
         }
     }
 
     //kiểm tra hoàn thành nhiệm vụ kết bạn
     public void checkDoneTaskMakeFriend(Player player, Player friend) {
-        if (!player.isBoss && !player.isPet) {
+        if (player.isPl()) {
             switch (friend.gender) {
                 case ConstPlayer.TRAI_DAT:
                     doneTask(player, ConstTask.TASK_11_0);
@@ -359,7 +365,7 @@ public class TaskService {
 
     //kiểm tra hoàn thành nhiệm vụ khi xác nhận menu npc nào đó
     public void checkDoneTaskConfirmMenuNpc(Player player, Npc npc, byte select) {
-        if (!player.isBoss && !player.isPet) {
+        if (player.isPl()) {
             switch (npc.tempId) {
                 case ConstNpc.DAU_THAN:
                     switch (player.iDMark.getIndexMenu()) {
@@ -376,7 +382,7 @@ public class TaskService {
 
     //kiểm tra hoàn thành nhiệm vụ khi tiêu diệt được boss
     public void checkDoneTaskKillBoss(Player player, Boss boss) {
-        if (player != null && !player.isBoss && !player.isPet) {
+        if (player != null && player.isPl()) {
             switch ((int) boss.id) {
                 case BossID.KUKU:
                     doneTask(player, ConstTask.TASK_19_0);
@@ -506,7 +512,7 @@ public class TaskService {
 
     //kiểm tra hoàn thành nhiệm vụ khi giết được quái
     public void checkDoneTaskKillMob(Player player, Mob mob) {
-        if (!player.isBoss && !player.isPet) {
+        if (player != null && player.isPl() && player.zone != null) {
             switch (mob.tempId) {
                 case ConstMob.MOC_NHAN:
                     doneTask(player, ConstTask.TASK_1_0);
@@ -630,6 +636,9 @@ public class TaskService {
                     break;
                 case ConstMob.XEN_CON_CAP_8:
                     doneTask(player, ConstTask.TASK_26_2);
+                    if (player.chienthan.tasknow == 1){
+                        player.chienthan.dalamduoc++;
+                    }
                     break;
                     //------------------
                 case ConstMob.TAI_TIM:
@@ -681,7 +690,7 @@ public class TaskService {
                 //--------------------------------------------------------------
                 case ConstTask.TASK_1_0:
                     if (isCurrentTask(player, idTaskCustom)) {
-                        Service.gI().sendThongBao(player, "Bạn đánh được "
+                        Service.getInstance().sendThongBao(player, "Bạn đánh được "
                                 + player.playerTask.taskMain.subTasks.get(player.playerTask.taskMain.index).count + "/"
                                 + player.playerTask.taskMain.subTasks.get(player.playerTask.taskMain.index).maxCount + " mộc nhân");
                     }
@@ -707,7 +716,7 @@ public class TaskService {
                     } catch (Exception ex) {
                     }
                     InventoryServiceNew.gI().sendItemBags(player);
-                    Service.gI().dropItemMapForMe(player, player.zone.getItemMapByTempId(74));
+                    Service.getInstance().dropItemMapForMe(player, player.zone.getItemMapByTempId(74));
                     npcSay(player, ConstTask.NPC_NHA,
                             "Tốt lắm, đùi gà đây rồi, haha. Ông sẽ nướng tại đống lửa gần kia con có thể ăn bất cứ lúc nào nếu muốn\n"
                             + "À cháu này, vừa nãy ông có nghe thấy 1 tiếng động lớn, hình như có 1 vật thể rơi tại %5, con hãy đến kiểm tra xem\n"
@@ -724,7 +733,7 @@ public class TaskService {
                     } catch (Exception ex) {
                     }
                     InventoryServiceNew.gI().sendItemBags(player);
-                    Service.gI().sendFlagBag(player);
+                    Service.getInstance().sendFlagBag(player);
                     npcSay(player, ConstTask.NPC_NHA,
                             "Có em bé trong phi thuyền rơi xuống à, ông cứ tưởng là sao băng chứ\n"
                             + "Ông sẽ đặt tên cho em nó là Goku, từ giờ nó sẽ là thành viên trong gia đình ta\n"
@@ -735,7 +744,7 @@ public class TaskService {
                 //--------------------------------------------------------------
                 case ConstTask.TASK_4_0:
                     if (isCurrentTask(player, idTaskCustom)) {
-                        Service.gI().sendThongBao(player, "Bạn đánh được "
+                        Service.getInstance().sendThongBao(player, "Bạn đánh được "
                                 + player.playerTask.taskMain.subTasks.get(player.playerTask.taskMain.index).count + "/"
                                 + player.playerTask.taskMain.subTasks.get(player.playerTask.taskMain.index).maxCount
                                 + transformName(player, " %4 mẹ"));
@@ -970,9 +979,9 @@ public class TaskService {
                     break;
                 case ConstTask.TASK_20_6:
                     npcSay(player, ConstNpc.CUI,
-                            "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít");
+                            "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi");
                     break;
                 //--------------------------------------------------------------
                 case ConstTask.TASK_21_0:
@@ -985,16 +994,16 @@ public class TaskService {
                     break;
                 case ConstTask.TASK_21_4:
                     npcSay(player, ConstNpc.CUI,
-                            "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít");
+                            "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi");
                     break;
                 //--------------------------------------------------------------
                 case ConstTask.TASK_22_0:
                     npcSay(player, ConstNpc.BUNMA_TL,
-                          "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít");
+                          "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi");
                     break;
                 case ConstTask.TASK_22_1:
                     break;
@@ -1004,9 +1013,9 @@ public class TaskService {
                     break;
                 case ConstTask.TASK_22_4:
                     npcSay(player, ConstNpc.BUNMA_TL,
-                            "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít");
+                            "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi");
                 //--------------------------------------------------------------
                 case ConstTask.TASK_23_0:
                     break;
@@ -1018,9 +1027,9 @@ public class TaskService {
                     break;
                 case ConstTask.TASK_23_4:
                     npcSay(player, ConstNpc.BUNMA_TL,
-                          "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít");
+                          "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi");
                     break;
                 //--------------------------------------------------------------
                 case ConstTask.TASK_24_0:
@@ -1033,9 +1042,9 @@ public class TaskService {
                     break;
                 case ConstTask.TASK_24_4:
                     npcSay(player, ConstNpc.BUNMA_TL,
-                            "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít");
+                            "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi");
                     break;
                  //---------------------------   
                   case ConstTask.TASK_25_0:
@@ -1050,9 +1059,9 @@ public class TaskService {
                     break;
                 case ConstTask.TASK_25_5:
                    npcSay(player, ConstNpc.BUNMA_TL,
-                            "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít");
+                            "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi");
                     break;
                     //-----------------
                  case ConstTask.TASK_26_0:
@@ -1065,9 +1074,9 @@ public class TaskService {
                     break;
                 case ConstTask.TASK_26_4:
                    npcSay(player, ConstNpc.BUNMA_TL,
-                            "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít");
+                            "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi");
                     break; 
                     //---------------------------------
                 case ConstTask.TASK_27_0:
@@ -1080,9 +1089,9 @@ public class TaskService {
                     break;
                 case ConstTask.TASK_27_4:
                    npcSay(player, ConstNpc.BUNMA_TL,
-                            "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít");
+                            "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi");
                     break;
                     //----
                      case ConstTask.TASK_28_0:
@@ -1097,9 +1106,9 @@ public class TaskService {
                      break;
                 case ConstTask.TASK_28_5:
                    npcSay(player, ConstNpc.BUNMA_TL,
-                            "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít");
+                            "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi");
                     break;
               //-------------------------------
                 case ConstTask.TASK_29_0:
@@ -1112,9 +1121,9 @@ public class TaskService {
                     break;
                 case ConstTask.TASK_29_4:
                    npcSay(player, ConstNpc.BUNMA_TL,
-                             "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít");
+                             "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi");
                     break;    
                  case ConstTask.TASK_30_0:
                     break;
@@ -1128,9 +1137,9 @@ public class TaskService {
                     break;
                 case ConstTask.TASK_30_5:
                    npcSay(player, ConstNpc.BUNMA_TL,
-                            "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít");
+                            "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi");
                     break;  
                 //-----------------
                   case ConstTask.TASK_31_0:
@@ -1143,9 +1152,9 @@ public class TaskService {
                     break;
                 case ConstTask.TASK_31_4:
                    npcSay(player, ConstNpc.BUNMA_TL,
-                            "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít\n"
-                            + "Độc Quyền Bởi User Thâm Đít");
+                            "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi\n"
+                            + "Độc Quyền Bởi Nro TaBi");
                     break;      
             }
             InventoryServiceNew.gI().sendItemBags(player);
@@ -1169,40 +1178,40 @@ public class TaskService {
 //        InventoryServiceNew.gI().sendItemBags(player);
 
 //        player.inventory.gold += 50;
-//        Service.gI().sendMoney(player);
+//        Service.getInstance().sendMoney(player);
 //        switch (player.playerTask.taskMain.id) {
 //            case 0:
-//                Service.gI().addSMTN(player, (byte) 0, 500, false);
-//                Service.gI().addSMTN(player, (byte) 1, 500, false);
+//                Service.getInstance().addSMTN(player, (byte) 0, 500, false);
+//                Service.getInstance().addSMTN(player, (byte) 1, 500, false);
 //                break;
 //            case 1:
-//                Service.gI().addSMTN(player, (byte) 0, 1000, false);
-//                Service.gI().addSMTN(player, (byte) 1, 1000, false);
+//                Service.getInstance().addSMTN(player, (byte) 0, 1000, false);
+//                Service.getInstance().addSMTN(player, (byte) 1, 1000, false);
 //                break;
 //            case 2:
-//                Service.gI().addSMTN(player, (byte) 0, 1200, false);
-//                Service.gI().addSMTN(player, (byte) 1, 1200, false);
+//                Service.getInstance().addSMTN(player, (byte) 0, 1200, false);
+//                Service.getInstance().addSMTN(player, (byte) 1, 1200, false);
 //                break;
 //            case 3:
-//                Service.gI().addSMTN(player, (byte) 0, 3000, false);
-//                Service.gI().addSMTN(player, (byte) 1, 3000, false);
+//                Service.getInstance().addSMTN(player, (byte) 0, 3000, false);
+//                Service.getInstance().addSMTN(player, (byte) 1, 3000, false);
 //                break;
 //            case 4:
-//                Service.gI().addSMTN(player, (byte) 0, 7000, false);
-//                Service.gI().addSMTN(player, (byte) 1, 7000, false);
+//                Service.getInstance().addSMTN(player, (byte) 0, 7000, false);
+//                Service.getInstance().addSMTN(player, (byte) 1, 7000, false);
 //                break;
 //            case 5:
-//                Service.gI().addSMTN(player, (byte) 0, 20000, false);
-//                Service.gI().addSMTN(player, (byte) 1, 20000, false);
+//                Service.getInstance().addSMTN(player, (byte) 0, 20000, false);
+//                Service.getInstance().addSMTN(player, (byte) 1, 20000, false);
 //                break;
 //        }
         if (player.playerTask.taskMain.id > 0 && player.playerTask.taskMain.id < 25) {
-            Service.gI().addSMTN(player, (byte) 2, 500 * (player.playerTask.taskMain.id + 1), false);
+            Service.getInstance().addSMTN(player, (byte) 2, 500 * (player.playerTask.taskMain.id + 1), false);
             player.inventory.gold += (player.playerTask.taskMain.id < 5 && player.playerTask.taskMain.id >= 0) ? 100000 * (player.playerTask.taskMain.id + 1) : 500000;
-            if (player.inventory.gold > 2000000000) {
-                player.inventory.gold = 2000000000;
+            if (player.inventory.gold > LIMIT_GOLD) {
+                player.inventory.gold = LIMIT_GOLD;
             }
-            Service.gI().sendMoney(player);
+            Service.getInstance().sendMoney(player);
         }
     }
 
@@ -1336,7 +1345,7 @@ public class TaskService {
     }
 
     public int getIdTask(Player player) {
-        if (player.isPet || player.isBoss || player.playerTask == null || player.playerTask.taskMain == null) {
+        if (player.isPet || player.isTrieuhoipet || player.isBoss || player.playerTask == null || player.playerTask.taskMain == null) {
             return -1;
         }
         return (player.playerTask.taskMain.id << 10) + player.playerTask.taskMain.index << 1;
@@ -1359,15 +1368,15 @@ public class TaskService {
             player.playerTask.sideTask.leftTask--;
             player.playerTask.sideTask.level = level;
             player.playerTask.sideTask.receivedTime = System.currentTimeMillis();
-            Service.gI().sendThongBao(player, "Bạn nhận được nhiệm vụ: " + player.playerTask.sideTask.getName());
+            Service.getInstance().sendThongBao(player, "Bạn nhận được nhiệm vụ: " + player.playerTask.sideTask.getName());
         } else {
-            Service.gI().sendThongBao(player,
+            Service.getInstance().sendThongBao(player,
                     "Bạn đã nhận hết nhiệm vụ hôm nay. Hãy chờ tới ngày mai rồi nhận tiếp");
         }
     }
 
     public void removeSideTask(Player player) {
-        Service.gI().sendThongBao(player, "Bạn vừa hủy bỏ nhiệm vụ " + player.playerTask.sideTask.getName());
+        Service.getInstance().sendThongBao(player, "Bạn vừa hủy bỏ nhiệm vụ " + player.playerTask.sideTask.getName());
         player.playerTask.sideTask.reset();
     }
 
@@ -1392,13 +1401,17 @@ public class TaskService {
                         goldReward = ConstTask.GOLD_HELL;
                         break;
                 }
-                player.inventory.addGold(goldReward);
-                Service.gI().sendMoney(player);
-                Service.gI().sendThongBao(player, "Bạn nhận được "
-                        + Util.numberToMoney(goldReward) + " vàng");
+                Item thoivang = ItemService.gI().createNewItem((short) 457);
+                thoivang.quantity = goldReward;
+                thoivang.itemOptions.add(new Item.ItemOption(30,1));
+                InventoryServiceNew.gI().addItemBag(player, thoivang);
+//                player.inventory.addRuby(goldReward);
+//                Service.getInstance().sendMoney(player);
+                Service.getInstance().sendThongBao(player, "Bạn nhận được "
+                        + goldReward + " Thỏi vàng");
                 player.playerTask.sideTask.reset();
             } else {
-                Service.gI().sendThongBao(player, "Bạn chưa hoàn thành nhiệm vụ");
+                Service.getInstance().sendThongBao(player, "Bạn chưa hoàn thành nhiệm vụ");
             }
         }
     }
@@ -1514,13 +1527,13 @@ public class TaskService {
                 notify = true;
             }
             if (notify) {
-                Service.gI().sendThongBao(player, "Nhiệm vụ: "
+                Service.getInstance().sendThongBao(player, "Nhiệm vụ: "
                         + player.playerTask.sideTask.getName() + " đã hoàn thành: "
                         + player.playerTask.sideTask.count + "/" + player.playerTask.sideTask.maxCount + " ("
                         + percentDone + "%)");
             }
         } else {
-            Service.gI().sendThongBao(player, "Chúc mừng bạn đã hoàn thành nhiệm vụ, "
+            Service.getInstance().sendThongBao(player, "Chúc mừng bạn đã hoàn thành nhiệm vụ, "
                     + "bây giờ hãy quay về Bò Mộng trả nhiệm vụ.");
         }
     }

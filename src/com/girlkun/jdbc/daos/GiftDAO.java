@@ -18,6 +18,7 @@ public class GiftDAO {
             ps.close();
         } catch (Exception e) {
             Logger.logException(GiftDAO.class, e);
+                System.out.println("        loi 22");
         }
     }
 
@@ -28,7 +29,7 @@ public class GiftDAO {
              ps = con.prepareStatement("select * from gift where player_id = ?");
             ps.setInt(1, (int) player.id);
              rs = ps.executeQuery();
-            if (rs.first()) {
+            if (rs.next()) { // forward-only cursor
                 player.gift.goldTanThu = rs.getBoolean("gold_tan_thu");
                 player.gift.gemTanThu = rs.getBoolean("gem_tan_thu");
             } else {
@@ -38,6 +39,7 @@ public class GiftDAO {
             ps.close();
         } catch (Exception e) {
             Logger.logException(GiftDAO.class, e);
+                System.out.println("        loi 23");
         } finally{
             
             try {
@@ -62,6 +64,7 @@ public class GiftDAO {
             ps.close();
         } catch (Exception e) {
             Logger.logException(GiftDAO.class, e);
+                System.out.println("        loi 24");
         }
     }
 

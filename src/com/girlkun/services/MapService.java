@@ -1,17 +1,20 @@
 package com.girlkun.services;
 
 import com.girlkun.consts.ConstMap;
+import com.girlkun.consts.ConstTask;
 import com.girlkun.models.boss.Boss;
 import com.girlkun.models.map.Map;
 import com.girlkun.models.map.WayPoint;
 import com.girlkun.models.map.Zone;
 import com.girlkun.models.map.blackball.BlackBallWar;
 import com.girlkun.models.map.doanhtrai.DoanhTraiService;
+import com.girlkun.models.map.gas.GasService;
 import com.girlkun.models.mob.Mob;
 import com.girlkun.models.player.Pet;
 import com.girlkun.models.player.Player;
 import com.girlkun.server.Manager;
 import com.girlkun.network.io.Message;
+import com.girlkun.services.func.ChangeMapService;
 import com.girlkun.utils.Logger;
 import com.girlkun.utils.Util;
 import java.io.DataInputStream;
@@ -94,9 +97,28 @@ public class MapService {
     }
 
     public Zone getMapCanJoin(Player player, int mapId, int zoneId) {
-       
+//        if (player.getSession() != null && player.isAdmin()) {
+//            if (zoneId == -1) {
+//                return getRandomZoneByMapID(mapId);
+//            } else {
+//                return getZoneByMapIDAndZoneID(mapId, zoneId);
+//            }
+//        }
         if (isMapOffline(mapId)) {
             return getMapById(mapId).zones.get(0);
+        }
+        if (this.isMapKhiGas(mapId)) {
+            if (player.clan == null || player.clan.khiGas == null) {
+                return null;
+            }
+            if (this.isMapKhiGas(player.zone.map.mapId)) {
+                for (Mob mob : player.zone.mobs) {
+                    if (!mob.isDie()) {
+                        return null;
+                    }
+                }
+            }
+            return player.clan.khiGas.getMapById(mapId);
         }
         if (this.isMapDoanhTrai(mapId)) {
             if (player.clan == null || player.clan.doanhTrai == null) {
@@ -116,6 +138,27 @@ public class MapService {
             }
             return player.clan.doanhTrai.getMapById(mapId);
         }
+        if (this.isMapBanDoKhoBau(mapId)) {
+            if (player.clan == null || player.clan.banDoKhoBau == null) {
+                return null;
+            }
+            if (this.isMapBanDoKhoBau(player.zone.map.mapId)) {
+                for (Mob mob : player.zone.mobs) {
+                    if (!mob.isDie()) {
+                        return null;
+                    }
+                }
+                for (Player boss : player.zone.getBosses()) {
+                    if (!boss.isDie()) {
+                        return null;
+                    }
+                }
+            }
+            /**
+             * Qua map mới thì làm mới lại mob
+             */
+            return player.clan.banDoKhoBau.getMapById(mapId);
+        }
         //**********************************************************************
         if (zoneId == -1) { //vào khu bất kỳ
             return getZone(mapId);
@@ -130,10 +173,10 @@ public class MapService {
             return null;
         }
             
-        //int z = Util.nextInt(0, map.zones.size() - 1);
-       int z = 0;
+        int z = Util.nextInt(0, map.zones.size() - 1);
+//       int z = 0;
         while (map.zones.get(z).getNumOfPlayers() >= map.zones.get(z).maxPlayer) {
-         //   z = Util.nextInt(0, map.zones.size() - 1);
+            z = Util.nextInt(0, map.zones.size() - 1);
          z++;
         }
         return map.zones.get(z);
@@ -203,7 +246,8 @@ public class MapService {
                 && pl.mapBeforeCapsule.map.mapId != 21
                 && pl.mapBeforeCapsule.map.mapId != 22
                 && pl.mapBeforeCapsule.map.mapId != 23
-                && !isMapTuongLai(pl.mapBeforeCapsule.map.mapId)) {
+                && !isMapTuongLai(pl.mapBeforeCapsule.map.mapId)
+                && pl.mapBeforeCapsule.map.mapId != 129) {
             addListMapCapsule(pl, list, pl.mapBeforeCapsule);
         }
         addListMapCapsule(pl, list, getMapCanJoin(pl, 21 + pl.gender, 0));
@@ -218,7 +262,9 @@ public class MapService {
         addListMapCapsule(pl, list, getMapCanJoin(pl, 24 + pl.gender, 0));
         addListMapCapsule(pl, list, getMapCanJoin(pl, 27, 0));
         addListMapCapsule(pl, list, getMapCanJoin(pl, 19, 0));
-        addListMapCapsule(pl, list, getMapCanJoin(pl, 79, 0));
+        if(TaskService.gI().getIdTask(pl) >= ConstTask.TASK_20_0){
+            addListMapCapsule(pl, list, getMapCanJoin(pl, 79, 0));
+        }
         addListMapCapsule(pl, list, getMapCanJoin(pl, 84, 0));
         return list;
     }
@@ -256,7 +302,7 @@ public class MapService {
             msg.writer().writeInt((int) player.id);
             msg.writer().writeShort(player.location.x);
             msg.writer().writeShort(player.location.y);
-            Service.gI().sendMessAllPlayerInMap(player, msg);
+            Service.getInstance().sendMessAllPlayerInMap(player, msg);
             msg.cleanup();
         } catch (Exception e) {
             Logger.logException(MapService.class, e);
@@ -278,21 +324,36 @@ public class MapService {
     public boolean isMapMaBu(int mapId) {
         return mapId >= 114 && mapId <= 120;
     }
-    public boolean isMapPVP(int mapId) {
-        return mapId == 112;
+    public boolean isMapNha(int mapId) {
+        return mapId >= 21 && mapId <= 23;
     }
 
     public boolean isMapCold(Map map) {
         int mapId = map.mapId;
         return mapId >= 105 && mapId <= 110;
     }
+    public boolean isMapNhanBan(int mapId) {
+        return mapId ==139 || mapId == 140;
+    }
+    public boolean isMapKhiGas(int mapId) {
+        return mapId ==149 || mapId == 148 || mapId == 147 || mapId == 151 || mapId == 152;
+    }
 
     public boolean isMapDoanhTrai(int mapId) {
         return mapId >= 53 && mapId <= 62;
     }
+    public boolean isMapTienMon(int mapId) {
+        return mapId >= 202 && mapId <= 203;
+    }
 
     public boolean isMapHuyDiet(int mapId) {
         return mapId >= 146 && mapId <= 148;
+    }
+    public boolean isMap1sao(int mapId) {
+        return mapId >= 106 && mapId <= 108;
+    }
+    public boolean isNguHanhSon(int mapId) {
+        return mapId >= 122 && mapId <= 124;
     }
 
     public boolean isMapBanDoKhoBau(int mapId) {
@@ -303,5 +364,27 @@ public class MapService {
         return (mapId >= 92 && mapId <= 94)
                 || (mapId >= 96 && mapId <= 100)
                 || mapId == 102 || mapId == 103;
+    }
+    public void goToMap(Player player, Zone zoneJoin) {
+        Zone oldZone = player.zone;
+        if (oldZone != null) {
+            ChangeMapService.gI().exitMap(player);
+            if (player.mobMe != null) {
+                player.mobMe.goToMap(zoneJoin);
+            }
+        }
+        player.zone = zoneJoin;
+        player.zone.addPlayer(player);
+    }
+    public boolean isMapSetKichHoat(int mapId) {
+        return (mapId >= 1 && mapId <= 3)
+                || (mapId == 8 || mapId == 9 || mapId == 11)
+                || (mapId >= 15 && mapId <= 17);
+    }
+    public boolean isMapKhongCoSieuQuai(int mapId) {
+        return !isMapSetKichHoat(mapId)
+                && mapId != 4 && mapId != 27 && mapId != 28
+                && mapId != 12 && mapId != 31 && mapId != 32
+                && mapId != 18 && mapId != 35 && mapId != 36;
     }
 }

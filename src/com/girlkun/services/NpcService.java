@@ -23,6 +23,10 @@ public class NpcService {
     public void createMenuRongThieng(Player player, int indexMenu, String npcSay, String... menuSelect) {
         createMenu(player, indexMenu, ConstNpc.RONG_THIENG, 123, npcSay, menuSelect);
     }
+    
+    public void createMenuRongXuong(Player player, int indexMenu, String npcSay, String... menuSelect) {
+        createMenu(player, indexMenu, ConstNpc.RONG_XUONG, 124, npcSay, menuSelect);
+    }
 
     public void createMenuConMeo(Player player, int indexMenu, int avatar, String npcSay, String... menuSelect) {
         createMenu(player, indexMenu, ConstNpc.CON_MEO, avatar, npcSay, menuSelect);
@@ -34,7 +38,7 @@ public class NpcService {
     }
 
     private void createMenu(Player player, int indexMenu, byte npcTempId, int avatar, String npcSay, String... menuSelect) {
-        if(player == null) return;
+        if(player == null || player.iDMark == null) return;
         Message msg;
         try {
             player.iDMark.setIndexMenu(indexMenu);

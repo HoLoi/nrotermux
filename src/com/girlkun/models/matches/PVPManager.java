@@ -54,6 +54,7 @@ public class PVPManager implements Runnable {
                 }
                 Thread.sleep(1000 - (System.currentTimeMillis() - st));
             } catch (Exception e) {
+                System.out.println("loi ne pvp 1 ");
             }
         }
     }

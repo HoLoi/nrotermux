@@ -9,11 +9,9 @@ import com.girlkun.services.GiftService;
 
 public class Inventory {
 
-    public static final long LIMIT_GOLD = 2000000000;
-
-    public static final int MAX_ITEMS_BAG = 100;
-    public static final int MAX_ITEMS_BOX = 100;
-
+  public static final long LIMIT_GOLD = 1000000000000L;
+    public static final int MAX_ITEMS_BAG = 60;
+    public static final int MAX_ITEMS_BOX = 60;
 
     public Item trainArmor;
     public List<String> giftCode;
@@ -70,6 +68,12 @@ public class Inventory {
         this.gold += gold;
         if (this.gold > LIMIT_GOLD) {
             this.gold = LIMIT_GOLD;
+        }
+    }
+    public void addRuby(int ruby) {
+        this.ruby += ruby;
+        if (this.ruby > 2000000000) {
+            this.ruby = 2000000000;
         }
     }
 

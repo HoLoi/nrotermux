@@ -1,0 +1,2 @@
+HikariProxyPreparedStatement@1153447573 wrapping com.mysql.cj.jdbc.ServerPreparedStatement[39]: update account set last_time_login = '2000-01-01', last_time_logout = '2001-01-01'
+HikariProxyPreparedStatement@487860209 wrapping com.mysql.cj.jdbc.ServerPreparedStatement[40]: select * from account where username = admin and password = 1

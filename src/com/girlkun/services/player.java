@@ -7,7 +7,7 @@ package com.girlkun.services;
 
 /**
  *
- * @Stole By Arriety
+ * @Stole By Hoàng Việt
  */
 class player {
     

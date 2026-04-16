@@ -11,7 +11,6 @@ import com.girlkun.services.Service;
 import com.girlkun.utils.Logger;
 import com.girlkun.utils.Util;
 
-
 public abstract class Npc implements IAtionNpc {
 
     public int mapId;
@@ -66,7 +65,7 @@ public abstract class Npc implements IAtionNpc {
             player.sendMessage(msg);
             msg.cleanup();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("zzzzz");
         }
     }
 
@@ -85,7 +84,7 @@ public abstract class Npc implements IAtionNpc {
             player.sendMessage(msg);
             msg.cleanup();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("xxxxx");
         }
     }
 
@@ -132,7 +131,7 @@ public abstract class Npc implements IAtionNpc {
             msg.writer().writeShort(tempId);
             msg.writer().writeUTF(text);
             for (Zone zone : map.zones) {
-                Service.gI().sendMessAllPlayerInMap(zone, msg);
+                Service.getInstance().sendMessAllPlayerInMap(zone, msg);
             }
             msg.cleanup();
         } catch (Exception e) {
@@ -141,24 +140,36 @@ public abstract class Npc implements IAtionNpc {
     }
 
     public boolean canOpenNpc(Player player) {
-        if (this.tempId == ConstNpc.DAU_THAN) {
-            if (player.zone.map.mapId == 21
-                    || player.zone.map.mapId == 22
-                    || player.zone.map.mapId == 23) {
-                return true;
+        if (player.soluongmuanhieu == 0) {
+            if (player.haveBeQuynh == false) {
+                if (this.tempId == ConstNpc.DAU_THAN) {
+                    if (player.zone.map.mapId == 21
+                            || player.zone.map.mapId == 22
+                            || player.zone.map.mapId == 23) {
+                        return true;
+                    } else {
+                        Service.getInstance().hideWaitDialog(player);
+                        Service.getInstance().sendThongBao(player, "Không thể thực hiện");
+                        return false;
+                    }
+                }
+                if (player.zone.map.mapId == this.mapId
+                        && Util.getDistance(this.cx, this.cy, player.location.x, player.location.y) <= 60) {
+                    player.iDMark.setNpcChose(this);
+                    return true;
+                } else {
+                    Service.getInstance().hideWaitDialog(player);
+                    Service.getInstance().sendThongBao(player, "Không thể thực hiện khi đứng quá xa");
+                    return false;
+                }
             } else {
-                Service.gI().hideWaitDialog(player);
-                Service.gI().sendThongBao(player, "Không thể thực hiện");
+                Service.getInstance().hideWaitDialog(player);
+                Service.getInstance().sendThongBao(player, "|7|Không thể thực hiện khi đang Hộ tống");
                 return false;
             }
-        }
-        if (player.zone.map.mapId == this.mapId
-                && Util.getDistance(this.cx, this.cy, player.location.x, player.location.y) <= 60) {
-            player.iDMark.setNpcChose(this);
-            return true;
         } else {
-            Service.gI().hideWaitDialog(player);
-            Service.gI().sendThongBao(player, "Không thể thực hiện khi đứng quá xa");
+            Service.getInstance().hideWaitDialog(player);
+            Service.getInstance().sendThongBao(player, "|7|Không thể thực hiện khi đang Auto mua Vật phẩm");
             return false;
         }
     }

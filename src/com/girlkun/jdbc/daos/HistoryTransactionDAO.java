@@ -82,10 +82,18 @@ public class HistoryTransactionDAO {
             }
         }
         try {
-            GirlkunDB.executeUpdate("insert into history_transaction values()", player1, player2,
-                    itemPlayer1, itemPlayer2, beforeTran1, beforeTran2, afterTran1, afterTran2, new Timestamp(System.currentTimeMillis()));
+            GirlkunDB.executeUpdate(
+                "insert into history_transaction (player_1, player_2, item_player_1, item_player_2, "
+                + "bag_1_before_tran, bag_2_before_tran, bag_1_after_tran, bag_2_after_tran, time_tran) "
+                + "values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                player1, player2,
+                itemPlayer1, itemPlayer2,
+                beforeTran1, beforeTran2,
+                afterTran1, afterTran2,
+                new Timestamp(System.currentTimeMillis()));
         } catch (Exception ex) {
             ex.printStackTrace();
+                System.out.println("loi ne  11      ClassCastException ");
         }
     }
 

@@ -14,19 +14,24 @@ import com.girlkun.models.skill.Skill;
 import com.girlkun.models.Template.MobTemplate;
 import com.girlkun.models.Template.NpcTemplate;
 import com.girlkun.models.Template.SkillTemplate;
+import com.girlkun.models.item.Item;
+import com.girlkun.models.player.Player;
 import com.girlkun.network.session.ISession;
 import com.girlkun.network.io.Message;
+import com.girlkun.server.Client;
 import com.girlkun.server.Manager;
 import com.girlkun.server.io.MySession;
+import com.girlkun.services.PlayerService;
 import com.girlkun.utils.Logger;
+import com.girlkun.utils.Util;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class DataGame {
 
@@ -36,8 +41,8 @@ public class DataGame {
     public static byte vsItem = 80;
     public static int vsRes = 752011;
 
-    public static String LINK_IP_PORT = "Arriety:sv.arriety.com:14445:0";
-    private static final String MOUNT_NUM = "733:1,734:2,735:3,743:4,744:5,746:6,795:7,849:8,897:9,920:10,1143:11,1141:15";
+    public static String LINK_IP_PORT = "Girlkun75-1:14.225.209.71:14445:0";
+    private static final String MOUNT_NUM = "733:1,734:2,735:3,743:4,744:5,746:6,795:7,849:8,897:9,920:10";
     public static final Map MAP_MOUNT_NUM = new HashMap();
 
     static {
@@ -56,7 +61,7 @@ public class DataGame {
     public static void sendVersionGame(MySession session) {
         Message msg;
         try {
-            msg = Service.gI().messageNotMap((byte) 4);
+            msg = Service.getInstance().messageNotMap((byte) 4);
             msg.writer().writeByte(vsData);
             msg.writer().writeByte(vsMap);
             msg.writer().writeByte(vsSkill);
@@ -64,8 +69,8 @@ public class DataGame {
             msg.writer().writeByte(0);
 
             long[] smtieuchuan = {1000L, 3000L, 15000L, 40000L, 90000L, 170000L, 340000L, 700000L,
-                    1500000L, 15000000L, 150000000L, 1500000000L, 5000000000L, 10000000000L, 40000000000L,
-                    50010000000L, 60010000000L, 70010000000L, 80010000000L, 100010000000L};
+                1500000L, 15000000L, 150000000L, 1500000000L, 5000000000L, 10000000000L, 40000000000L,
+                50010000000L, 60010000000L, 70010000000L, 80010000000L, 100010000000L};
             msg.writer().writeByte(smtieuchuan.length);
             for (int i = 0; i < smtieuchuan.length; i++) {
                 msg.writer().writeLong(smtieuchuan[i]);
@@ -73,6 +78,7 @@ public class DataGame {
             session.sendMessage(msg);
             msg.cleanup();
         } catch (Exception e) {
+            System.out.println("        loi");
         }
     }
 
@@ -106,6 +112,7 @@ public class DataGame {
             session.doSendMessage(msg);
             msg.cleanup();
         } catch (Exception e) {
+            System.out.println("        loi 1");
         }
     }
 
@@ -113,7 +120,7 @@ public class DataGame {
     public static void updateMap(MySession session) {
         Message msg;
         try {
-            msg = Service.gI().messageNotMap((byte) 6);
+            msg = Service.getInstance().messageNotMap((byte) 6);
             msg.writer().writeByte(vsMap);
             msg.writer().writeByte(Manager.MAP_TEMPLATES.length);
             for (MapTemplate temp : Manager.MAP_TEMPLATES) {
@@ -140,6 +147,7 @@ public class DataGame {
             msg.cleanup();
         } catch (Exception e) {
             Logger.logException(DataGame.class, e);
+            System.out.println("        loi 2");
         }
     }
 
@@ -167,7 +175,7 @@ public class DataGame {
                     msg.writer().writeByte(skillTemp.type);
                     msg.writer().writeShort(skillTemp.iconId);
                     msg.writer().writeUTF(skillTemp.damInfo);
-                    msg.writer().writeUTF("Arriety");
+                    msg.writer().writeUTF("Tabi");
                     if (skillTemp.id != 0) {
                         msg.writer().writeByte(skillTemp.skillss.size());
                         for (Skill skill : skillTemp.skillss) {
@@ -219,6 +227,7 @@ public class DataGame {
             msg.cleanup();
         } catch (Exception e) {
             Logger.logException(DataGame.class, e);
+            System.out.println("        loi 3");
         }
     }
 
@@ -231,6 +240,7 @@ public class DataGame {
             msg.cleanup();
         } catch (Exception e) {
             Logger.logException(DataGame.class, e);
+            System.out.println("        loi 4");
         }
     }
 
@@ -244,17 +254,42 @@ public class DataGame {
             session.sendMessage(msg);
             msg.cleanup();
         } catch (Exception e) {
+            System.out.println("        loi 5");
         }
     }
-public static void effData(MySession session, int id, int... idtemp) {
+//    public static void removeEffectTemplate(MySession session, int id) {
+//        Message msg;
+//        try {
+//            msg = new Message(-66);
+//            msg.writer().writeShort(id);
+//            msg.writer().writeInt(0); // Set the length of effect data to 0
+//            msg.writer().writeByte(1); // Set the flag byte to 0 to indicate removal
+//            msg.writer().writeInt(0); // Set the length of effect image to 0
+//            session.sendMessage(msg);
+//            System.out.println("XXXXXXXXXXXXXXXXXXXXXXXX         ");
+//            msg.cleanup();
+//            
+//        } catch (Exception e) {
+//            Logger.logException(DataGame.class, e);
+//        }
+//    }
+
+    public static void effData(MySession session, int id, int... idtemp) {
+        if ((id == 210 || id == 205 || id == 206 || id == 207) && session.version > 228) {
+            sendEffectTemplate(session, id);
+            return;
+        }
         int idT = id;
-        if(idtemp.length > 0 && idtemp[0] != 0){
+        if (idtemp.length > 0 && idtemp[0] != 0) {
             idT = idtemp[0];
         }
         Message msg;
         try {
             byte[] effData = FileIO.readFile("data/girlkun/effect/x" + session.zoomLevel + "/data/DataEffect_" + idT);
-            byte[] effImg = FileIO.readFile("data/girlkun/effect/x" + session.zoomLevel + "/img/ImgEffect_" + idT+".png");
+            byte[] effImg = FileIO.readFile("data/girlkun/effect/x" + session.zoomLevel + "/img/ImgEffect_" + idT + ".png");
+//            if (effData == null || effImg == null) {
+//                return;
+//            }
             msg = new Message(-66);
             msg.writer().writeShort(id);
             msg.writer().writeInt(effData.length);
@@ -265,8 +300,11 @@ public static void effData(MySession session, int id, int... idtemp) {
             session.sendMessage(msg);
             msg.cleanup();
         } catch (Exception e) {
+            Logger.logException(DataGame.class, e);
+            System.out.println("        loi 6 -- id:"+idT);
         }
     }
+
     public static void sendItemBGTemplate(MySession session, int id) {
         Message msg;
         try {
@@ -279,6 +317,7 @@ public static void effData(MySession session, int id, int... idtemp) {
             msg.cleanup();
         } catch (Exception e) {
             Logger.logException(DataGame.class, e);
+            System.out.println("        loi 7");
         }
     }
 
@@ -291,9 +330,33 @@ public static void effData(MySession session, int id, int... idtemp) {
             session.sendMessage(msg);
             msg.cleanup();
         } catch (Exception e) {
+            System.out.println("        loi 8");
         }
     }
 
+//    public static void antiKeoRes(MySession session, short from, short to) {
+////        Client.gI().kickSession(session);
+//        System.out.println("-------Da kick thang ngu  :   " + session.ipAddress);
+//        session.isRIcon = true;
+//        Message msg;
+//        try {
+//            for (int i = from; i < to; i++) {
+//                try {
+//                    byte[] icon = Util.randomImg();
+//                    msg = new Message(-67);
+//                    msg.writer().writeInt(i);
+//                    msg.writer().writeInt(icon.length);
+//                    msg.writer().write(icon);
+//                    session.doSendMessage(msg);
+//                    msg.cleanup();
+//                } catch (Exception ex) {
+//                }
+//            }
+//            session.disconnect();
+//        } catch (Exception e) {
+//        }
+//    }
+//
     public static void sendIcon(MySession session, int id) {
         Message msg;
         try {
@@ -305,6 +368,10 @@ public static void effData(MySession session, int id, int... idtemp) {
             session.sendMessage(msg);
             msg.cleanup();
         } catch (Exception e) {
+//            System.out.println("^^^^^^^^^IP tui ngu dang keo res  :   " + session.ipAddress);
+            if (id > 11060) { // id check anti
+//                antiKeoRes(session, (short) 11060, (short) 30000); // gui anh tu 1->2000
+            }
         }
     }
 
@@ -319,9 +386,9 @@ public static void effData(MySession session, int id, int... idtemp) {
             session.sendMessage(msg);
             msg.cleanup();
         } catch (Exception e) {
+            System.out.println("        loi 10");
         }
     }
-
 
     private static List<Integer> list = new ArrayList<>();
 
@@ -336,11 +403,17 @@ public static void effData(MySession session, int id, int... idtemp) {
         try {
             byte[] mob = FileIO.readFile("data/girlkun/mob/x" + session.zoomLevel + "/" + id);
             msg = new Message(11);
-            msg.writer().writeByte(id);
+            if (id != 88 && id != 89 && id != 85 && id != 94) {
+                msg.writer().writeByte(id);
+            }
+            if (id == 95) {
+                msg.writer().writeByte(0);
+            }
             msg.writer().write(mob);
             session.sendMessage(msg);
             msg.cleanup();
         } catch (Exception e) {
+            System.out.println("        loi 11");
         }
     }
 
@@ -352,6 +425,7 @@ public static void effData(MySession session, int id, int... idtemp) {
             session.sendMessage(msg);
             msg.cleanup();
         } catch (Exception e) {
+            System.out.println("        loi 12");
         }
     }
 
@@ -372,6 +446,7 @@ public static void effData(MySession session, int id, int... idtemp) {
                 }
             }
         } catch (Exception e) {
+            System.out.println("        loi 13");
         }
     }
 
@@ -413,12 +488,15 @@ public static void effData(MySession session, int id, int... idtemp) {
         Message msg;
         try {
             msg = new Message(-28);
-            msg.writer().writeByte(10);
+            if (id != 167 && id != 168) {
+                msg.writer().writeByte(10);
+            }
             msg.writer().write(FileIO.readFile("data/girlkun/map/tile_map_data/" + id));
             session.sendMessage(msg);
             msg.cleanup();
         } catch (Exception e) {
             Logger.logException(DataGame.class, e);
+            System.out.println("        loi 14");
         }
     }
 
@@ -431,6 +509,7 @@ public static void effData(MySession session, int id, int... idtemp) {
                 msg.writer().writeShort(ha.avatarId);
             }
         } catch (Exception e) {
+            System.out.println("        loi 15");
         }
     }
 
@@ -445,7 +524,9 @@ public static void effData(MySession session, int id, int... idtemp) {
             msg.writer().write(data);
             session.sendMessage(msg);
             msg.cleanup();
-        } catch (Exception e) {
+        } catch (IOException e) {
+            System.out.println("        loi imgbyname tai: "+imgName+" - x"+session.zoomLevel);
+            e.printStackTrace();
         }
     }
 
@@ -459,6 +540,7 @@ public static void effData(MySession session, int id, int... idtemp) {
             session.sendMessage(msg);
             msg.cleanup();
         } catch (Exception e) {
+            System.out.println("        loi 17");
         }
     }
 
@@ -471,6 +553,7 @@ public static void effData(MySession session, int id, int... idtemp) {
             session.sendMessage(msg);
             msg.cleanup();
         } catch (Exception e) {
+            System.out.println("        loi 18");
         }
     }
 
@@ -496,7 +579,9 @@ public static void effData(MySession session, int id, int... idtemp) {
             session.sendMessage(msg);
             msg.cleanup();
         } catch (Exception e) {
-            Logger.logException(DataGame.class, e);
+            //Logger.logException(DataGame.class, e);
+            //System.out.println("        loi sendres: "+session+" ["+(session.player != null ? session.player:"null")+"]"); 
+            //Error xuat hien do ben kia loi du lieu res chi can vao lai game la dc k anh huong
         }
     }
 
@@ -510,6 +595,7 @@ public static void effData(MySession session, int id, int... idtemp) {
             session.sendMessage(msg);
             msg.cleanup();
         } catch (Exception e) {
+            System.out.println("        loi 20");
         }
     }
     /**

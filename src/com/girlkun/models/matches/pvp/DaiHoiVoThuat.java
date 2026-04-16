@@ -67,6 +67,7 @@ public class DaiHoiVoThuat implements Runnable{
                 DaiHoiVoThuatService.gI(getDaiHoiNow()).Update();
                 Thread.sleep(1000);
             }catch(Exception e){
+                System.out.println("loi ne dhvt 1 ");
             }
         }
     }

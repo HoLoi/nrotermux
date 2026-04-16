@@ -86,5 +86,7 @@ public class ConstMob {
     public static final byte KHI_LONG_XANH = 78;
     public static final byte TABURINE_DO = 79;
     public static final byte TRU_INVIS = 82;
+    public static final byte TEST_1 = 88;
+    public static final byte TEST_2 = 89;
 
 }

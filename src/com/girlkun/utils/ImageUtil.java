@@ -126,7 +126,7 @@ public class ImageUtil {
                 try {
                     imagesInfo[i] = image.getSubimage(x, y, w, h);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println("sfwfewfwe");
 //                    System.out.println("mob: " + mobId);
                 }
                 //từng bộ phận
@@ -154,7 +154,7 @@ public class ImageUtil {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("wertyjbvcxaqwe");
         }
     }
 
@@ -189,7 +189,7 @@ public class ImageUtil {
                 } catch (Exception e) {
                     System.out.println(x + " - " + y + " - " + w + " - " + h);
                     System.out.println("loi doc mob: " + mobId);
-                    e.printStackTrace();
+                    System.out.println("esxdftfvghu");
 //                    System.out.println("mob: " + mobId);
                 }
                 //từng bộ phận
@@ -237,7 +237,7 @@ public class ImageUtil {
             output.close();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("asdfvcxzasdf");
         }
     }
 
@@ -320,7 +320,7 @@ public class ImageUtil {
             readDataEffect(data, id, zoom, oriImage);
 //            JOptionPane.showMessageDialog(null, null, "", zoom, new ImageIcon(oriImage));
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("edsfeter43");
         }
     }
 
@@ -360,13 +360,12 @@ public class ImageUtil {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("w3456yuhgfds");
         }
     }
 
 }
 
 /**
- * Vui lòng không sao chép mã nguồn này dưới mọi hình thức. Hãy tôn trọng tác
- * giả của mã nguồn này. Xin cảm ơn! - GirlBeo
+ * Vui lòng không sao chép mã nguồn này dưới mọi hình thức.
  */

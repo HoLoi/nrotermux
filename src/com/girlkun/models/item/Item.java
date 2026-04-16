@@ -2,6 +2,7 @@ package com.girlkun.models.item;
 
 import com.girlkun.models.Template;
 import com.girlkun.models.Template.ItemTemplate;
+import com.girlkun.services.InventoryServiceNew;
 import com.girlkun.services.ItemService;
 import com.girlkun.utils.Util;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Item {
+
 
     public ItemTemplate template;
 
@@ -43,7 +45,7 @@ public class Item {
     public String getInfo() {
         String strInfo = "";
         for (ItemOption itemOption : itemOptions) {
-            strInfo += itemOption.getOptionString();
+            strInfo += itemOption.getOptionString() + "\n";
         }
         return strInfo;
     }
@@ -63,6 +65,15 @@ public class Item {
             this.itemOptions.clear();
         }
         this.itemOptions = null;
+    }
+    
+    public String getInfoItem() {
+        String strInfo = "|1|" + template.name + "\n|0|";
+        for (ItemOption itemOption : itemOptions) {
+            strInfo += itemOption.getOptionString() + "\n";
+        }
+        strInfo += "|2|" + template.description;
+        return strInfo;
     }
 
     public static class ItemOption {
@@ -98,7 +109,6 @@ public class Item {
         public void dispose() {
             this.optionTemplate = null;
         }
-        
         @Override
         public String toString() {
             final String n = "\"";
@@ -131,6 +141,12 @@ public class Item {
         }
         return false;
     }
+    public boolean isCongThuc() {
+        if (this.template.id >= 1071 && this.template.id <= 1073) {
+            return true;
+        }
+        return false;
+    }
 
     public boolean isDHD() {
         if (this.template.id >= 650 && this.template.id <= 662) {
@@ -144,6 +160,17 @@ public class Item {
             return true;
         }
         return false;
+    }
+    
+    public boolean haveOption(int idOption) {
+        if (this != null && this.isNotNullItem()) {
+            return this.itemOptions.stream().anyMatch(op -> op != null && op.optionTemplate.id == idOption);
+        }
+        return false;
+    }
+    
+    public boolean isTrangBiHSD() {
+        return InventoryServiceNew.gI().hasOptionTemplateId(this, 93);
     }
 
     public String typeName() {

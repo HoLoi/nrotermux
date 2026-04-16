@@ -85,7 +85,7 @@ public class ImageUtil2 {
                 readFrameBoss(dis);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("wert6tbfvdefer");
         }
     }
 
@@ -155,6 +155,7 @@ public class ImageUtil2 {
 
         } catch (Exception e) {
             e.printStackTrace();
+                        System.out.println("nnnnn2  ");
         }
     }
 
@@ -235,6 +236,7 @@ public class ImageUtil2 {
 
         } catch (Exception e) {
             e.printStackTrace();
+                        System.out.println("nnnnn2  ");
         }
     }
 
@@ -322,6 +324,7 @@ public class ImageUtil2 {
             JOptionPane.showMessageDialog(null, null, "", zoom, new ImageIcon(oriImage));
         } catch (Exception e) {
             e.printStackTrace();
+                        System.out.println("nnnnn2  ");
         }
     }
 
@@ -362,12 +365,12 @@ public class ImageUtil2 {
 
         } catch (Exception e) {
             e.printStackTrace();
+                        System.out.println("nnnnn2  ");
         }
     }
 
 }
 
 /**
- * Vui lòng không sao chép mã nguồn này dưới mọi hình thức. Hãy tôn trọng tác
- * giả của mã nguồn này. Xin cảm ơn! - GirlBeo
+ * Vui lòng không sao chép mã nguồn này dưới mọi hình thức.
  */

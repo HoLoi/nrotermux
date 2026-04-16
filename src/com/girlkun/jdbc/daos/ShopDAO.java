@@ -39,8 +39,9 @@ public class ShopDAO {
                 }
             } catch (SQLException ex) {
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             Logger.logException(ShopDAO.class, e);
+                System.out.println("        loi 31");
         }
         return list;
     }
@@ -69,6 +70,7 @@ public class ShopDAO {
             }
         } catch (Exception e) {
             Logger.logException(ShopDAO.class, e);
+                System.out.println("        loi 32");
         }
     }
 
@@ -101,6 +103,7 @@ public class ShopDAO {
             }
         } catch (Exception e) {
             Logger.logException(ShopDAO.class, e);
+                System.out.println("        loi 33");
         }
     }
 
@@ -121,8 +124,9 @@ public class ShopDAO {
                 }
             } catch (SQLException ex) {
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             Logger.logException(ShopDAO.class, e);
+                System.out.println("loi ne SQLException 3");
         }
     }
 

@@ -25,6 +25,7 @@ public class BaseMenu {
             player.sendMessage(msg);
             msg.cleanup();
         } catch (Exception e) {
+                System.out.println("loi ne basemenu 1 ");
         }
     }
 }

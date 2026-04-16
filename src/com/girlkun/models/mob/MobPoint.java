@@ -6,27 +6,27 @@ import com.girlkun.utils.Util;
 public class MobPoint {
 
     public final Mob mob;
-    public int hp;
-    public int maxHp;
-    public int dame;
+    public double hp;
+    public double maxHp;
+    public double dame;
     
     public MobPoint(Mob mob){
         this.mob = mob;
     }
 
-    public int getHpFull() {
+    public double getHpFull() {
         return maxHp;
     }
 
-    public void setHpFull(int hp) {
+    public void setHpFull(double hp) {
         maxHp = hp;
     }
 
-    public int gethp() {
+    public double gethp() {
         return hp;
     }
 
-    public void sethp(int hp) {
+    public void sethp(double hp) {
         if (this.hp < 0) {
             this.hp = 0;
         } else {
@@ -34,9 +34,9 @@ public class MobPoint {
         }
     }
 
-    public int getDameAttack() {
-        return this.dame != 0 ? this.dame + Util.nextInt(-(this.dame / 100), (this.dame / 100))
-                : this.getHpFull() * Util.nextInt(mob.pDame - 1, mob.pDame + 1) / 100
-                + Util.nextInt(-(mob.level * 10), mob.level * 10);
+    public double getDameAttack() {
+        return this.dame != 0 ? this.dame + Util.GioiHannextdame(-(this.dame / 100d), (this.dame / 100d))
+                : this.getHpFull() * Util.GioiHannextdame(mob.pDame - 1, mob.pDame + 1) / 100d
+                + Util.GioiHannextdame(-(mob.level * 10d), mob.level * 10d);
     }
 }

@@ -36,7 +36,7 @@ public class ItemMapService {
         try {
             msg = new Message(-21);
             msg.writer().writeShort(itemMap.itemMapId);
-            Service.gI().sendMessAllPlayerInMap(itemMap.zone, msg);
+            Service.getInstance().sendMessAllPlayerInMap(itemMap.zone, msg);
             msg.cleanup();
         } catch (Exception e) {
             Logger.logException(ItemMapService.class, e);
@@ -50,6 +50,10 @@ public class ItemMapService {
 
     public boolean isBlackBall(int tempId) {
         return tempId >= 372 && tempId <= 378;
+    }
+    
+    public boolean isVetinh(int tempId) {
+        return tempId >= 342 && tempId <= 345;
     }
 
     public boolean isNamecBall(int tempId) {

@@ -11,8 +11,6 @@ import com.girlkun.utils.Util;
 import java.util.Arrays;
 
 /**
- *
- * @author Dev Duy Beo
  */
 public class DaiHoiVoThuatService {
     

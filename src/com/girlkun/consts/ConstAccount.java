@@ -2,7 +2,7 @@ package com.girlkun.consts;
 
 /**
  *
- * @Stole By Arriety
+ * @Stole By Hoàng Việt
  *
  */
 public class ConstAccount {

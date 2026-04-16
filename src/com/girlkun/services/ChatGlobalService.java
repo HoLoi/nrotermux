@@ -34,13 +34,13 @@ public class ChatGlobalService implements Runnable {
     }
 
     public void chat(Player player, String text) {
-////        if (!player.getSession().actived) {
-////            Service.gI().sendThongBaoFromAdmin(player,
-////                    "|5|VUI LÒNG Kích Hoạt Thành Viên\n|7|Bằng Cách\n|5|Đổi Điểm Pvp Ở Npc Trong Nhà!");
-////            return;
-////        }
+//        if (!player.getSession().actived) {
+//            Service.getInstance().sendThongBaoFromAdmin(player,
+//                    "|5|VUI LÒNG KÍCH HOẠT TÀI KHOẢN TẠI\n|7|NROGOD.COM\n|5|ĐỂ MỞ KHÓA TÍNH NĂNG");
+//            return;
+//        }
         if (waitingChat.size() >= COUNT_WAIT) {
-            Service.gI().sendThongBao(player, "Kênh thế giới hiện đang quá tải, không thể chat lúc này");
+            Service.getInstance().sendThongBao(player, "Kênh thế giới hiện đang quá tải, không thể chat lúc này");
             return;
         }
         boolean haveInChatting = false;
@@ -54,22 +54,22 @@ public class ChatGlobalService implements Runnable {
             return;
         }
 
-        if (player.inventory.gem >= 5) {
-            if (player.isAdmin() || Util.canDoWithTime(player.iDMark.getLastTimeChatGlobal(), 360000)) {
+        if (player.inventory.ruby >= 5) {
+            if (player.isAdmin() || Util.canDoWithTime(player.iDMark.getLastTimeChatGlobal(), 30000)) {
                 if (player.isAdmin() || player.nPoint.power > 2000000000) {
-//                    player.inventory.subGemAndRuby(5); 
-//                    Service.gI().sendMoney(player);
+                    player.inventory.ruby -=5; 
+                    Service.getInstance().sendMoney(player);
                     player.iDMark.setLastTimeChatGlobal(System.currentTimeMillis());
                     waitingChat.add(new ChatGlobal(player, text.length() > 100 ? text.substring(0, 100) : text));
                 } else {
-                    Service.gI().sendThongBao(player, "Sức mạnh phải ít nhất 2tỷ mới có thể chat thế giới");
+                    Service.getInstance().sendThongBao(player, "Sức mạnh phải ít nhất 2tỷ mới có thể chat thế giới");
                 }
             } else {
-                Service.gI().sendThongBao(player, "Không thể chat thế giới lúc này, vui lòng đợi "
-                        + TimeUtil.getTimeLeft(player.iDMark.getLastTimeChatGlobal(), 240));
+                Service.getInstance().sendThongBao(player, "Không thể chat thế giới lúc này, vui lòng đợi 30 giây");
+//                        + TimeUtil.getTimeLeft(player.iDMark.getLastTimeChatGlobal(), 240));
             }
         } else {
-            Service.gI().sendThongBao(player, "Không đủ ngọc chat thế giới");
+            Service.getInstance().sendThongBao(player, "Không đủ hồng ngọc chat thế giới");
         }
     }
 
@@ -113,7 +113,7 @@ public class ChatGlobalService implements Runnable {
             msg.writer().writeShort(chat.bag); //bag
             msg.writer().writeShort(chat.leg);
             msg.writer().writeByte(0);
-            Service.gI().sendMessAllPlayer(msg);
+            Service.getInstance().sendMessAllPlayer(msg);
             msg.cleanup();
         } catch (Exception e) {
         }

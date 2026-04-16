@@ -23,7 +23,7 @@ public class PlayerService {
         return i;
     }
 
-    public void sendTNSM(Player player, byte type, long param) {
+    public void sendTNSM(Player player, byte type, double param) {
         if (param > 0) {
             Message msg;
             try {
@@ -57,10 +57,13 @@ public class PlayerService {
     }
 
     public void sendInfoHp(Player player) {
+        if(player == null || player.nPoint == null){
+            return;
+        }
         Message msg;
         try {
-            msg = Service.gI().messageSubCommand((byte) 5);
-            msg.writer().writeInt(player.nPoint.hp);
+            msg = Service.getInstance().messageSubCommand((byte) 5);
+            msg.writer().writeInt(Util.DoubleGioihan(player.nPoint.hp));
             player.sendMessage(msg);
             msg.cleanup();
         } catch (Exception e) {
@@ -69,10 +72,13 @@ public class PlayerService {
     }
 
     public void sendInfoMp(Player player) {
+        if(player == null || player.nPoint == null){
+            return;
+        }
         Message msg;
         try {
-            msg = Service.gI().messageSubCommand((byte) 6);
-            msg.writer().writeInt(player.nPoint.mp);
+            msg = Service.getInstance().messageSubCommand((byte) 6);
+            msg.writer().writeInt(Util.DoubleGioihan(player.nPoint.mp));
             player.sendMessage(msg);
             msg.cleanup();
         } catch (Exception e) {
@@ -85,12 +91,12 @@ public class PlayerService {
         sendInfoMp(player);
     }
 
-    public void hoiPhuc(Player player, int hp, int mp) {
+    public void hoiPhuc(Player player, double hp, double mp) {
         if (!player.isDie()) {
             player.nPoint.addHp(hp);
             player.nPoint.addMp(mp);
-            Service.gI().Send_Info_NV(player);
-            if (!player.isPet&&!player.isNewPet) {
+            Service.getInstance().Send_Info_NV(player);
+            if (!player.isPet && !player.isNewPet && !player.isTrieuhoipet) {
                 PlayerService.gI().sendInfoHpMp(player);
             }
         }
@@ -99,7 +105,7 @@ public class PlayerService {
     public void sendInfoHpMpMoney(Player player) {
         Message msg;
         try {
-            msg = Service.gI().messageSubCommand((byte) 4);
+            msg = Service.getInstance().messageSubCommand((byte) 4);
             try {
                 if (player.getSession().version >= 214) {
                     msg.writer().writeLong(player.inventory.gold);
@@ -110,8 +116,8 @@ public class PlayerService {
                 msg.writer().writeInt((int) player.inventory.gold);
             }
             msg.writer().writeInt(player.inventory.gem);//luong
-            msg.writer().writeInt(player.nPoint.hp);//chp
-            msg.writer().writeInt(player.nPoint.mp);//cmp
+            msg.writer().writeInt(Util.DoubleGioihan(player.nPoint.hp));//chp
+            msg.writer().writeInt(Util.DoubleGioihan(player.nPoint.mp));//cmp
             msg.writer().writeInt(player.inventory.ruby);//ruby
             player.sendMessage(msg);
         } catch (Exception e) {
@@ -141,7 +147,7 @@ public class PlayerService {
                 case 89:
                 case 90:
                 case 91:
-                    if (!player.isBoss && !player.isPet) {
+                    if (!player.isBoss && !player.isPet && !player.isTrieuhoipet) {
                         if (x < 24 || x > player.zone.map.mapWidth - 24 || y < 0 || y > player.zone.map.mapHeight - 24) {
                             if (MapService.gI().getWaypointPlayerIn(player) == null) {
                                 ChangeMapService.gI().changeMap(player, 21 + player.gender, 0, 200, 336);
@@ -161,6 +167,9 @@ public class PlayerService {
             }
             if (player.newpet != null) {
                 player.newpet.followMaster();
+            }
+            if (player.TrieuHoipet != null) {
+                player.TrieuHoipet.followMaster();
             }
             MapService.gI().sendPlayerMove(player);
             TaskService.gI().checkDoneTaskGoToMap(player, player.zone);
@@ -203,10 +212,10 @@ public class PlayerService {
     public void sendTypePk(Player player) {
         Message msg;
         try {
-            msg = Service.gI().messageSubCommand((byte) 35);
+            msg = Service.getInstance().messageSubCommand((byte) 35);
             msg.writer().writeInt((int) player.id);
             msg.writer().writeByte(player.typePk);
-            Service.gI().sendMessAllPlayerInMap(player.zone, msg);
+            Service.getInstance().sendMessAllPlayerInMap(player.zone, msg);
             msg.cleanup();
         } catch (Exception e) {
         }
@@ -218,16 +227,15 @@ public class PlayerService {
                     playerBaned.getSession().userId, playerBaned.getSession().uu);
         } catch (Exception e) {
         }
-        Service.gI().sendThongBao(playerBaned,
+        Service.getInstance().sendThongBao(playerBaned,
                 "Tài khoản của bạn đã bị khóa\nGame sẽ mất kết nối sau 5 giây...");
         playerBaned.iDMark.setLastTimeBan(System.currentTimeMillis());
         playerBaned.iDMark.setBan(true);
     }
 
     private static final int COST_GOLD_HOI_SINH = 10000000;
-    private static final int COST_GEM_HOI_SINH = 10;
+    private static final int COST_GEM_HOI_SINH = 1;
     private static final int COST_GOLD_HOI_SINH_NRSD = 20000000;
-    private static final int COST_GOLD_HOI_SINH_PVP = 200000000;
 
     public void hoiSinh(Player player) {
         if (player.isDie()) {
@@ -237,31 +245,24 @@ public class PlayerService {
                     player.inventory.gold -= COST_GOLD_HOI_SINH_NRSD;
                     canHs = true;
                 } else {
-                    Service.gI().sendThongBao(player, "Không đủ vàng để thực hiện, còn thiếu " + Util.numberToMoney(COST_GOLD_HOI_SINH_NRSD
+                    Service.getInstance().sendThongBao(player, "Không đủ vàng để thực hiện, còn thiếu " + Util.numberToMoney(COST_GOLD_HOI_SINH_NRSD
                             - player.inventory.gold) + " vàng");
                     return;
                 }
-            }if (MapService.gI().isMapPVP(player.zone.map.mapId)) {
-                if (player.inventory.gold >= COST_GOLD_HOI_SINH_PVP) {
-                    player.inventory.gold -= COST_GOLD_HOI_SINH_PVP;
-                    canHs = true;
-                } else {
-                    Service.gI().sendThongBao(player, "Không đủ vàng để thực hiện, còn thiếu " + Util.numberToMoney(COST_GOLD_HOI_SINH_PVP
-                            - player.inventory.gold) + " vàng");
-                    return;
-                }    
             } else {
                 if (player.inventory.gem >= COST_GEM_HOI_SINH) {
                     player.inventory.gem -= COST_GEM_HOI_SINH;
                     canHs = true;
                 } else {
-                    Service.gI().sendThongBao(player, "?");
+                    Service.getInstance().sendThongBao(player, "Không đủ vàng để thực hiện, còn thiếu " + Util.numberToMoney(COST_GEM_HOI_SINH
+                            - player.inventory.gem) + " vàng");
                     return;
                 }
             }
             if (canHs) {
-                Service.gI().sendMoney(player);
-                Service.gI().hsChar(player, player.nPoint.hpMax, player.nPoint.mpMax);
+                Service.getInstance().sendMoney(player);
+                Service.getInstance().hsChar(player, player.nPoint.hpMax, player.nPoint.mpMax);
+//                player.achievement.plusCount(13);
             }
         }
     }
@@ -274,7 +275,7 @@ public class PlayerService {
                     player.inventory.gold -= COST_GOLD_HOI_SINH_NRSD;
                     canHs = true;
                 } else {
-                    Service.gI().sendThongBao(player, "Không đủ vàng để thực hiện, còn thiếu " + Util.numberToMoney(COST_GOLD_HOI_SINH_NRSD
+                    Service.getInstance().sendThongBao(player, "Không đủ vàng để thực hiện, còn thiếu " + Util.numberToMoney(COST_GOLD_HOI_SINH_NRSD
                             - player.inventory.gold) + " vàng");
                     return;
                 }
@@ -283,14 +284,14 @@ public class PlayerService {
                     player.inventory.gold -= COST_GOLD_HOI_SINH;
                     canHs = true;
                 } else {
-                    Service.gI().sendThongBao(player, "Không đủ vàng để thực hiện, còn thiếu " + Util.numberToMoney(COST_GOLD_HOI_SINH
+                    Service.getInstance().sendThongBao(player, "Không đủ vàng để thực hiện, còn thiếu " + Util.numberToMoney(COST_GOLD_HOI_SINH
                             - player.inventory.gold) + " vàng");
                     return;
                 }
             }
             if (canHs) {
-                Service.gI().sendMoney(player);
-                Service.gI().hsChar(player, player.nPoint.hpMax, player.nPoint.mpMax);
+                Service.getInstance().sendMoney(player);
+                Service.getInstance().hsChar(player, player.nPoint.hpMax, player.nPoint.mpMax);
             }
         }
     }

@@ -1,65 +1,67 @@
 package com.girlkun.models.boss.list_boss.Broly;
 
+import com.girlkun.consts.ConstTask;
 import com.girlkun.models.boss.Boss;
 import com.girlkun.models.boss.BossID;
+import com.girlkun.models.boss.BossManager;
 import com.girlkun.models.boss.BossStatus;
 import com.girlkun.models.boss.BossesData;
+import com.girlkun.models.boss.list_boss.cell.SieuBoHung;
 import com.girlkun.models.map.ItemMap;
 import com.girlkun.models.player.Player;
+import com.girlkun.models.skill.Skill;
+import com.girlkun.server.Manager;
 import com.girlkun.services.EffectSkillService;
+import com.girlkun.services.PlayerService;
 import com.girlkun.services.Service;
+import com.girlkun.services.TaskService;
+import com.girlkun.utils.SkillUtil;
 import com.girlkun.utils.Util;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class Broly extends Boss {
 
+    private long lastTimeHP;
+    private int timeHP;
     public Broly() throws Exception {
-        super(BossID.BROLY , BossesData.BROLY_1,BossesData.BROLY_2, BossesData.BROLY_3);
+        super(BossID.BROLY , BossesData.BROLY, BossesData.BROLSP);
     }
-     @Override
+    @Override
     public void reward(Player plKill) {
-      int[] itemDos = new int[]{1115,1116,1117,1118,1119};
-        int[] NRs = new int[]{17,18};
-        int randomDo = new Random().nextInt(itemDos.length);
-        int randomNR = new Random().nextInt(NRs.length);
-        if (Util.isTrue(15, 100)) {
-            if (Util.isTrue(1, 50)) {
-                Service.gI().dropItemMap(this.zone, Util.ratiItem(zone, 17, 1, this.location.x, this.location.y, plKill.id));
-                return;
-            }
-            Service.gI().dropItemMap(this.zone, Util.ratiItem(zone, itemDos[randomDo], 1, this.location.x, this.location.y, plKill.id));
-        } else {
-            Service.gI().dropItemMap(this.zone, new ItemMap(zone, NRs[randomNR], 1, this.location.x, this.location.y, plKill.id));
-        }
-    }  
+        ItemMap it = new ItemMap(this.zone, 568, 1, this.location.x, this.zone.map.yPhysicInTop(this.location.x,
+                this.location.y - 24), plKill.id);
+        Service.getInstance().dropItemMap(this.zone, it);
+    }
     @Override
     public void active() {
         super.active(); //To change body of generated methods, choose Tools | Templates.
-        if(Util.canDoWithTime(st,900000)){
+        if (Util.canDoWithTime(st, 36000000)) {
             this.changeStatus(BossStatus.LEAVE_MAP);
         }
     }
-
+     
     @Override
     public void joinMap() {
         super.joinMap(); //To change body of generated methods, choose Tools | Templates.
-        st= System.currentTimeMillis();
+        st = System.currentTimeMillis();
     }
     private long st;
-    @Override
-    public int injured(Player plAtt, int damage, boolean piercing, boolean isMobAttack) {
+     @Override
+    public double injured(Player plAtt, double damage, boolean piercing, boolean isMobAttack) {
         if (!this.isDie()) {
             if (!piercing && Util.isTrue(this.nPoint.tlNeDon, 1000)) {
                 this.chat("Xí hụt");
                 return 0;
             }
-            damage = this.nPoint.subDameInjureWithDeff(damage/2);
+            damage = this.nPoint.subDameInjureWithDeff(damage);
             if (!piercing && effectSkill.isShielding) {
                 if (damage > nPoint.hpMax) {
                     EffectSkillService.gI().breakShield(this);
                 }
-                damage = damage/2;
+                damage = 1;
             }
             this.nPoint.subHP(damage);
             if (isDie()) {
@@ -72,12 +74,6 @@ public class Broly extends Boss {
         }
     }
 }
-
-
-
-
-
-
 
 
 

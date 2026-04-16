@@ -2,28 +2,6 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/D:/nr/NroTeav8.5/NroTea/src/com/girlkun/models/item/ItemTime.java</file>
-            <file>file:/D:/nr/NroTeav8.5/NroTea/src/com/girlkun/models/player/Pet.java</file>
-            <file>file:/D:/nr/NroTeav8.5/NroTea/src/com/girlkun/models/item/Item.java</file>
-            <file>file:/D:/nr/NroTeav8.5/NroTea/src/com/girlkun/models/npc/IAtionNpc.java</file>
-            <file>file:/D:/nr/NroTeav8.5/NroTea/src/ArrietyManager/ArrietyManager.java</file>
-            <file>file:/D:/nr/NroTeav8.5/NroTea/src/com/girlkun/consts/ConstRatio.java</file>
-            <file>file:/D:/nr/NroTeav8.5/NroTea/src/com/girlkun/models/Template.java</file>
-            <file>file:/D:/nr/NroTeav8.5/NroTea/src/com/girlkun/models/matches/pvp/DaiHoiVoThuat.java</file>
-            <file>file:/D:/nr/NroTeav8.5/NroTea/src/com/girlkun/models/player/EffectSkill.java</file>
-            <file>file:/D:/nr/NroTeav8.5/NroTea/src/com/girlkun/server/model/AntiLogin.java</file>
-            <file>file:/D:/nr/NroTeav8.5/NroTea/src/com/arriety/card/Card.java</file>
-            <file>file:/D:/nr/NroTeav8.5/NroTea/src/com/girlkun/jdbc/daos/GodGK.java</file>
-            <file>file:/D:/nr/NroTeav8.5/NroTea/src/com/arriety/MaQuaTang/MaQuaTang.java</file>
-            <file>file:/D:/nr/NroTeav8.5/NroTea/src/com/arriety/card/RadarCard.java</file>
-            <file>file:/D:/nr/NroTeav8.5/NroTea/src/com/girlkun/models/npc/specialnpc/BillEgg.java</file>
-            <file>file:/D:/nr/NroTeav8.5/NroTea/src/com/girlkun/models/player/SetClothes.java</file>
-            <file>file:/D:/nr/NroTeav8.5/NroTea/src/com/girlkun/data/DataGame.java</file>
-            <file>file:/D:/nr/NroTeav8.5/NroTea/src/com/girlkun/models/boss/BossManager.java</file>
-            <file>file:/D:/nr/NroTeav8.5/NroTea/src/com/arriety/card/OptionCard.java</file>
-            <file>file:/D:/nr/NroTeav8.5/NroTea/src/com/girlkun/models/npc/NguoiChoi.java</file>
-            <file>file:/D:/nr/NroTeav8.5/NroTea/src/cbro/CBRO.java</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>

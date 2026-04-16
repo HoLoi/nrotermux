@@ -8,6 +8,7 @@ import com.girlkun.server.Client;
 import com.girlkun.server.Manager;
 import com.girlkun.server.ServerManager;
 import com.girlkun.services.func.ChangeMapService;
+import com.girlkun.utils.TimeUtil;
 import com.girlkun.utils.Util;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,7 +25,39 @@ public class NgocRongNamecService implements Runnable{
         if (instance == null) {
             instance = new NgocRongNamecService();
         }
+        NgocRongNamecService.instance.setTimeopenNRNM();
         return instance;
+    }
+    
+    public static long TIME_OP;
+    public static long TIME_BL;
+    public static long TIME_DELAY;
+
+    
+    public static final byte TIME_OP_HOUR = 14;
+    public static final byte TIME_OP_MIN = 0;
+    public static final byte TIME_OP_SECOND = 0;
+    
+    public static final byte TIME_BL_HOUR = 16;
+    public static final byte TIME_BL_MIN = 0;
+    public static final byte TIME_BL_SECOND = 0;
+    
+    public static final byte TIME_DL_HOUR = 14;
+    public static final byte TIME_DL_MIN = 0;
+    public static final byte TIME_DL_SECOND = 1;
+    private int day = -1;
+    
+        public void setTimeopenNRNM() {
+        if (NgocRongNamecService.instance.day == -1 || NgocRongNamecService.instance.day != TimeUtil.getCurrDay()) {
+            NgocRongNamecService.instance.day = TimeUtil.getCurrDay();
+            try {
+                TIME_OP = TimeUtil.getTime(TimeUtil.getTimeNow("dd/MM/yyyy") + " " + TIME_OP_HOUR + ":" + TIME_OP_MIN + ":" + TIME_OP_SECOND, "dd/MM/yyyy HH:mm:ss");
+                TIME_BL = TimeUtil.getTime(TimeUtil.getTimeNow("dd/MM/yyyy") + " " + TIME_BL_HOUR + ":" + TIME_BL_MIN + ":" + TIME_BL_SECOND, "dd/MM/yyyy HH:mm:ss");
+                TIME_DELAY = TimeUtil.getTime(TimeUtil.getTimeNow("dd/MM/yyyy") + " " + TIME_DL_HOUR + ":" + TIME_DL_MIN + ":" + TIME_DL_SECOND, "dd/MM/yyyy HH:mm:ss");
+
+            } catch (Exception ignored) {
+            }
+        }
     }
     
     public int mapNrNamec[] = {-1,-1,-1,-1,-1,-1,-1};
@@ -100,11 +133,11 @@ public class NgocRongNamecService implements Runnable{
             }
             if(type == (byte)0) {
                 ItemMap itemMap = new ItemMap(zone, i + 353, 1, x, y, -1);
-                Service.gI().dropItemMap(zone, itemMap);
+                Service.getInstance().dropItemMap(zone, itemMap);
                 System.out.println(itemMap.itemTemplate.name+"[" + zone.map.mapId+ "-" + zone.zoneId+"]");
             } else {
                 ItemMap itemMap = new ItemMap(zone, 362, 1, x, y, -1);
-                Service.gI().dropItemMap(zone, itemMap);
+                Service.getInstance().dropItemMap(zone, itemMap);
             }
             listMap.remove(index);
         }
@@ -129,14 +162,14 @@ public class NgocRongNamecService implements Runnable{
                 p.idNRNM = -1;
                 pNrNamec[i] = "";
                 idpNrNamec[i] = -1;
-                Service.gI().sendFlagBag(p);
+                Service.getInstance().sendFlagBag(p);
                 PlayerService.gI().changeAndSendTypePK(p, ConstPlayer.NON_PK);
             }
         }
     }
     
     public void reInitNrNamec(long time) {
-        lastTimeReinit = System.currentTimeMillis()+time;
+        lastTimeReinit = time;
         isReinit = true;
     }
     
@@ -242,11 +275,12 @@ public class NgocRongNamecService implements Runnable{
     public void run() {
         while (ServerManager.isRunning) {
             try{
-                if(this.isReinit && this.lastTimeReinit - System.currentTimeMillis() <= 0){
+                if(this.isReinit && System.currentTimeMillis() >= TIME_OP && System.currentTimeMillis() <= TIME_DELAY){
                     removeStoneNrNamec();
                     initNgocRongNamec((byte)0);
+                    break;
                 }
-                Thread.sleep(1000);
+                Thread.sleep(500);
             }catch(Exception e){
             }
         }

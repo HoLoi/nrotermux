@@ -2,7 +2,7 @@ package com.girlkun.consts;
 
 /**
  *
- * @Stole By Arriety
+ * @Stole By Hoàng Việt
  *
  */
 public class ConstMap {
@@ -16,7 +16,7 @@ public class ConstMap {
     public static final byte MAP_BLACK_BALL_WAR = 3;
     public static final byte MAP_BAN_DO_KHO_BAU = 4;
     public static final byte MAP_MA_BU = 5;
-
+ public static final byte MAP_KHI_GAS = 6;
 
 
     //type change map

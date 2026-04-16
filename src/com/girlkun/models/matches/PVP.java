@@ -3,8 +3,6 @@ package com.girlkun.models.matches;
 import com.girlkun.consts.ConstPlayer;
 import com.girlkun.models.player.Player;
 import com.girlkun.services.PlayerService;
-import com.girlkun.services.func.ChangeMapService;
-import com.girlkun.utils.Logger;
 
 
 public abstract class PVP implements IPVP {
@@ -20,14 +18,14 @@ public abstract class PVP implements IPVP {
     public PVP(TYPE_PVP type, Player p1, Player p2) {
         this.typePVP = type;
         this.p1 = p1;
-        this.p2 = p2;   
+        this.p2 = p2;
         p1.pvp = this;
         p2.pvp = this;
         this.lastTimeStart = System.currentTimeMillis();
         this.start();
         PVPManager.gI().addPVP(this);
     }
-    
+
     @Override
     public void start() {
         this.started = true;

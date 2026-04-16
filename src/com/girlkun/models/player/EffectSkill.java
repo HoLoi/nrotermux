@@ -31,7 +31,7 @@ public class EffectSkill {
     public int countCharging;
 
     //huýt sáo
-    public int tiLeHPHuytSao;
+    public long tiLeHPHuytSao;
     public long lastTimeHuytSao;
 
     //thôi miên
@@ -57,8 +57,11 @@ public class EffectSkill {
 
     //socola
     public boolean isSocola;
+    public boolean isBinh;
     public long lastTimeSocola;
     public int timeSocola;
+    public long lastTimeBinh;
+    public int timeBinh;
     public int countPem1hp;
 
     public EffectSkill(Player player) {
@@ -113,6 +116,9 @@ public class EffectSkill {
         }
         if (isSocola && (Util.canDoWithTime(lastTimeSocola, timeSocola))) {
             EffectSkillService.gI().removeSocola(this.player);
+        }
+        if (isBinh && (Util.canDoWithTime(lastTimeBinh, timeBinh))) {
+            EffectSkillService.gI().removeBinh(this.player);
         }
         if (tiLeHPHuytSao != 0 && Util.canDoWithTime(lastTimeHuytSao, 30000)) {
             EffectSkillService.gI().removeHuytSao(this.player);

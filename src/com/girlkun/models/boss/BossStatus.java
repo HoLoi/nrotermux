@@ -7,7 +7,7 @@ package com.girlkun.models.boss;
 
 /**
  *
- * @Stole By Arriety
+ * @Stole By Hoàng Việt
  */
 public enum BossStatus {
     REST,

@@ -34,12 +34,12 @@ public class GiaiNgoaiHang implements Runnable {
             try {
                 Thread.sleep(1000);
             } catch (Exception e) {
+                System.out.println("loi ne giaingoaihang 1 ");
             }
         }
     }
 }
 
 /**
- * Vui lòng không sao chép mã nguồn này dưới mọi hình thức. Hãy tôn trọng tác
- * giả của mã nguồn này. Xin cảm ơn! - GirlBeo
+ * Vui lòng không sao chép mã nguồn này dưới mọi hình thức.
  */

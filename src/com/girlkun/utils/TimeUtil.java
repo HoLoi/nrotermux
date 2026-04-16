@@ -75,7 +75,7 @@ public class TimeUtil {
         int secondPassed = (int) ((System.currentTimeMillis() - lastTime) / 1000);
         int secondsLeft = secondTarget - secondPassed;
         if (secondsLeft < 0) {
-            secondsLeft = 0;
+            secondsLeft = 10;
         }
         return secondsLeft > 60 ? (secondsLeft / 60) + " phút" : secondsLeft + " giây";
     }

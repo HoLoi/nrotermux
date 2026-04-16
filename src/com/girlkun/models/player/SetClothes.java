@@ -23,15 +23,27 @@ public class SetClothes {
     public byte cadic;
     public byte nappa;
 
-    public byte worldcup;
+    public byte tabi;
     public byte setDHD;
+    public byte setDTS;
+    public byte setDTL;
+    public byte tinhan;
+    public byte nguyetan;
+    public byte nhatan;
 
     public boolean godClothes;
     public int ctHaiTac = -1;
 
     public void setup() {
+//        if (!player.isPet){
+//        setupGOGETA();
+//        }
         setDefault();
         setupSKT();
+        setupAN();
+        setupDTS();
+        setupDHD();
+        setupDTL();
         this.godClothes = true;
         for (int i = 0; i < 5; i++) {
             Item item = this.player.inventory.itemsBody.get(i);
@@ -116,11 +128,6 @@ public class SetClothes {
                             isActSet = true;
                             cadic++;
                             break;
-                        case 21:
-                            if (io.param == 80) {
-                                setDHD++;
-                            }
-                            break;
                     }
 
                     if (isActSet) {
@@ -132,7 +139,130 @@ public class SetClothes {
             }
         }
     }
+    private void setupAN() {
+        for (int i = 0; i < 5; i++) {
+            Item item = this.player.inventory.itemsBody.get(i);
+            if (item.isNotNullItem()) {
+                boolean isActSett = false;
+                for (Item.ItemOption io : item.itemOptions) {
+                    switch (io.optionTemplate.id) {
+                        case 34:
+                            isActSett = true;
+                            tinhan++;
+                            break;
+                        case 35:
+                            isActSett = true;
+                            nguyetan++;
+                            break;
+                        case 36:
+                            isActSett = true;
+                            nhatan++;
+                            break;
+                    }
+                    if (isActSett) {
+                        break;
+                    }
 
+                }
+            } else {
+                break;
+            }
+        }
+    }
+//    private void setupGOGETA() {
+//        for (int i = 5; i < 11; i++) {
+//            Item item = this.player.inventory.itemsBody.get(i);
+//            if (item.isNotNullItem()) {
+//                boolean isActSet = false;
+//                for (Item.ItemOption io : item.itemOptions) {
+//                    switch (io.optionTemplate.id) {
+//                        case 192:
+//                        case 193:
+//                            isActSet = true;
+//                            solomon++;
+//                            break;
+//                    }
+//                    if (isActSet) {
+//                        break;
+//                    }
+//
+//                }
+//            } else {
+//                break;
+//            }
+//        }
+//    }
+    private void setupDTS() {
+        for (int i = 0; i < 5; i++) {
+            Item item = this.player.inventory.itemsBody.get(i);
+            if (item.isNotNullItem()) {
+                boolean isActSet = false;
+                for (Item.ItemOption io : item.itemOptions) {
+                    switch (io.optionTemplate.id) {
+                        case 21:
+                            if (io.param == 120) {
+                                setDTS++;
+                            }
+                            break;
+                    }
+                    if (isActSet) {
+                        break;
+                    }
+
+                }
+            } else {
+                break;
+            }
+        }
+    }
+    private void setupDHD() {
+        for (int i = 0; i < 5; i++) {
+            Item item = this.player.inventory.itemsBody.get(i);
+            if (item.isNotNullItem()) {
+                boolean isActSet = false;
+                for (Item.ItemOption io : item.itemOptions) {
+                    switch (io.optionTemplate.id) {
+                        case 21:
+                            if (io.param == 80) {
+                                setDHD++;
+                            }
+                            break;
+                    }
+                    if (isActSet) {
+                        break;
+                    }
+
+                }
+            } else {
+                break;
+            }
+        }
+    }
+    private void setupDTL() {
+        for (int i = 0; i < 5; i++) {
+            Item item = this.player.inventory.itemsBody.get(i);
+            if (item.isNotNullItem()) {
+                boolean isActSet = false;
+                for (Item.ItemOption io : item.itemOptions) {
+                    switch (io.optionTemplate.id) {
+                        case 21:
+                            if (io.param == 15) {
+                                setDTL++;
+                            }
+                            break;
+                    }
+                    if (isActSet) {
+                        break;
+                    }
+
+                }
+            } else {
+                break;
+            }
+        }
+    }
+
+    
     private void setDefault() {
         this.songoku = 0;
         this.thienXinHang = 0;
@@ -144,7 +274,12 @@ public class SetClothes {
         this.cadic = 0;
         this.nappa = 0;
         this.setDHD = 0;
-        this.worldcup = 0;
+        this.setDTS = 0;
+        this.setDTL = 0;
+        this.tabi = 0;
+        this.tinhan = 0;
+        this.nhatan = 0;
+        this.nguyetan = 0;
         this.godClothes = false;
         this.ctHaiTac = -1;
     }

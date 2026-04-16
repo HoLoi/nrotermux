@@ -78,11 +78,12 @@ public class Logger {
     public static final String PURPLE_BACKGROUND_BRIGHT = "\033[0;105m"; // PURPLE
     public static final String CYAN_BACKGROUND_BRIGHT = "\033[0;106m";  // CYAN
     public static final String WHITE_BACKGROUND_BRIGHT = "\033[0;107m";   // WHITE
+
     /**
      * Note: System.out.print
      */
     public static void log(String text) {
-        System.out.println(text);
+        System.out.print(text);
     }
     
     public static void log(String color, String text){
@@ -107,7 +108,7 @@ public class Logger {
      * Note: System.out.print
      */
     public static void error(String text) {
-        System.out.print(BLUE + text + RESET);
+        System.out.print(RED + text + RESET);
     }
 
     public static void logException(Class clazz, Exception ex, String... log) {
@@ -120,6 +121,7 @@ public class Logger {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             ex.printStackTrace(pw);
+            System.out.println("loi ne    kkkk    ClassCastException ");
             String detail = sw.toString();
             String[] arr = detail.split("\n");
             Logger.warning("Có lỗi tại class: ");

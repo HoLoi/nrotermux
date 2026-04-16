@@ -7,10 +7,33 @@ import com.girlkun.models.skill.Skill;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import lombok.Data;
 
 
 public class Template {
+    
+    @Data
+    public static class AchievementTemplate {
 
+        int index;
+        String info1;
+        String info2;
+        double count_Purpose;
+        int gem;
+
+        public AchievementTemplate() {
+
+        }
+
+        public AchievementTemplate(int index, String info1, String info2, double count, int gem) {
+            this.index = index;
+            this.info1 = info1;
+            this.info2 = info2;
+            this.count_Purpose = count;
+            this.gem = gem;
+        }
+
+    }
     public static class ItemOptionTemplate {
 
         public int id;
@@ -119,7 +142,7 @@ public class Template {
 
         public byte[] mobTemp;
         public byte[] mobLevel;
-        public int[] mobHp;
+        public double[] mobHp;
         public short[] mobX;
         public short[] mobY;
 

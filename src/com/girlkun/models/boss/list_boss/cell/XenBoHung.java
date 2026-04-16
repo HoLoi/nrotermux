@@ -9,6 +9,7 @@ import com.girlkun.models.player.Player;
 import com.girlkun.services.EffectSkillService;
 import com.girlkun.services.PlayerService;
 import com.girlkun.services.Service;
+import com.girlkun.models.boss.BossStatus;
 import com.girlkun.services.TaskService;
 import com.girlkun.utils.Util;
 
@@ -26,51 +27,49 @@ public class XenBoHung extends Boss {
 
     @Override
     public void reward(Player plKill) {
-        if(Util.isTrue(50,100)){
-        ItemMap it = new ItemMap(this.zone, 1142, 1, this.location.x, this.location.y, plKill.id);
-        Service.gI().dropItemMap(this.zone, it);
-    }else  if(Util.isTrue(5,100)){
-         ItemMap it = new ItemMap(this.zone, 16, 1, this.location.x, this.location.y, plKill.id);
-        Service.gI().dropItemMap(this.zone, it);
-        }
+        plKill.achievement.plusCount(3);
+        plKill.inventory.event++;
+        Service.getInstance().sendThongBao(plKill, "Bạn đã nhận được 1 điểm săn Boss");
+        ItemMap it = new ItemMap(this.zone, 16, 1, this.location.x, this.location.y, plKill.id);
+        Service.getInstance().dropItemMap(this.zone, it);
+                ItemMap it1 = new ItemMap(this.zone, 2030, 2, this.location.x - 10, this.zone.map.yPhysicInTop(this.location.x,
+                    this.location.y - 24),  plKill.id);
+            Service.getInstance().dropItemMap(this.zone, it1);
         TaskService.gI().checkDoneTaskKillBoss(plKill, this);
     }
-    @Override
-    public void active() {
-        if (this.typePk == ConstPlayer.NON_PK) {
-            this.changeToTypePK();
-        }
-      //  this.hapThu();
-        this.attack();
-    }
-   
-    private void hapThu() {
-        if (!Util.canDoWithTime(this.lastTimeHapThu, this.timeHapThu) || !Util.isTrue(1, 100)) {
-            return;
-        }
-    
-        Player pl = this.zone.getRandomPlayerInMap();
-        if (pl == null || pl.isDie()) {
-            return;
-        }
-//        ChangeMapService.gI().changeMapYardrat(this, this.zone, pl.location.x, pl.location.y);
-        this.nPoint.dameg += (pl.nPoint.dame * 5 / 100);
-        this.nPoint.hpg += (pl.nPoint.hp * 2 / 100);
-        this.nPoint.critg++;
-        this.nPoint.calPoint();
-        PlayerService.gI().hoiPhuc(this, pl.nPoint.hp, 0);
-        pl.injured(null, pl.nPoint.hpMax, true, false);
-        Service.gI().sendThongBao(pl, "Bạn vừa bị " + this.name + " hấp thu!");
-        this.chat(2, "Ui cha cha, kinh dị quá. " + pl.name + " vừa bị tên " + this.name + " nuốt chửng kìa!!!");
-        this.chat("Haha, ngọt lắm đấy " + pl.name + "..");
-        this.lastTimeHapThu = System.currentTimeMillis();
-        this.timeHapThu = Util.nextInt(30000, 50000);
-    }
-    
 
+    @Override
+    public void joinMap() {
+        super.joinMap(); //To change body of generated methods, choose Tools | Templates.
+        st = System.currentTimeMillis();
+    }
+    private long st;
+    @Override
+    public double injured(Player plAtt, double damage, boolean piercing, boolean isMobAttack) {
+        if (!this.isDie()) {
+            if (!piercing && Util.isTrue(this.nPoint.tlNeDon - plAtt.nPoint.tlchinhxac, 1)) {
+                this.chat("Xí hụt");
+                return 0;
+            }
+            damage = this.nPoint.subDameInjureWithDeff(damage);
+            if (!piercing && effectSkill.isShielding) {
+                if (damage > nPoint.hpMax) {
+                    EffectSkillService.gI().breakShield(this);
+                }
+                damage = 1;
+            }
+            this.nPoint.subHP(damage);
+            if (isDie()) {
+                this.setDie(plAtt);
+                die(plAtt);
+            }
+            return damage;
+        } else {
+            return 0;
+        }
+    }
 }
 
 /**
- * Vui lòng không sao chép mã nguồn này dưới mọi hình thức. Hãy tôn trọng tác
- * giả của mã nguồn này. Xin cảm ơn! - GirlBeo
+ * Vui lòng không sao chép mã nguồn này dưới mọi hình thức.
  */

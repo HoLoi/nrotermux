@@ -10,7 +10,7 @@ import com.girlkun.result.GirlkunResultSet;
 
 /**
  *
- * @Stole By Arriety
+ * @Stole By Hoàng Việt
  */
 public class Test {
 

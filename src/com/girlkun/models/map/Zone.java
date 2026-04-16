@@ -3,14 +3,19 @@ package com.girlkun.models.map;
 import com.girlkun.consts.ConstPlayer;
 import com.girlkun.consts.ConstTask;
 import com.girlkun.models.boss.Boss;
+import com.girlkun.models.boss.dhvt.BossDHVT;
 import com.girlkun.models.item.Item;
 import com.girlkun.models.mob.Mob;
 import com.girlkun.models.npc.Npc;
 import com.girlkun.models.npc.NpcManager;
-import com.girlkun.models.npc.specialnpc.MabuEgg;
-import com.girlkun.models.player.Inventory;
+//import com.girlkun.models.npc.specialnpc.MabuEgg;
+//import com.girlkun.models.npc.specialnpc.Timedua;
+//import com.girlkun.models.player.Inventory;
 import com.girlkun.models.player.Pet;
 import com.girlkun.models.player.Player;
+import com.girlkun.models.player.Referee;
+import com.girlkun.models.player.Referee1;
+import com.girlkun.models.player.TestDame;
 import com.girlkun.network.io.Message;
 import com.girlkun.services.ItemMapService;
 import com.girlkun.services.ItemService;
@@ -20,14 +25,18 @@ import com.girlkun.services.Service;
 import com.girlkun.services.TaskService;
 import com.girlkun.services.InventoryServiceNew;
 import com.girlkun.services.NgocRongNamecService;
-import com.girlkun.services.func.TopService;
-import com.girlkun.models.npc.specialnpc.BillEgg;
+import static com.girlkun.services.NgocRongNamecService.TIME_BL;
+import static com.girlkun.services.NgocRongNamecService.TIME_OP;
+//import com.girlkun.services.func.TopService;
+import com.girlkun.models.player.Thu_TrieuHoi;
 import com.girlkun.utils.FileIO;
 import com.girlkun.utils.Logger;
 import com.girlkun.utils.Util;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 
 public class Zone {
@@ -41,8 +50,8 @@ public class Zone {
     public int maxPlayer;
 
     private final List<Player> humanoids; //player, boss, pet
-    private final List<Player> notBosses; //player, pet
-    private final List<Player> players; //player
+    public final List<Player> notBosses; //player, pet
+    public final List<Player> players; //player
     private final List<Player> bosses; //boss
     private final List<Player> pets; //pet
 
@@ -55,11 +64,21 @@ public class Zone {
 
 
     public List<TrapMap> trapMaps;
+    public boolean haveBeQuynh;
+    @Setter
+    @Getter
+    private Player referee;
+
+    private Player referee1;
+    private Player testdame;
 
     public boolean isFullPlayer() {
         return this.players.size() >= this.maxPlayer;
     }
-
+    
+    public boolean isTrungUyTrangAlive;
+    public boolean isbulon13Alive;
+    public boolean isbulon14Alive;
     private void udMob() {
         for (Mob mob : this.mobs) {
             mob.update();
@@ -67,10 +86,14 @@ public class Zone {
     }
 
     private void udPlayer() {
-        for (int i = this.notBosses.size() - 1; i >= 0; i--) {
-            Player pl = this.notBosses.get(i);
-            if (!pl.isPet && !pl.isNewPet) {
-                this.notBosses.get(i).update();
+        if(this.notBosses.size() > 0){
+            for (int i = this.notBosses.size() - 1; i >= 0; i--) {
+                if(this.notBosses.size() > i){
+                    Player pl = this.notBosses.get(i);
+                    if (!pl.isPet && !pl.isNewPet && !pl.isTrieuhoipet) {
+                        this.notBosses.get(i).update();
+                    }
+                }
             }
         }
     }
@@ -138,16 +161,36 @@ public class Zone {
             if (!player.isBoss && !this.notBosses.contains(player)) {
                 this.notBosses.add(player);
             }
-            if (!player.isBoss &&!player.isNewPet&& !player.isPet && !this.players.contains(player)) {
+            if (!player.isBoss &&!player.isNewPet&& !player.isPet &&!player.isTrieuhoipet && !this.players.contains(player)) {
                 this.players.add(player);
             }
             if (player.isBoss) {
                 this.bosses.add(player);
             }
-            if (player.isPet || player.isNewPet) {
+            if (player.isPet || player.isNewPet || player.isTrieuhoipet) {
                 this.pets.add(player);
             }
         }
+    }
+    public boolean isKhongCoTrongTaiTrongKhu() {
+        boolean kovao = true;
+        for (Player pl : players) {
+            if (!pl.isPl()) {
+                kovao = false;
+                break;
+            }
+            if ((pl.zone.map.mapId >= 21 && pl.zone.map.mapId <= 23) || pl.zone.map.mapId == 170 || pl.zone.map.mapId == 153
+                    || pl.zone.map.mapId == 52 || pl.zone.map.mapId == 113 || pl.zone.map.mapId == 129
+                    || MapService.gI().isMapDoanhTrai(pl.zone.map.mapId) 
+                    || MapService.gI().isMapBlackBallWar(pl.zone.map.mapId)
+                    || MapService.gI().isMapBanDoKhoBau(pl.zone.map.mapId) 
+                    || MapService.gI().isMapKhiGas(pl.zone.map.mapId) 
+                    || MapService.gI().isMapMaBu(pl.zone.map.mapId)
+                    || MapService.gI().isMapOffline(pl.zone.map.mapId)) {
+                kovao = false;
+            }
+        }
+        return kovao;
     }
 
     public void removePlayer(Player player) {
@@ -205,10 +248,21 @@ public class Zone {
 
     public void pickItem(Player player, int itemMapId) {
         ItemMap itemMap = getItemMapByItemMapId(itemMapId);
+//        if(itemMap.itemTemplate.type != 22){
         if (itemMap != null) {
-            if (itemMap.playerId == player.id || itemMap.playerId == -1) {
+            if(itemMap.itemTemplate.type != 22){
+            if (itemMap.playerId == player.id * 100000 || itemMap.playerId == player.id || itemMap.playerId == -1) {
                 Item item = ItemService.gI().createItemFromItemMap(itemMap);
-                 boolean picked=true;
+                boolean picked=true;
+                if (item.template.id == 934 && player.taixiu.bongtai >= 400){
+                    Service.getInstance().sendThongBao(player, "Mỗi ngày chỉ nhặt được 400 mảnh hồn");
+                    return;
+                }else 
+                    if (item.template.id == 934 && player.taixiu.bongtai < 400){
+                    player.taixiu.bongtai ++;
+                    InventoryServiceNew.gI().sendItemBags(player);
+                    Service.getInstance().sendToAntherMePickItem(player, itemMapId);
+                }
                 if(!ItemMapService.gI().isNamecBall(item.template.id)){
                     picked = InventoryServiceNew.gI().addItemBag(player, item);
                 }
@@ -220,15 +274,20 @@ public class Zone {
                         msg.writer().writeShort(itemMapId);
                         switch (itemType) {
                             case 9:
+                                player.vangnhat += item.quantity;
+                                msg.writer().writeUTF("");
+                                PlayerService.gI().sendInfoHpMpMoney(player);
+                                break;
                             case 10:
                             case 34:
+                                player.hngocnhat += item.quantity;
                                 msg.writer().writeUTF("");
                                 PlayerService.gI().sendInfoHpMpMoney(player);
                                 break;
                             default:
                                 switch (item.template.id) {
                                     case 362:
-                                        Service.gI().sendThongBao(player, "Chỉ là cục đá thôi, nhặt làm gì?");
+                                        Service.getInstance().sendThongBao(player, "Chỉ là cục đá thôi, nhặt làm gì?");
                                         break;
                                     case 353:
                                     case 354:
@@ -237,8 +296,8 @@ public class Zone {
                                     case 357:
                                     case 358:
                                     case 359:
-                                        if(System.currentTimeMillis() >= NgocRongNamecService.gI().tOpenNrNamec) {
-                                            if(player.idNRNM == -1){
+                                        if(System.currentTimeMillis() >= TIME_OP && System.currentTimeMillis() <= TIME_BL) {
+                                            if(player.idNRNM == -1 ){
                                                 PlayerService.gI().changeAndSendTypePK(player, ConstPlayer.PK_ALL);
                                                 player.idNRNM = item.template.id;
                                                 NgocRongNamecService.gI().mapNrNamec[item.template.id - 353] = player.zone.map.mapId;
@@ -247,16 +306,25 @@ public class Zone {
                                                 NgocRongNamecService.gI().pNrNamec[item.template.id - 353] = player.name;
                                                 NgocRongNamecService.gI().idpNrNamec[item.template.id - 353] = (int) player.id;
                                                 player.lastTimePickNRNM = System.currentTimeMillis();
-                                                Service.gI().sendFlagBag(player);
+                                                Service.getInstance().sendFlagBag(player);
                                                 msg.writer().writeUTF("Bạn đã nhặt được "+item.template.name);
                                                 msg.writer().writeShort(item.quantity);
                                                 player.sendMessage(msg);
                                                 msg.cleanup();
+                                                
                                             }else{
-                                                Service.gI().sendThongBao(player, "Bạn đã mang ngọc rồng trên người");
+                                                Service.getInstance().sendThongBao(player, "Bạn đã mang ngọc rồng trên người");
+                                                ItemMap itm = new ItemMap(itemMap);
+                                                itm.x = player.location.x + Util.nextInt(-20, 20);
+                                                itm.y = itm.zone.map.yPhysicInTop(itm.x, player.location.y);
+                                                Service.getInstance().dropItemMap(player.zone, itm);
                                             }
                                         }else{
-                                            Service.gI().sendThongBao(player, "Chỉ là cục đá thôi, nhặt làm gì?");
+                                            Service.getInstance().sendThongBao(player, "NRNM chỉ nhặt được trong khung giờ 14h đến 16h hằng ngày !!!!");
+                                            ItemMap itm = new ItemMap(itemMap);
+                                            itm.x = player.location.x + Util.nextInt(-20, 20);
+                                            itm.y = itm.zone.map.yPhysicInTop(itm.x, player.location.y);
+                                            Service.getInstance().dropItemMap(player.zone, itm);
                                         }
                                         break;
                                     case 73:
@@ -283,39 +351,47 @@ public class Zone {
                                         InventoryServiceNew.gI().sendItemBags(player);
                                         break;
                                 }
-
                         }
                         msg.writer().writeShort(item.quantity);
                         player.sendMessage(msg);
                         msg.cleanup();
-                        Service.gI().sendToAntherMePickItem(player, itemMapId);
+                        Service.getInstance().sendToAntherMePickItem(player, itemMapId);
                         if (!(this.map.mapId >= 21 && this.map.mapId <= 23
                                 && itemMap.itemTemplate.id == 74
                                 || this.map.mapId >= 42 && this.map.mapId <= 44
                                 && itemMap.itemTemplate.id == 78)) {
                             removeItemMap(itemMap);
                         }
+                        
                     } catch (Exception e) {
+                System.out.println("        loi zone1");
                         Logger.logException(Zone.class, e);
                     }
                 } else {
                     if (!ItemMapService.gI().isBlackBall(item.template.id)) {
                         String text = "Hành trang không còn chỗ trống";
-                        Service.gI().sendThongBao(player, text);
+                        Service.getInstance().sendThongBao(player, text);
                     }
                 }
 //                if (!picked) {
 //                    ItemMap itm = new ItemMap(itemMap);
 //                    itm.x = player.location.x + Util.nextInt(-20, 20);
 //                    itm.y = itm.zone.map.yPhysicInTop(itm.x, player.location.y);
-//                    Service.gI().dropItemMap(player.zone, itm);
+//                    Service.getInstance().dropItemMap(player.zone, itm);
 //                }
             } else {
-                Service.gI().sendThongBao(player, "Không thể nhặt vật phẩm của người khác");
+                Service.getInstance().sendThongBao(player, "Không thể nhặt vật phẩm của người khác");
+            }
+            } else {
+                Service.getInstance().sendThongBao(player, "Không thể nhặt Vệ tinh");
             }
         } else {
-            Service.gI().sendThongBao(player, "Không thể thực hiện");
+            Service.getInstance().sendThongBao(player, "Không thể thực hiện");
+            removeItemMap(itemMap);
         }
+//        } else {
+//            Service.getInstance().sendThongBao(player, "Không thể nhặt Vệ tinh");
+//        }
         TaskService.gI().checkDoneTaskPickItem(player, itemMap);
         TaskService.gI().checkDoneSideTaskPickItem(player, itemMap);
     }
@@ -337,6 +413,20 @@ public class Zone {
             return null;
         }
     }
+    public Player getRandomPlayerInMapPlayer() {
+        if (!this.players.isEmpty()) {
+            return this.players.get(Util.nextInt(0, this.players.size() - 1));
+        } else {
+            return null;
+        }
+    }
+    public Player PlayerPKinmap() {
+        if (!this.humanoids.isEmpty()) {
+            return this.humanoids.get(Util.nextInt(0, this.humanoids.size() - 1));
+        } else {
+            return null;
+        }
+    }
 
     public void load_Me_To_Another(Player player) { //load thông tin người chơi cho những người chơi khác
         try {
@@ -344,6 +434,9 @@ public class Zone {
                 if (MapService.gI().isMapOffline(this.map.mapId)) {
                     if (player.isPet && this.equals(((Pet) player).master.zone)) {
                         infoPlayer(((Pet) player).master, player);
+                    } else
+                    if (player.isTrieuhoipet && this.equals(((Thu_TrieuHoi) player).masterr.zone)) {
+                        infoPlayer(((Thu_TrieuHoi) player).masterr, player);
                     }
                 } else {
                     for(int i = 0 ; i < players.size();i++){
@@ -355,6 +448,7 @@ public class Zone {
                 }
             }
         } catch (Exception e) {
+                System.out.println("        loi zone2");
             Logger.logException(MapService.class, e);
         }
     }
@@ -363,7 +457,7 @@ public class Zone {
         try {
             if (MapService.gI().isMapOffline(this.map.mapId)) {
                 for (Player pl : this.humanoids) {
-                    if (pl.id == -player.id) {
+                    if (pl.id == -player.id || (pl instanceof TestDame)) {
                         infoPlayer(player, pl);
                         break;
                     }
@@ -376,6 +470,7 @@ public class Zone {
                 }
             }
         } catch (Exception e) {
+                System.out.println("        loi zone3");
             Logger.logException(MapService.class, e);
         }
     }
@@ -398,6 +493,7 @@ public class Zone {
                 }
             }
         } catch (Exception e) {
+                System.out.println("        loi zone4");
             Logger.logException(MapService.class, e);
         }
     }
@@ -405,6 +501,7 @@ public class Zone {
     private void infoPlayer(Player plReceive, Player plInfo) {
         Message msg;
         try {
+            String name;//test
             msg = new Message(-5);
             msg.writer().writeInt((int) plInfo.id);
             if (plInfo.clan != null) {
@@ -412,15 +509,22 @@ public class Zone {
             } else {
                 msg.writer().writeInt(-1);
             }
-            msg.writer().writeByte(Service.gI().getCurrLevel(plInfo));
+//            if (plInfo.clan != null) {
+//                msg.writer().writeInt(plInfo.clan.id);
+//                name = "[" + plInfo.clan.name + "]" + plInfo.name;//test
+//            } else {
+//                msg.writer().writeInt(-1);
+//                name = plInfo.name; //test
+//            }
+            msg.writer().writeByte(Service.getInstance().getCurrLevel(plInfo));
             msg.writer().writeBoolean(false);
             msg.writer().writeByte(plInfo.typePk);
             msg.writer().writeByte(plInfo.gender);
             msg.writer().writeByte(plInfo.gender);
             msg.writer().writeShort(plInfo.getHead());
-            msg.writer().writeUTF(plInfo.name);
-            msg.writer().writeInt(plInfo.nPoint.hp);
-            msg.writer().writeInt(plInfo.nPoint.hpMax);
+            msg.writer().writeUTF(plInfo.name);//plInfo.name
+            msg.writer().writeInt(Util.DoubleGioihan(plInfo.nPoint.hp));
+            msg.writer().writeInt(Util.DoubleGioihan(plInfo.nPoint.hpMax));
             msg.writer().writeShort(plInfo.getBody());
             msg.writer().writeShort(plInfo.getLeg());
             msg.writer().writeByte(plInfo.getFlagBag()); //bag
@@ -439,22 +543,33 @@ public class Zone {
             msg.writer().writeByte(plInfo.cFlag);
             msg.writer().writeByte(0);
 
-            if (plInfo.isPl()) {
-                msg.writer().writeShort(plInfo.idAura); //idauraeff
-                msg.writer().writeShort(plInfo.getAura()); //idauraeff
-                msg.writer().writeByte(plInfo.getEffFront()); //seteff
-            }
+//            if (!plInfo.isPet && !plInfo.isBoss && plInfo.isAdmin()) {
+            msg.writer().writeShort(-1); //idauraeff plInfo.getAura()
+            msg.writer().writeByte(-1); //seteff plInfo.getEffFront()
+//            }
 
             plReceive.sendMessage(msg);
             msg.cleanup();
         } catch (Exception e) {
+                System.out.println("        loi zone5");
 //            Logger.logException(MapService.class, e);
         }
-        Service.gI().sendFlagPlayerToMe(plReceive, plInfo);
-        if (!plInfo.isBoss && !plInfo.isPet &&!plInfo.isNewPet) {
-            Service.gI().sendPetFollowToMe(plReceive, plInfo);
+        Service.getInstance().sendFlagPlayerToMe(plReceive, plInfo);
+//        Service.gI().sendFlagPlayerToMe(plInfo, plReceive);
+        if (!plInfo.isBoss && !plInfo.isPet &&!plInfo.isNewPet &&!plInfo.isTrieuhoipet && !(plInfo instanceof BossDHVT) && !(plInfo instanceof Referee) & !(plInfo instanceof Referee1) & !(plInfo instanceof TestDame)) {
+            Service.getInstance().sendPetFollowToMe(plReceive, plInfo);
+            if (plInfo.inventory.itemsBody.get(11).isNotNullItem()) {
+                Service.getInstance().sendFootRv(plInfo, plReceive, (short) plInfo.inventory.itemsBody.get(11).template.id);
+            }
         }
-
+        if (plInfo.isPl() && plInfo.name.compareTo("TABI") != 0 && plInfo.name.compareTo("TEST DAME") != 0) {
+        if (plInfo.inventory.itemsBody.get(5).isNotNullItem()) {
+                Service.getInstance().sendTitleRv(plInfo, plReceive, (short) plInfo.inventory.itemsBody.get(5).template.id);
+            }
+        }
+        Service.getInstance().sendTitleRv(plInfo, plReceive, (short) 888);
+        Service.getInstance().sendTitleRv(plInfo, plReceive, (short) 889);
+        Service.getInstance().sendTitleRv(plInfo, plReceive, (short) 890);
         try {
             if (plInfo.isDie()) {
                 msg = new Message(-8);
@@ -466,7 +581,7 @@ public class Zone {
                 msg.cleanup();
             }
         } catch (Exception e) {
-
+                System.out.println("        loi zone6");
         }
     }
 
@@ -508,9 +623,9 @@ public class Zone {
                 msg.writer().writeBoolean(false); //is wind
                 msg.writer().writeByte(mob.tempId);
                 msg.writer().writeByte(0);
-                msg.writer().writeInt(mob.point.gethp());
+                msg.writer().writeInt(Util.DoubleGioihan(mob.point.gethp()));
                 msg.writer().writeByte(mob.level);
-                msg.writer().writeInt((mob.point.getHpFull()));
+                msg.writer().writeInt((Util.DoubleGioihan(mob.point.getHpFull())));
                 msg.writer().writeShort(mob.location.x);
                 msg.writer().writeShort(mob.location.y);
                 msg.writer().writeByte(mob.status);
@@ -548,6 +663,7 @@ public class Zone {
                 byte[] bgItem = FileIO.readFile("data/girlkun/map/item_bg_map_data/" + this.map.mapId);
                 msg.writer().write(bgItem);
             } catch (Exception e) {
+                System.out.println("        loi zone7    "  + this.map.mapId);
                 msg.writer().writeShort(0);
             }
 
@@ -557,6 +673,7 @@ public class Zone {
                 byte[] effItem = FileIO.readFile("data/girlkun/map/eff_map/" + this.map.mapId);
                 msg.writer().write(effItem);
             } catch (Exception e) {
+                System.out.println("        loi zone8    " + this.map.mapId);
                 msg.writer().writeShort(0);
             }
 
@@ -568,6 +685,7 @@ public class Zone {
             msg.cleanup();
 
         } catch (Exception e) {
+                System.out.println("        loi zone9");
             Logger.logException(Service.class, e);
         }
     }
@@ -580,5 +698,8 @@ public class Zone {
             }
         }
         return null;
+    }
+    public int getNumOfBosses() {
+        return this.bosses.size();
     }
 }

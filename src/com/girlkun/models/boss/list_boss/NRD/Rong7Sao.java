@@ -18,16 +18,16 @@ public class Rong7Sao extends Boss {
     @Override
     public void reward(Player plKill) {
         ItemMap it = new ItemMap(this.zone, 378, 1, this.location.x, this.location.y, -1);
-        Service.gI().dropItemMap(this.zone, it);
+        Service.getInstance().dropItemMap(this.zone, it);
     }
 @Override
-    public int injured(Player plAtt, int damage, boolean piercing, boolean isMobAttack) {
+    public double injured(Player plAtt, double damage, boolean piercing, boolean isMobAttack) {
         if (!this.isDie()) {
-            if (!piercing && Util.isTrue(this.nPoint.tlNeDon, 1000)) {
+            if (!piercing && Util.isTrue(this.nPoint.tlNeDon - plAtt.nPoint.tlchinhxac, 1000)) {
                 this.chat("Xí hụt");
                 return 0;
             }
-            damage = this.nPoint.subDameInjureWithDeff(damage/7);
+            damage = this.nPoint.subDameInjureWithDeff(damage);
             if (!piercing && effectSkill.isShielding) {
                 if (damage > nPoint.hpMax) {
                     EffectSkillService.gI().breakShield(this);

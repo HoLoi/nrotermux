@@ -38,7 +38,7 @@ public class FileIO {
             openFileInput.close();
             return byteArrayOutputStream;
         } catch (IOException e) {
-            e.printStackTrace();
+//            System.out.println("12345676543212345678765432");
             return null;
         }
     }
