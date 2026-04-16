@@ -121,7 +121,6 @@ public class Logger {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             ex.printStackTrace(pw);
-            System.out.println("loi ne    kkkk    ClassCastException ");
             String detail = sw.toString();
             String[] arr = detail.split("\n");
             Logger.warning("Có lỗi tại class: ");
