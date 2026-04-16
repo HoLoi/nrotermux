@@ -774,8 +774,7 @@ public class Controller implements IMessageHandler {
     }
 
     public void login2(MySession session, Message msg) {
-//        Service.getInstance().switchToRegisterScr(session);
-        Service.getInstance().sendThongBaoOK(session, "Vui lòng đăng ký tài khoản tại trang chủ!");
+        Service.getInstance().switchToRegisterScr(session);
     }
 
     public void sendInfo(MySession session) {
