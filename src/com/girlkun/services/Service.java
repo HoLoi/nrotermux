@@ -1588,6 +1588,7 @@ public class Service {
         if (player.isPet) {
             player.nPoint.powerUp(param);
             player.nPoint.tiemNangUp(param);
+            player.nPoint.autoIncreasePointForPet();
             Player master = ((Pet) player).master;
 
             param = master.nPoint.calSubTNSM(param);

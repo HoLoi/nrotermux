@@ -580,6 +580,7 @@ public class Mob {
         byte radaThuong = (byte) new Random().nextInt(Manager.manhradaThuong.length);
         byte radaVIP = (byte) new Random().nextInt(Manager.manhradaVIP.length);
         byte nroquai = (byte) new Random().nextInt(Manager.itemIds_NR.length);
+        byte saophale = (byte) new Random().nextInt(Manager.spl.length);
         byte randomTrungthu = (byte) new Random().nextInt(Manager.SuKien_TrungThu.length);
 //        if (!items.isEmpty()) {
 //            ItemMobReward item = items.get(Util.nextInt(0, items.size() - 1));
@@ -621,6 +622,9 @@ public class Mob {
         if (Util.isTrue(1, 100)) {
             list.add(new ItemMap(zone, Manager.itemIds_NR[nroquai], 1, this.location.x, this.location.y, player.id));
         }
+        if (Util.isTrue(1, 100)) {
+            list.add(new ItemMap(zone, Manager.spl[saophale], 1, this.location.x, this.location.y, player.id));
+        }
         if (Util.isTrue(20, 100) && MapService.gI().isMapCold(this.zone.map)) {
             list.add(new ItemMap(zone, Manager.itemIds_TL[randomDo], 1, this.location.x, this.location.y, player.id));
         }
@@ -632,8 +636,8 @@ public class Mob {
         }
         
         tileVang = player.nPoint.tlGold / 100;
-        if (Util.isTrue(5, 100)) {
-            int vang = (Util.nextInt(30000, 50000) + Util.nextInt(30000, 50000) * tileVang);
+        if (Util.isTrue(30, 100)) {
+            int vang = (Util.nextInt(30000, 50000) + Util.nextInt(30000, 50000) * tileVang)*10;
             list.add(new ItemMap(zone, 190, vang, this.location.x, this.location.y, player.id));
         }
         tileHn = player.nPoint.tlGold / 100;

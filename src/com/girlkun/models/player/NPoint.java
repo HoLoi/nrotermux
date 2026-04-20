@@ -6,11 +6,9 @@ import com.girlkun.models.card.Card;
 import com.girlkun.models.card.OptionCard;
 import com.girlkun.models.intrinsic.Intrinsic;
 import com.girlkun.models.item.Item;
-import com.girlkun.models.mob.Mob;
 import com.girlkun.models.skill.Skill;
 import com.girlkun.server.Manager;
 import com.girlkun.services.EffectSkillService;
-import com.girlkun.services.InventoryServiceNew;
 import com.girlkun.services.ItemService;
 import com.girlkun.services.MapService;
 import com.girlkun.services.PlayerService;
@@ -19,7 +17,6 @@ import com.girlkun.services.TaskService;
 import com.girlkun.utils.Logger;
 import com.girlkun.utils.SkillUtil;
 import com.girlkun.utils.Util;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -1961,6 +1958,85 @@ public class NPoint {
             return;
         }
         Service.getInstance().point(player);
+    }
+
+    public void autoIncreasePointForPet() {
+        if (!player.isPet) {
+            return;
+        }
+        boolean changed = false;
+        int guard = 0;
+        int typeCursor = 0;
+        byte[] autoTypes = new byte[]{0, 1, 2, 3};
+        while (guard++ < 2000) {
+            byte type = autoTypes[typeCursor++ % autoTypes.length];
+            if (!canIncreaseOnePoint(type)) {
+                boolean hasAny = false;
+                for (byte t : autoTypes) {
+                    if (canIncreaseOnePoint(t)) {
+                        hasAny = true;
+                        break;
+                    }
+                }
+                if (!hasAny) {
+                    break;
+                }
+                continue;
+            }
+            if (!increaseOnePoint(type)) {
+                break;
+            }
+            changed = true;
+        }
+        if (changed) {
+            Service.getInstance().point(player);
+        }
+    }
+
+    private boolean canIncreaseOnePoint(byte type) {
+        switch (type) {
+            case 0:
+                return (this.hpg + 20) <= getHpMpLimit() && this.tiemNang >= (this.hpg + 1000);
+            case 1:
+                return (this.mpg + 20) <= getHpMpLimit() && this.tiemNang >= (this.mpg + 1000);
+            case 2:
+                return (this.dameg + 1) <= getDameLimit() && this.tiemNang >= (this.dameg * 100);
+            case 3:
+                return (this.defg + 1) <= getDefLimit() && this.tiemNang >= ((this.defg + 5) * 100000L);
+            default:
+                return false;
+        }
+    }
+
+    private boolean increaseOnePoint(byte type) {
+        switch (type) {
+            case 0:
+                if (doUseTiemNang(this.hpg + 1000)) {
+                    this.hpg += 20;
+                    return true;
+                }
+                return false;
+            case 1:
+                if (doUseTiemNang(this.mpg + 1000)) {
+                    this.mpg += 20;
+                    return true;
+                }
+                return false;
+            case 2:
+                if (doUseTiemNang(this.dameg * 100)) {
+                    this.dameg += 1;
+                    return true;
+                }
+                return false;
+            case 3:
+                if (doUseTiemNang((this.defg + 5) * 100000L)) {
+                    this.defg += 1;
+                    return true;
+                }
+                return false;
+            default:
+                return false;
+        }
     }
 
     private boolean doUseTiemNang(double tiemNang) {

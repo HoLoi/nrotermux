@@ -50,6 +50,7 @@ public class ServerManager {
     public static ServerSocket listenSocket;
     public static boolean isRunning;
     public static long delaylogin;
+    private volatile boolean waitingMenuCommand;
 
     public void init() {
         Manager.gI();
@@ -130,6 +131,7 @@ public class ServerManager {
         try {
             if (GraphicsEnvironment.isHeadless()) {
                 Logger.warning("Moi truong headless - bo qua giao dien quan ly server\n");
+                Logger.warning("Go 'menu' de mo bang dieu khien terminal\n");
                 return;
             }
             JFrame frame = new JFrame("Ngọc rồng Tabi");
@@ -244,6 +246,23 @@ public class ServerManager {
             Scanner sc = new Scanner(System.in);
             while (true) {
                 String line = sc.nextLine();
+                if (line == null) {
+                    continue;
+                }
+                line = line.trim();
+                if (line.isEmpty()) {
+                    continue;
+                }
+                if (line.equalsIgnoreCase("menu")) {
+                    showControlMenu();
+                    waitingMenuCommand = true;
+                    continue;
+                }
+                if (waitingMenuCommand) {
+                    if (handleMenuSelection(sc, line)) {
+                        continue;
+                    }
+                }
                 if (line.equals("baotri")) {
                     Maintenance.gI().start(60 * 2);
                 } else if (line.equals("athread")) {
@@ -297,6 +316,84 @@ public class ServerManager {
                 }
             }
         }, "Active line").start();
+    }
+
+    private void showControlMenu() {
+        Logger.warning("=========== MENU DIEU KHIEN SERVER ===========\n");
+        Logger.warning("1. Bao tri may chu (30 phut)\n");
+        Logger.warning("2. Doi EXP server\n");
+        Logger.warning("3. Chon su kien server\n");
+        Logger.warning("4. Thong bao server\n");
+        Logger.warning("5. Da all player\n");
+        Logger.warning("6. Khuyen mai nap\n");
+        Logger.warning("0. Thoat menu\n");
+        Logger.warning("Nhap so de thuc hien: \n");
+    }
+
+    private boolean handleMenuSelection(Scanner sc, String line) {
+        int option;
+        try {
+            option = Integer.parseInt(line);
+        } catch (NumberFormatException e) {
+            waitingMenuCommand = false;
+            return false;
+        }
+        if (option == 0) {
+            waitingMenuCommand = false;
+            Logger.warning("Da thoat menu dieu khien\n");
+            return true;
+        }
+        executeControlAction(option, sc);
+        showControlMenu();
+        waitingMenuCommand = true;
+        return true;
+    }
+
+    private void executeControlAction(int option, Scanner sc) {
+        try {
+            switch (option) {
+                case 1:
+                    Maintenance.gI().start(30);
+                    Logger.error("Tien hanh bao tri 30 phut\n");
+                    break;
+                case 2:
+                    Logger.warning("Nhap ti le EXP server moi: \n");
+                    Manager.RATE_EXP_SERVER = Byte.parseByte(sc.nextLine().trim());
+                    Logger.error("EXP server hien tai: " + Manager.RATE_EXP_SERVER + "\n");
+                    break;
+                case 3:
+                    Logger.warning("Nhap su kien (1:TrungThu, 2:He, 3:Tet, 4:Valentine, 5:GioTo, 6:GiangSinh, 7:Halloween): \n");
+                    Manager.SUKIEN = Byte.parseByte(sc.nextLine().trim());
+                    Logger.error("Su kien hien tai: " + Manager.SUKIEN + "\n");
+                    if (Manager.SUKIEN == 1) {
+                        Service.getInstance().sendThongBaoAllPlayer("|7|Sự kiện Trung thu đang được diễn ra"
+                                + "\n|5|Thông tin chi tiết Sự kiện vui lòng xem tại NPC Trung thu tại Làng Aru");
+                    }
+                    break;
+                case 4:
+                    Logger.warning("Nhap noi dung thong bao server: \n");
+                    String chat = sc.nextLine();
+                    Service.getInstance().sendThongBaoAllPlayer(chat);
+                    Logger.error("Thong bao: " + chat + "\n");
+                    break;
+                case 5:
+                    new Thread(() -> Client.gI().close()).start();
+                    Logger.error("Dang thuc hien da all player\n");
+                    break;
+                case 6:
+                    Logger.warning("Nhap he so khuyen mai nap moi: \n");
+                    Manager.KHUYEN_MAI_NAP = Byte.parseByte(sc.nextLine().trim());
+                    Logger.error("Khuyen mai nap hien tai: x" + Manager.KHUYEN_MAI_NAP + "\n");
+                    break;
+                default:
+                    Logger.warning("Lua chon khong hop le\n");
+                    break;
+            }
+        } catch (NumberFormatException e) {
+            Logger.warning("Gia tri nhap vao khong hop le\n");
+        } catch (Exception e) {
+            Logger.warning("Loi thuc thi menu dieu khien\n");
+        }
     }
 
     private void activeGame() {
