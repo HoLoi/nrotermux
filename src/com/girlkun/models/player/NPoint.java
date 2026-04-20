@@ -62,6 +62,8 @@ public class NPoint {
     private long petBaseKiForAuto;
     private long petBaseDameForAuto;
     private byte petLastPriorityTypeForAuto = -1;
+    private long petLastDebugLogTime;
+    private static final long PET_DEBUG_LOG_INTERVAL = 3000;
 
     public double def;
     public long defg;
@@ -1870,6 +1872,26 @@ public class NPoint {
         if (point <= 0 || point > 100) {
             return;
         }
+        if (player.isPet && type == 3) {
+            sanitizePetAutoStats();
+            initPetAutoBase();
+            boolean hpAtLimit = isPointAtLimitForPet((byte) 0);
+            boolean kiAtLimit = isPointAtLimitForPet((byte) 1);
+            boolean dameAtLimit = isPointAtLimitForPet((byte) 2);
+
+            // Chặn cộng giáp cho đệ tử khi 3 chỉ số chính chưa chạm trần.
+            if (!(hpAtLimit && kiAtLimit && dameAtLimit)) {
+                byte redirectType = getPriorityPointTypeForPet();
+                logPetAutoDebug("redirect-armor type=3 -> " + redirectType
+                        + " hpAtLimit=" + hpAtLimit
+                        + " kiAtLimit=" + kiAtLimit
+                        + " dameAtLimit=" + dameAtLimit);
+                if (redirectType >= 0 && redirectType <= 2) {
+                    increasePoint(redirectType, point);
+                }
+                return;
+            }
+        }
         double tiemNangUse = 0;
         if (type == 0) {
             int pointHp = point * 20;
@@ -1982,23 +2004,34 @@ public class NPoint {
         initPetAutoBase();
         boolean changed = false;
         int guard = 0;
+        int applied = 0;
+        String stopReason = "none";
         while (guard++ < 2000) {
             byte type = getPriorityPointTypeForPet();
             if (type == -1) {
+                stopReason = "priority=-1";
                 break;
             }
             if (type == 3
                     && !(isPointAtLimitForPet((byte) 0)
                     && isPointAtLimitForPet((byte) 1)
                     && isPointAtLimitForPet((byte) 2))) {
+                stopReason = "blocked-armor-before-main-max";
                 break;
             }
             if (!increaseOnePoint(type)) {
+                stopReason = "increase-failed-type=" + type;
                 break;
             }
             this.petLastPriorityTypeForAuto = type;
             changed = true;
+            applied++;
         }
+        if (guard > 2000) {
+            stopReason = "guard-limit";
+        }
+        logPetAutoDebug("auto-loop applied=" + applied + " stop=" + stopReason
+                + " next=" + getPriorityPointTypeForPet());
         if (changed) {
             Service.getInstance().point(player);
         }
@@ -2210,6 +2243,26 @@ public class NPoint {
             return true;
         }
         return false;
+    }
+
+    private void logPetAutoDebug(String message) {
+        if (this.player == null || !this.player.isPet) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+        if (now - this.petLastDebugLogTime < PET_DEBUG_LOG_INTERVAL) {
+            return;
+        }
+        this.petLastDebugLogTime = now;
+        Logger.log("[PET-AUTO] name=" + this.player.name
+                + " | " + message
+                + " | lp=" + this.limitPower
+                + " hp=" + this.hpg + "/" + getHpMpLimit()
+                + " ki=" + this.mpg + "/" + getHpMpLimit()
+                + " sd=" + this.dameg + "/" + getDameLimit()
+                + " def=" + this.defg + "/" + getDefLimit()
+                + " tn=" + (long) this.tiemNang
+                + "\n");
     }
 
     //--------------------------------------------------------------------------
