@@ -2003,8 +2003,16 @@ public class NPoint {
         boolean canKi = canIncreaseOnePoint((byte) 1);
         boolean canDame = canIncreaseOnePoint((byte) 2);
 
+        // Ưu tiên tuyệt đối cho HP/KI/Sức đánh theo tỉ lệ gốc.
+        // Chỉ cộng giáp khi cả 3 chỉ số chính đều đã đạt giới hạn.
         if (!canHp && !canKi && !canDame) {
-            return canIncreaseOnePoint((byte) 3) ? (byte) 3 : (byte) -1;
+            boolean hpAtLimit = isPointAtLimit((byte) 0);
+            boolean kiAtLimit = isPointAtLimit((byte) 1);
+            boolean dameAtLimit = isPointAtLimit((byte) 2);
+            if (hpAtLimit && kiAtLimit && dameAtLimit) {
+                return canIncreaseOnePoint((byte) 3) ? (byte) 3 : (byte) -1;
+            }
+            return -1;
         }
 
         double hpProgress = this.hpg / (double) this.petBaseHpForAuto;
@@ -2026,6 +2034,21 @@ public class NPoint {
             selected = 2;
         }
         return selected;
+    }
+
+    private boolean isPointAtLimit(byte type) {
+        switch (type) {
+            case 0:
+                return (this.hpg + 20) > getHpMpLimit();
+            case 1:
+                return (this.mpg + 20) > getHpMpLimit();
+            case 2:
+                return (this.dameg + 1) > getDameLimit();
+            case 3:
+                return (this.defg + 1) > getDefLimit();
+            default:
+                return false;
+        }
     }
 
     private boolean canIncreaseOnePoint(byte type) {
