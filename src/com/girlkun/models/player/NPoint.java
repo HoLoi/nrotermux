@@ -62,9 +62,6 @@ public class NPoint {
     private long petBaseKiForAuto;
     private long petBaseDameForAuto;
     private byte petLastPriorityTypeForAuto = -1;
-    private long petLastDebugLogTime;
-    private static final long PET_DEBUG_LOG_INTERVAL = 3000;
-    private boolean petDebugHookLogged;
 
     public double def;
     public long defg;
@@ -1894,10 +1891,6 @@ public class NPoint {
                     this.petLastPriorityTypeForAuto = redirectType;
                     applied++;
                 }
-                logPetAutoDebug("redirect-armor type=3 applied=" + applied
-                        + " hpAtLimit=" + hpAtLimit
-                        + " kiAtLimit=" + kiAtLimit
-                        + " dameAtLimit=" + dameAtLimit);
                 if (applied > 0) {
                     Service.getInstance().point(player);
                 }
@@ -2012,16 +2005,6 @@ public class NPoint {
         if (!player.isPet) {
             return;
         }
-        if (!this.petDebugHookLogged) {
-            this.petDebugHookLogged = true;
-            Logger.log("[PET-AUTO] hook-active name=" + this.player.name
-                    + " lp=" + this.limitPower
-                    + " hp=" + this.hpg
-                    + " ki=" + this.mpg
-                    + " sd=" + this.dameg
-                    + " tn=" + (long) this.tiemNang
-                    + "\n");
-        }
         sanitizePetAutoStats();
         initPetAutoBase();
         boolean changed = false;
@@ -2052,8 +2035,6 @@ public class NPoint {
         if (guard > 2000) {
             stopReason = "guard-limit";
         }
-        logPetAutoDebug("auto-loop applied=" + applied + " stop=" + stopReason
-                + " next=" + getPriorityPointTypeForPet());
         if (changed) {
             Service.getInstance().point(player);
         }
@@ -2265,26 +2246,6 @@ public class NPoint {
             return true;
         }
         return false;
-    }
-
-    private void logPetAutoDebug(String message) {
-        if (this.player == null || !this.player.isPet) {
-            return;
-        }
-        long now = System.currentTimeMillis();
-        if (now - this.petLastDebugLogTime < PET_DEBUG_LOG_INTERVAL) {
-            return;
-        }
-        this.petLastDebugLogTime = now;
-        Logger.log("[PET-AUTO] name=" + this.player.name
-                + " | " + message
-                + " | lp=" + this.limitPower
-                + " hp=" + this.hpg + "/" + getHpMpLimit()
-                + " ki=" + this.mpg + "/" + getHpMpLimit()
-                + " sd=" + this.dameg + "/" + getDameLimit()
-                + " def=" + this.defg + "/" + getDefLimit()
-                + " tn=" + (long) this.tiemNang
-                + "\n");
     }
 
     //--------------------------------------------------------------------------
