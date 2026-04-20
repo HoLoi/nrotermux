@@ -58,6 +58,10 @@ public class NPoint {
     public long hpg, mpg, dameg;
     public double dame;
 
+    private long petBaseHpForAuto;
+    private long petBaseKiForAuto;
+    private long petBaseDameForAuto;
+
     public double def;
     public long defg;
     public int crit, critg;
@@ -1964,24 +1968,13 @@ public class NPoint {
         if (!player.isPet) {
             return;
         }
+        initPetAutoBase();
         boolean changed = false;
         int guard = 0;
-        int typeCursor = 0;
-        byte[] autoTypes = new byte[]{0, 1, 2, 3};
         while (guard++ < 2000) {
-            byte type = autoTypes[typeCursor++ % autoTypes.length];
-            if (!canIncreaseOnePoint(type)) {
-                boolean hasAny = false;
-                for (byte t : autoTypes) {
-                    if (canIncreaseOnePoint(t)) {
-                        hasAny = true;
-                        break;
-                    }
-                }
-                if (!hasAny) {
-                    break;
-                }
-                continue;
+            byte type = getPriorityPointTypeForPet();
+            if (type == -1) {
+                break;
             }
             if (!increaseOnePoint(type)) {
                 break;
@@ -1991,6 +1984,48 @@ public class NPoint {
         if (changed) {
             Service.getInstance().point(player);
         }
+    }
+
+    private void initPetAutoBase() {
+        if (this.petBaseHpForAuto <= 0) {
+            this.petBaseHpForAuto = Math.max(1, this.hpg);
+        }
+        if (this.petBaseKiForAuto <= 0) {
+            this.petBaseKiForAuto = Math.max(1, this.mpg);
+        }
+        if (this.petBaseDameForAuto <= 0) {
+            this.petBaseDameForAuto = Math.max(1, this.dameg);
+        }
+    }
+
+    private byte getPriorityPointTypeForPet() {
+        boolean canHp = canIncreaseOnePoint((byte) 0);
+        boolean canKi = canIncreaseOnePoint((byte) 1);
+        boolean canDame = canIncreaseOnePoint((byte) 2);
+
+        if (!canHp && !canKi && !canDame) {
+            return canIncreaseOnePoint((byte) 3) ? (byte) 3 : (byte) -1;
+        }
+
+        double hpProgress = this.hpg / (double) this.petBaseHpForAuto;
+        double kiProgress = this.mpg / (double) this.petBaseKiForAuto;
+        double dameProgress = this.dameg / (double) this.petBaseDameForAuto;
+
+        byte selected = -1;
+        double minProgress = Double.MAX_VALUE;
+
+        if (canHp && hpProgress < minProgress) {
+            minProgress = hpProgress;
+            selected = 0;
+        }
+        if (canKi && kiProgress < minProgress) {
+            minProgress = kiProgress;
+            selected = 1;
+        }
+        if (canDame && dameProgress < minProgress) {
+            selected = 2;
+        }
+        return selected;
     }
 
     private boolean canIncreaseOnePoint(byte type) {

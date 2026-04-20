@@ -8,7 +8,6 @@ import com.girlkun.utils.SkillUtil;
 import com.girlkun.services.Service;
 import com.girlkun.utils.Util;
 import com.girlkun.network.io.Message;
-import com.girlkun.server.Manager;
 import com.girlkun.services.ItemTimeService;
 import com.girlkun.services.PlayerService;
 import com.girlkun.services.SkillService;
@@ -534,13 +533,7 @@ public class Pet extends Player {
 
     private void increasePoint() {
         if (this.nPoint != null && Util.canDoWithTime(lastTimeIncreasePoint, 10)) {
-            if (Util.isTrue(1, 100)) {
-                this.nPoint.increasePoint((byte) 3, (short) 1);
-            } else {
-                byte type = (byte) Util.nextInt(0, 2);
-                short point = (short) Util.nextInt(Manager.RATE_EXP_SERVER);
-                this.nPoint.increasePoint(type, point);
-            }
+            this.nPoint.autoIncreasePointForPet();
             lastTimeIncreasePoint = System.currentTimeMillis();
         }
     }
