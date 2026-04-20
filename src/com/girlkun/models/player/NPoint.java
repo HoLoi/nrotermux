@@ -64,6 +64,7 @@ public class NPoint {
     private byte petLastPriorityTypeForAuto = -1;
     private long petLastDebugLogTime;
     private static final long PET_DEBUG_LOG_INTERVAL = 3000;
+    private boolean petDebugHookLogged;
 
     public double def;
     public long defg;
@@ -2010,6 +2011,16 @@ public class NPoint {
     public void autoIncreasePointForPet() {
         if (!player.isPet) {
             return;
+        }
+        if (!this.petDebugHookLogged) {
+            this.petDebugHookLogged = true;
+            Logger.log("[PET-AUTO] hook-active name=" + this.player.name
+                    + " lp=" + this.limitPower
+                    + " hp=" + this.hpg
+                    + " ki=" + this.mpg
+                    + " sd=" + this.dameg
+                    + " tn=" + (long) this.tiemNang
+                    + "\n");
         }
         sanitizePetAutoStats();
         initPetAutoBase();

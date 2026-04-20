@@ -53,6 +53,7 @@ import java.util.logging.Level;
 public class Service {
 
     private static Service instance;
+    private long lastPetSmtnDebugLog;
 
     public static Service gI() {
         if (instance == null) {
@@ -1586,6 +1587,16 @@ public class Service {
 
     public void addSMTN(Player player, byte type, double param, boolean isOri) {
         if (player.isPet) {
+            long now = System.currentTimeMillis();
+            if (now - this.lastPetSmtnDebugLog >= 3000) {
+                this.lastPetSmtnDebugLog = now;
+                Logger.log("[PET-AUTO] addSMTN-enter name=" + player.name
+                        + " type=" + type
+                        + " param=" + (long) param
+                        + " power=" + (long) player.nPoint.power
+                        + " tn=" + (long) player.nPoint.tiemNang
+                        + "\n");
+            }
             player.nPoint.powerUp(param);
             player.nPoint.tiemNangUp(param);
             player.nPoint.autoIncreasePointForPet();
