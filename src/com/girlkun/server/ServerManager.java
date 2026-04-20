@@ -244,6 +244,10 @@ public class ServerManager {
     private void activeCommandLine() {
         new Thread(() -> {
             Scanner sc = new Scanner(System.in);
+            if (GraphicsEnvironment.isHeadless()) {
+                showControlMenu();
+                waitingMenuCommand = true;
+            }
             while (true) {
                 String line = sc.nextLine();
                 if (line == null) {
