@@ -61,6 +61,7 @@ public class NPoint {
     private long petBaseHpForAuto;
     private long petBaseKiForAuto;
     private long petBaseDameForAuto;
+    private byte petLastPriorityTypeForAuto = -1;
 
     public double def;
     public long defg;
@@ -1976,9 +1977,16 @@ public class NPoint {
             if (type == -1) {
                 break;
             }
+            if (type == 3
+                    && !(isPointAtLimitForPet((byte) 0)
+                    && isPointAtLimitForPet((byte) 1)
+                    && isPointAtLimitForPet((byte) 2))) {
+                break;
+            }
             if (!increaseOnePoint(type)) {
                 break;
             }
+            this.petLastPriorityTypeForAuto = type;
             changed = true;
         }
         if (changed) {
@@ -2022,21 +2030,60 @@ public class NPoint {
         double kiProgress = this.mpg / (double) this.petBaseKiForAuto;
         double dameProgress = this.dameg / (double) this.petBaseDameForAuto;
 
-        byte selected = -1;
         double minProgress = Double.MAX_VALUE;
+        if (canHp) {
+            minProgress = Math.min(minProgress, hpProgress);
+        }
+        if (canKi) {
+            minProgress = Math.min(minProgress, kiProgress);
+        }
+        if (canDame) {
+            minProgress = Math.min(minProgress, dameProgress);
+        }
+        if (minProgress == Double.MAX_VALUE) {
+            return -1;
+        }
 
-        if (canHp && hpProgress < minProgress) {
-            minProgress = hpProgress;
-            selected = 0;
+        final double epsilon = 1e-9;
+        boolean hpCandidate = canHp && Math.abs(hpProgress - minProgress) <= epsilon;
+        boolean kiCandidate = canKi && Math.abs(kiProgress - minProgress) <= epsilon;
+        boolean dameCandidate = canDame && Math.abs(dameProgress - minProgress) <= epsilon;
+
+        return pickPetPriorityType(hpCandidate, kiCandidate, dameCandidate);
+    }
+
+    private byte pickPetPriorityType(boolean hpCandidate, boolean kiCandidate, boolean dameCandidate) {
+        int candidateCount = (hpCandidate ? 1 : 0) + (kiCandidate ? 1 : 0) + (dameCandidate ? 1 : 0);
+        if (candidateCount == 0) {
+            return -1;
         }
-        if (canKi && kiProgress < minProgress) {
-            minProgress = kiProgress;
-            selected = 1;
+        if (candidateCount == 1) {
+            if (hpCandidate) {
+                return 0;
+            }
+            if (kiCandidate) {
+                return 1;
+            }
+            return 2;
         }
-        if (canDame && dameProgress < minProgress) {
-            selected = 2;
+
+        byte[] order = new byte[]{0, 1, 2};
+        int startIndex = 0;
+        if (this.petLastPriorityTypeForAuto == 0) {
+            startIndex = 1;
+        } else if (this.petLastPriorityTypeForAuto == 1) {
+            startIndex = 2;
         }
-        return selected;
+
+        for (int i = 0; i < order.length; i++) {
+            byte type = order[(startIndex + i) % order.length];
+            if ((type == 0 && hpCandidate)
+                    || (type == 1 && kiCandidate)
+                    || (type == 2 && dameCandidate)) {
+                return type;
+            }
+        }
+        return hpCandidate ? (byte) 0 : (kiCandidate ? (byte) 1 : (byte) 2);
     }
 
     private boolean isPointAtLimitForPet(byte type) {
