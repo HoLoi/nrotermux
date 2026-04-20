@@ -1999,16 +1999,23 @@ public class NPoint {
     }
 
     private byte getPriorityPointTypeForPet() {
-        boolean canHp = canIncreaseOnePoint((byte) 0);
-        boolean canKi = canIncreaseOnePoint((byte) 1);
-        boolean canDame = canIncreaseOnePoint((byte) 2);
-        boolean canDef = canIncreaseOnePoint((byte) 3);
+        boolean hpAtLimit = isPointAtLimitForPet((byte) 0);
+        boolean kiAtLimit = isPointAtLimitForPet((byte) 1);
+        boolean dameAtLimit = isPointAtLimitForPet((byte) 2);
 
-        // Ưu tiên HP/KI/Sức đánh theo tỉ lệ gốc.
-        // Nếu tại thời điểm hiện tại không cộng được 3 chỉ số chính
-        // thì fallback sang giáp theo lượng tiềm năng hiện có.
+        // Chỉ cộng giáp khi 3 chỉ số chính đã chạm trần thật sự.
+        if (hpAtLimit && kiAtLimit && dameAtLimit) {
+            return canIncreaseOnePoint((byte) 3) ? (byte) 3 : (byte) -1;
+        }
+
+        boolean canHp = !hpAtLimit && canAffordOnePoint((byte) 0);
+        boolean canKi = !kiAtLimit && canAffordOnePoint((byte) 1);
+        boolean canDame = !dameAtLimit && canAffordOnePoint((byte) 2);
+
+        // Chưa đủ tiềm năng cho 3 chỉ số chính thì tạm dừng,
+        // không chuyển sang cộng giáp để tránh dồn hết vào giáp.
         if (!canHp && !canKi && !canDame) {
-            return canDef ? (byte) 3 : (byte) -1;
+            return -1;
         }
 
         double hpProgress = this.hpg / (double) this.petBaseHpForAuto;
@@ -2030,6 +2037,38 @@ public class NPoint {
             selected = 2;
         }
         return selected;
+    }
+
+    private boolean isPointAtLimitForPet(byte type) {
+        switch (type) {
+            case 0:
+                return (this.hpg + 20) > getHpMpLimit();
+            case 1:
+                return (this.mpg + 20) > getHpMpLimit();
+            case 2:
+                return (this.dameg + 1) > getDameLimit();
+            default:
+                return false;
+        }
+    }
+
+    private boolean canAffordOnePoint(byte type) {
+        return this.tiemNang >= getOnePointCost(type);
+    }
+
+    private double getOnePointCost(byte type) {
+        switch (type) {
+            case 0:
+                return this.hpg + 1000;
+            case 1:
+                return this.mpg + 1000;
+            case 2:
+                return this.dameg * 100;
+            case 3:
+                return (this.defg + 5) * 100000L;
+            default:
+                return Double.MAX_VALUE;
+        }
     }
 
     private boolean canIncreaseOnePoint(byte type) {
