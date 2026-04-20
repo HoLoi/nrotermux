@@ -1881,13 +1881,24 @@ public class NPoint {
 
             // Chặn cộng giáp cho đệ tử khi 3 chỉ số chính chưa chạm trần.
             if (!(hpAtLimit && kiAtLimit && dameAtLimit)) {
-                byte redirectType = getPriorityPointTypeForPet();
-                logPetAutoDebug("redirect-armor type=3 -> " + redirectType
+                int applied = 0;
+                for (int i = 0; i < point; i++) {
+                    byte redirectType = getPriorityPointTypeForPet();
+                    if (redirectType < 0 || redirectType > 2) {
+                        break;
+                    }
+                    if (!increaseOnePoint(redirectType)) {
+                        break;
+                    }
+                    this.petLastPriorityTypeForAuto = redirectType;
+                    applied++;
+                }
+                logPetAutoDebug("redirect-armor type=3 applied=" + applied
                         + " hpAtLimit=" + hpAtLimit
                         + " kiAtLimit=" + kiAtLimit
                         + " dameAtLimit=" + dameAtLimit);
-                if (redirectType >= 0 && redirectType <= 2) {
-                    increasePoint(redirectType, point);
+                if (applied > 0) {
+                    Service.getInstance().point(player);
                 }
                 return;
             }
