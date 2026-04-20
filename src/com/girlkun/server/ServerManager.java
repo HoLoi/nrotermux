@@ -2,7 +2,12 @@ package com.girlkun.server;
 
 import com.girlkun.database.GirlkunDB;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.Socket;
 
 import com.girlkun.jdbc.daos.HistoryTransactionDAO;
 import com.girlkun.models.boss.BossManager;
@@ -50,6 +55,7 @@ public class ServerManager {
     public static ServerSocket listenSocket;
     public static boolean isRunning;
     public static long delaylogin;
+    public static final int ADMIN_CONSOLE_PORT = 14446;
     private volatile boolean waitingMenuCommand;
 
     public void init() {
@@ -84,6 +90,7 @@ public class ServerManager {
         isRunning = true;
         initControlPanel();
         activeCommandLine();
+        activeAdminConsole();
         activeGame();
         activeServerSocket();
         Logger.log(Logger.PURPLE_BOLD_BRIGHT,"░░░░░░░░░░░░▄▄\n░░░░░░░░░░░█░░█\n░░░░░░░░░░░█░░█\n░░░░░░░░░░█░░░█\n░░░░░░░░░█░░░░█\n███████▄▄█░░░░░██████▄\n▓▓▓▓▓▓█░░░░░░░░░░░░░░█\n▓▓▓▓▓▓█░░░░░░░░░░░░░░█\n▓▓▓▓▓▓█░░░░░░░░░░░░░░█\n▓▓▓▓▓▓█░░░░░░░░░░░░░░█\n▓▓▓▓▓▓█░░░░░░░░░░░░░░█\n▓▓▓▓▓▓█████░░░░░░░░░█\n██████▀░░░░▀▀██████▀");
@@ -249,6 +256,9 @@ public class ServerManager {
                 waitingMenuCommand = true;
             }
             while (true) {
+                if (!sc.hasNextLine()) {
+                    continue;
+                }
                 String line = sc.nextLine();
                 if (line == null) {
                     continue;
@@ -260,6 +270,11 @@ public class ServerManager {
                 if (line.equalsIgnoreCase("menu")) {
                     showControlMenu();
                     waitingMenuCommand = true;
+                    continue;
+                }
+                if (line.matches("^[0-6]$")) {
+                    waitingMenuCommand = true;
+                    handleMenuSelection(sc, line);
                     continue;
                 }
                 if (waitingMenuCommand) {
@@ -320,6 +335,116 @@ public class ServerManager {
                 }
             }
         }, "Active line").start();
+    }
+
+    private void activeAdminConsole() {
+        new Thread(() -> {
+            try (ServerSocket adminSocket = new ServerSocket(ADMIN_CONSOLE_PORT, 50, InetAddress.getByName("127.0.0.1"))) {
+                Logger.warning("Admin console local ready at 127.0.0.1:" + ADMIN_CONSOLE_PORT + "\n");
+                while (isRunning) {
+                    Socket socket = adminSocket.accept();
+                    new Thread(() -> handleAdminSession(socket), "Admin Console Session").start();
+                }
+            } catch (Exception e) {
+                Logger.warning("Khong the mo admin console local\n");
+            }
+        }, "Admin Console Listener").start();
+    }
+
+    private void handleAdminSession(Socket socket) {
+        try (Socket s = socket;
+             BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
+             PrintWriter writer = new PrintWriter(s.getOutputStream(), true)) {
+            writer.println("=== MENU DIEU KHIEN SERVER ===");
+            writer.println("1. Bao tri may chu (30 phut)");
+            writer.println("2. Doi EXP server");
+            writer.println("3. Chon su kien server");
+            writer.println("4. Thong bao server");
+            writer.println("5. Da all player");
+            writer.println("6. Khuyen mai nap");
+            writer.println("0. Thoat");
+            writer.println("Nhap 'menu' de hien lai bang, 'exit' de thoat");
+
+            while (true) {
+                writer.print("> ");
+                writer.flush();
+                String line = reader.readLine();
+                if (line == null) {
+                    break;
+                }
+                line = line.trim();
+                if (line.equalsIgnoreCase("exit") || line.equals("0")) {
+                    writer.println("Bye");
+                    break;
+                }
+                if (line.equalsIgnoreCase("menu") || line.equalsIgnoreCase("help")) {
+                    writer.println("1 2 3 4 5 6 0");
+                    continue;
+                }
+                if (!line.matches("^[1-6]$")) {
+                    writer.println("Lenh khong hop le");
+                    continue;
+                }
+                int option = Integer.parseInt(line);
+                switch (option) {
+                    case 1:
+                        Maintenance.gI().start(30);
+                        writer.println("Da bat bao tri 30 phut");
+                        break;
+                    case 2:
+                        writer.println("Nhap ti le EXP moi:");
+                        String exp = reader.readLine();
+                        try {
+                            Manager.RATE_EXP_SERVER = Byte.parseByte(exp.trim());
+                            writer.println("EXP hien tai: " + Manager.RATE_EXP_SERVER);
+                        } catch (Exception ex) {
+                            writer.println("Gia tri EXP khong hop le");
+                        }
+                        break;
+                    case 3:
+                        writer.println("Nhap su kien (1..7):");
+                        String sk = reader.readLine();
+                        try {
+                            Manager.SUKIEN = Byte.parseByte(sk.trim());
+                            writer.println("Su kien hien tai: " + Manager.SUKIEN);
+                            if (Manager.SUKIEN == 1) {
+                                Service.getInstance().sendThongBaoAllPlayer("|7|Sự kiện Trung thu đang được diễn ra"
+                                        + "\n|5|Thông tin chi tiết Sự kiện vui lòng xem tại NPC Trung thu tại Làng Aru");
+                            }
+                        } catch (Exception ex) {
+                            writer.println("Gia tri su kien khong hop le");
+                        }
+                        break;
+                    case 4:
+                        writer.println("Nhap noi dung thong bao:");
+                        String chat = reader.readLine();
+                        if (chat != null) {
+                            Service.getInstance().sendThongBaoAllPlayer(chat);
+                            writer.println("Da gui thong bao");
+                        }
+                        break;
+                    case 5:
+                        new Thread(() -> Client.gI().close()).start();
+                        writer.println("Dang da all player");
+                        break;
+                    case 6:
+                        writer.println("Nhap he so khuyen mai nap moi:");
+                        String km = reader.readLine();
+                        try {
+                            Manager.KHUYEN_MAI_NAP = Byte.parseByte(km.trim());
+                            writer.println("Khuyen mai nap hien tai: x" + Manager.KHUYEN_MAI_NAP);
+                        } catch (Exception ex) {
+                            writer.println("Gia tri khuyen mai khong hop le");
+                        }
+                        break;
+                    default:
+                        writer.println("Lenh khong hop le");
+                        break;
+                }
+            }
+        } catch (Exception e) {
+            Logger.warning("Admin console session closed\n");
+        }
     }
 
     private void showControlMenu() {
