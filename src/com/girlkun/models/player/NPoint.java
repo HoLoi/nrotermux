@@ -1641,7 +1641,8 @@ public class NPoint {
     }
 
     public long getPowerLimit() {
-        switch (limitPower) {
+        int lp = Math.max(0, Math.min(MAX_LIMIT, this.limitPower));
+        switch (lp) {
             case 0:
                 return 17999999999L;
             case 1:
@@ -1665,12 +1666,16 @@ public class NPoint {
             case 10:
                 return 400999999999L;
             default:
-                return 0;
+                return 17999999999L;
         }
     }
 
     public long getPowerNextLimit() {
-        switch (limitPower + 1) {
+        int lp = Math.max(0, Math.min(MAX_LIMIT, this.limitPower));
+        if (lp >= MAX_LIMIT) {
+            return getPowerLimit();
+        }
+        switch (lp + 1) {
             case 0:
                 return 17999999999L;
             case 1:
@@ -1694,156 +1699,160 @@ public class NPoint {
             case 10:
                 return 400999999999L;
             default:
-                return 0;
+                return 17999999999L;
         }
     }
 
     public int getHpMpLimit() {
-        if (limitPower == 0) {
+        int lp = Math.max(0, Math.min(MAX_LIMIT, this.limitPower));
+        if (lp == 0) {
             return 220000;
         }
-        if (limitPower == 1) {
+        if (lp == 1) {
             return 240000;
         }
-        if (limitPower == 2) {
+        if (lp == 2) {
             return 300000;
         }
-        if (limitPower == 3) {
+        if (lp == 3) {
             return 350000;
         }
-        if (limitPower == 4) {
+        if (lp == 4) {
             return 400000;
         }
-        if (limitPower == 5) {
+        if (lp == 5) {
             return 450000;
         }
-        if (limitPower == 6) {
+        if (lp == 6) {
             return 500000;
         }
-        if (limitPower == 7) {
+        if (lp == 7) {
             return 550000;
         }
-        if (limitPower == 8) {
+        if (lp == 8) {
             return 600000;
         }
-        if (limitPower == 9) {
+        if (lp == 9) {
             return 650000;
         }
-        if (limitPower == 10) {
+        if (lp == 10) {
             return 700000;
         }
-        return 0;
+        return 220000;
     }
 
     public int getDameLimit() {
-        if (limitPower == 0) {
+        int lp = Math.max(0, Math.min(MAX_LIMIT, this.limitPower));
+        if (lp == 0) {
             return 8000;
         }
-        if (limitPower == 1) {
+        if (lp == 1) {
             return 10000;
         }
-        if (limitPower == 2) {
+        if (lp == 2) {
             return 12000;
         }
-        if (limitPower == 3) {
+        if (lp == 3) {
             return 14000;
         }
-        if (limitPower == 4) {
+        if (lp == 4) {
             return 16000;
         }
-        if (limitPower == 5) {
+        if (lp == 5) {
             return 18000;
         }
-        if (limitPower == 6) {
+        if (lp == 6) {
             return 20000;
         }
-        if (limitPower == 7) {
+        if (lp == 7) {
             return 24000;
         }
-        if (limitPower == 8) {
+        if (lp == 8) {
             return 28000;
         }
-        if (limitPower == 9) {
+        if (lp == 9) {
             return 35000;
         }
-        if (limitPower == 10) {
+        if (lp == 10) {
             return 40000;
         }
-        return 0;
+        return 8000;
     }
 
     public short getDefLimit() {
-        if (limitPower == 0) {
+        int lp = Math.max(0, Math.min(MAX_LIMIT, this.limitPower));
+        if (lp == 0) {
             return 550;
         }
-        if (limitPower == 1) {
+        if (lp == 1) {
             return 600;
         }
-        if (limitPower == 2) {
+        if (lp == 2) {
             return 700;
         }
-        if (limitPower == 3) {
+        if (lp == 3) {
             return 800;
         }
-        if (limitPower == 4) {
+        if (lp == 4) {
             return 1000;
         }
-        if (limitPower == 5) {
+        if (lp == 5) {
             return 1200;
         }
-        if (limitPower == 6) {
+        if (lp == 6) {
             return 1400;
         }
-        if (limitPower == 7) {
+        if (lp == 7) {
             return 1600;
         }
-        if (limitPower == 8) {
+        if (lp == 8) {
             return 1700;
         }
-        if (limitPower == 9) {
+        if (lp == 9) {
             return 1800;
         }
-        if (limitPower == 10) {
+        if (lp == 10) {
             return 2500;
         }
-        return 0;
+        return 550;
     }
 
     public byte getCritLimit() {
-        if (limitPower == 0) {
+        int lp = Math.max(0, Math.min(MAX_LIMIT, this.limitPower));
+        if (lp == 0) {
             return 5;
         }
-        if (limitPower == 1) {
+        if (lp == 1) {
             return 6;
         }
-        if (limitPower == 2) {
+        if (lp == 2) {
             return 7;
         }
-        if (limitPower == 3) {
+        if (lp == 3) {
             return 8;
         }
-        if (limitPower == 4) {
+        if (lp == 4) {
             return 9;
         }
-        if (limitPower == 5) {
+        if (lp == 5) {
             return 10;
         }
-        if (limitPower == 6) {
+        if (lp == 6) {
             return 10;
         }
-        if (limitPower == 7) {
+        if (lp == 7) {
             return 10;
         }
-        if (limitPower == 8) {
+        if (lp == 8) {
             return 10;
         }
-        if (limitPower == 9) {
+        if (lp == 9) {
             return 10;
         }
-        if (limitPower == 10) {
+        if (lp == 10) {
             return 15;
         }
-        return 0;
+        return 5;
     }
 
     //**************************************************************************
