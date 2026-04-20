@@ -1978,6 +1978,7 @@ public class NPoint {
         if (!player.isPet) {
             return;
         }
+        sanitizePetAutoStats();
         initPetAutoBase();
         boolean changed = false;
         int guard = 0;
@@ -2000,6 +2001,23 @@ public class NPoint {
         }
         if (changed) {
             Service.getInstance().point(player);
+        }
+    }
+
+    private void sanitizePetAutoStats() {
+        if (this.limitPower < 0) {
+            this.limitPower = 0;
+        } else if (this.limitPower > MAX_LIMIT) {
+            this.limitPower = MAX_LIMIT;
+        }
+        if (this.hpg <= 0) {
+            this.hpg = 1;
+        }
+        if (this.mpg <= 0) {
+            this.mpg = 1;
+        }
+        if (this.dameg <= 0) {
+            this.dameg = 1;
         }
     }
 
