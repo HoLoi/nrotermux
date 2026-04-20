@@ -622,7 +622,7 @@ public class Mob {
         if (Util.isTrue(1, 100)) {
             list.add(new ItemMap(zone, Manager.itemIds_NR[nroquai], 1, this.location.x, this.location.y, player.id));
         }
-        if (Util.isTrue(1, 100)) {
+        if (Util.isTrue(100, 100)) {
             list.add(new ItemMap(zone, Manager.spl[saophale], 1, this.location.x, this.location.y, player.id));
         }
         if (Util.isTrue(20, 100) && MapService.gI().isMapCold(this.zone.map)) {
