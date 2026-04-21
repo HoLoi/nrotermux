@@ -637,7 +637,7 @@ public class Mob {
         
         tileVang = player.nPoint.tlGold / 100;
         if (Util.isTrue(30, 100)) {
-            int vang = (Util.nextInt(30000, 50000) + Util.nextInt(30000, 50000) * tileVang)*10;
+            int vang = (Util.nextInt(300000, 500000) + Util.nextInt(300000, 500000) * tileVang);
             list.add(new ItemMap(zone, 190, vang, this.location.x, this.location.y, player.id));
         }
         tileHn = player.nPoint.tlGold / 100;
