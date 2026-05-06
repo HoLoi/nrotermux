@@ -580,7 +580,6 @@ public class Mob {
         byte radaThuong = (byte) new Random().nextInt(Manager.manhradaThuong.length);
         byte radaVIP = (byte) new Random().nextInt(Manager.manhradaVIP.length);
         byte nroquai = (byte) new Random().nextInt(Manager.itemIds_NR.length);
-        byte saophale = (byte) new Random().nextInt(Manager.spl.length);
         byte randomTrungthu = (byte) new Random().nextInt(Manager.SuKien_TrungThu.length);
 //        if (!items.isEmpty()) {
 //            ItemMobReward item = items.get(Util.nextInt(0, items.size() - 1));
@@ -596,6 +595,8 @@ public class Mob {
 //                list.add(itemMap);
 //            }
 //        }
+
+        // rơi bí kíp khi đánh quái thường vào các giờ lẻ trong ngày và quái phải có tempId = 0
         if (player.cFlag >= 1 && Util.isTrue(100, 100) && this.tempId == 0 && hour != 1 && hour != 3 && hour != 5 && hour != 7 && hour != 9 && hour != 11 && hour != 13 && hour != 15 && hour != 17 && hour != 19 && hour != 21 && hour != 23) {    //up bí kíp
             list.add(new ItemMap(zone, 590, 1, x, player.location.y, player.id));// cai nay sua sau nha
             if (Util.isTrue(50, 100) && this.tempId == 0) {    //up bí kíp
@@ -608,6 +609,8 @@ public class Mob {
                 }
             }
         }
+
+        // khi player sử dụng máy dò có 8% xác suất rơi vật phẩm khi đánh quái thường và quái phải có tempId từ 58 đến 65
         if (player.itemTime.isUseMayDo && Util.isTrue(8, 100) && this.tempId > 57 && this.tempId < 66) {
             if (player.chienthan.tasknow == 4) {
                 player.chienthan.dalamduoc++;
@@ -619,27 +622,35 @@ public class Mob {
 //        if (player.itemTime.isUseMayDo2) {
 //            list.add(new ItemMap(zone, 570, 1, x, player.location.y, player.id));// cai nay sua sau nha
 //        }
-        if (Util.isTrue(1, 100)) {
+
+        // khi đánh quái thường có 8% xác suất rơi vật phẩm ngoc rong 
+        if (Util.isTrue(8, 100)) {
             list.add(new ItemMap(zone, Manager.itemIds_NR[nroquai], 1, this.location.x, this.location.y, player.id));
         }
-        if (Util.isTrue(1, 100)) {
-            list.add(new ItemMap(zone, Manager.spl[saophale], 1, this.location.x, this.location.y, player.id));
-        }
+
+        // ti le roi trang bi TL khi danh quai thuong map phai la map lanh
         if (Util.isTrue(20, 100) && MapService.gI().isMapCold(this.zone.map)) {
             list.add(Util.ratiItem(zone, Manager.itemIds_TL[randomDo], 1, this.location.x, this.location.y, player.id));
         }
+
+        // ti le roi trang bi TL khi danh quai map phai la map nui khi do
         if (Util.isTrue(1, 100) && this.zone.map.mapId == 79) {
             list.add(Util.ratiItem(zone, Manager.itemIds_TL[randomDo], 1, this.location.x, this.location.y, player.id));
         }
+
+        // ti le roi thuc an khi danh quai map phai la map lanh
         if (Util.isTrue(10, 100) && MapService.gI().isMapCold(this.zone.map)) {
-            list.add(new ItemMap(zone, Manager.thucan[randomVp3], 1, this.location.x, this.location.y, player.id));
+            list.add(Util.ratiDa(zone, Manager.thucan[randomVp3], 1, this.location.x, this.location.y, player.id));
         }
         
+        // ti le roi vang khi danh quai thuong
         tileVang = player.nPoint.tlGold / 100;
         if (Util.isTrue(30, 100)) {
             int vang = (Util.nextInt(300000, 500000) + Util.nextInt(300000, 500000) * tileVang);
             list.add(new ItemMap(zone, 190, vang, this.location.x, this.location.y, player.id));
         }
+
+        // ti le roi hong ngoc khi danh quai thuong
         tileHn = player.nPoint.tlGold / 100;
         if (Util.isTrue(20, 100)) {
             int hongngoc = (Util.nextInt(300, 500) + Util.nextInt(300, 500) * tileHn);
@@ -662,6 +673,7 @@ public class Mob {
 //            }
 //        }
 
+        
         if (Util.isTrue(5, 100) && (this.zone.map.mapId == 0 || this.zone.map.mapId == 7 || this.zone.map.mapId == 14)) {
             list.add(new ItemMap(zone, 1215, 10, this.location.x, this.location.y, player.id));
         }
@@ -671,35 +683,49 @@ public class Mob {
         if (Util.isTrue(120, 10000) && this.zone.map.mapId >= 202 && this.zone.map.mapId <= 203) {
             list.add(new ItemMap(zone, Manager.manhradaVIP[radaVIP], 1, this.location.x, this.location.y, player.id));
         }
+
+        // tỉ lệ rơi đá chiến thần khi đánh quái thường ở map chiến thần và map kho báu
         if (Util.isTrue(50, 1000) && this.zone.map.mapId == 171) {
             list.add(new ItemMap(zone, Manager.dachienthan[randomVp5], 1, this.location.x, this.location.y, player.id));
         }
+
+        // tỉ lệ rơi đá chiến thần khi đánh quái thường ở map chiến thần và map kho báu sẽ cao hơn nếu đánh quái ở map kho báu
         if (Util.isTrue(50, 1000) && this.zone.map.mapId >= 202 && this.zone.map.mapId <= 203) {
             list.add(new ItemMap(zone, Manager.dachienthan[randomVp5], 1, this.location.x, this.location.y, player.id));
         }
         if (Util.isTrue(3, 100) && this.zone.map.mapId > 202 && this.zone.map.mapId < 203) {
             list.add(new ItemMap(zone, 2031, 1, this.location.x, this.location.y, player.id));
         }
-        if (Util.isTrue(5, 100)) {
+
+        // ti le roi danang cap khi danh quai thuong
+        if (Util.isTrue(30, 100)) {
             list.add(Util.ratiDa(zone, Manager.danangcap[randomVp4], 1, this.location.x, this.location.y, player.id));
         }
+        // kiem tra dieu kien rơi spl khi rơi spl se kiem tra xem có phải là người chơi hay không nếu là người chơi và có trang bị áo giáp có option 110 thì sẽ rơi spl nếu không có sẽ không rơi spl
         if (player.isPl()) {
             if (Util.isTrue(30f, 100) && player.inventory.itemsBody.get(5).isNotNullItem() && player.inventory.haveOption(player.inventory.itemsBody, 5, 110)) {
                 list.add(Util.ratiSpl(zone, Manager.spl[randomVp2], 1, this.location.x, this.location.y, player.id));
             }
         }
+
+        // tỉ lệ rơi thức ăn khi đánh quái thường ở map lạnh sẽ cao hơn nếu người chơi đang mặc set đồ than linh
         if (Util.isTrue(100, 100) && player.setClothes.setDTL == 5 && MapService.gI().isMapCold(this.zone.map)) {
             list.add(new ItemMap(zone, Manager.thucan[randomVp3], 1, this.location.x, this.location.y, player.id));
         }
+        // ti le roi manh vo bong tai khi danh quai thuong dong tay nam bac thanh dia
         if (Util.isTrue(40, 100) && this.zone.map.mapId > 155 && this.zone.map.mapId < 159) {
             list.add(new ItemMap(zone, 933, 1, this.location.x, this.location.y, player.id));
         }
+
+        // ti le roi manh hon bong tai khi danh quai thuong dong tay nam bac thanh dia
         if (Util.isTrue(5, 100) && this.zone.map.mapId > 158 && this.zone.map.mapId < 160) {
             list.add(new ItemMap(zone, 934, 1, this.location.x, this.location.y, player.id));
         }       
         if (Util.isTrue(5, 100) && this.zone.map.mapId == 155 && player.setClothes.setDHD == 5) {
             list.add(new ItemMap(zone, Manager.itemManh[randomVp1], 1, this.location.x, this.location.y, player.id));
         }
+
+        // ti le roi bi kiep
         if (Util.isTrue(40, 100) && this.tempId < 1 && (this.zone.map.mapId == 131)) {
             list.add(new ItemMap(zone, 590, Util.nextInt(15, 30), this.location.x, this.location.y, player.id));
         }
@@ -715,6 +741,10 @@ public class Mob {
         if (Util.isTrue(5, 10000) && this.zone.map.mapId > 0 && this.zone.map.mapId < 203) {
             list.add(new ItemMap(zone, 20, 1, this.location.x, this.location.y, player.id));
         }
+        // rơi ngẫu nhiên đồ thần linh khi đánh quái ở map lạnh 
+        // nếu rơi được đồ thần linh sẽ có tỉ lệ rơi ra hồng ngọc 
+        // nếu rơi được đồ thần linh và người chơi đang làm nhiệm vụ chiến thần 
+        // thì sẽ cộng vào số lượng đã làm được của nhiệm vụ chiến thần
         if ((Util.nextInt(100, 70000) == 2) && MapService.gI().isMapCold(this.zone.map)) {
             if (player.chienthan.tasknow == 2) {
                 player.chienthan.dalamduoc++;

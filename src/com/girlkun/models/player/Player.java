@@ -284,6 +284,7 @@ public class Player {
         this.TrieuHoiHP = Util.GioiHannext(100000, 100000L + ((this.TrieuHoiCapBac + 1) * 50000L));
     }
 
+    // kiem tra xem co phai la player khong
     public boolean isPl() {
         return !isPet && !isBoss && !isNewPet && !isTrieuhoipet;// && !isNewPet1
     }
