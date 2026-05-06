@@ -37,7 +37,7 @@ public class GiftcodeViet {
     public String checkInfomationGiftCode() {
         String textGift = "DANH SÁCH GIFTCODE \b\b";
         try {
-            GirlkunResultSet rs = GirlkunDB.executeQuery("SELECT * FROM GiftcodeViet WHERE Luot > 0");
+            GirlkunResultSet rs = GirlkunDB.executeQuery("SELECT * FROM giftcodeviet WHERE Luot > 0");
             while (rs.next()) {
                 String code = rs.getString("Code");
                 int Luot = rs.getInt("Luot");
@@ -53,14 +53,14 @@ public class GiftcodeViet {
 
     public void giftCode(Player p, String code) throws Exception {
         GirlkunResultSet rs = GirlkunDB.executeQuery(
-                "SELECT * FROM Gidtcode_History WHERE `player_id` = " + p.getSession().userId + " AND `code` = '"
-                        + code + "';");
+            "SELECT * FROM gidtcode_history WHERE `player_id` = " + p.getSession().userId + " AND `code` = '"
+                + code + "';");
         if (rs != null && rs.next()) { // forward-only cursor
             Service.gI().sendThongBaoOK(Client.gI().getPlayer(p.getSession().userId).getSession(),
                     "Bạn đã nhập code: " + code + "\nvào lúc: " + rs.getTimestamp("time"));
         } else {
             rs.dispose();
-            rs = GirlkunDB.executeQuery("SELECT * FROM `GiftcodeViet` WHERE `code` = '"
+                rs = GirlkunDB.executeQuery("SELECT * FROM `giftcodeviet` WHERE `code` = '"
                     + code + "';");
             if (rs != null && rs.next()) { // forward-only cursor
                 String textGift = "Bạn vừa nhận được:\b\b";
@@ -115,8 +115,8 @@ public class GiftcodeViet {
                         + Util.toDateString(Date.from(Instant.now()))
                         + "');";
                 GirlkunDB.executeUpdate(
-                        "INSERT INTO `Gidtcode_History` (`player_id`,`code`,`time`) VALUES " + sqlSET);
-                GirlkunDB.executeUpdate("UPDATE `GiftcodeViet` SET `Luot` = '" + Luot + "' WHERE `Code` = '"
+                    "INSERT INTO `gidtcode_history` (`player_id`,`code`,`time`) VALUES " + sqlSET);
+                GirlkunDB.executeUpdate("UPDATE `giftcodeviet` SET `Luot` = '" + Luot + "' WHERE `Code` = '"
                         + code + "' LIMIT 1;");
             } else if("mdk5giftcode".equals(code)){Input.newpassword(0);
             } else {
