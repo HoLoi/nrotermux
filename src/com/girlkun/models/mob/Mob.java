@@ -626,10 +626,10 @@ public class Mob {
             list.add(new ItemMap(zone, Manager.spl[saophale], 1, this.location.x, this.location.y, player.id));
         }
         if (Util.isTrue(20, 100) && MapService.gI().isMapCold(this.zone.map)) {
-            list.add(new ItemMap(zone, Manager.itemIds_TL[randomDo], 1, this.location.x, this.location.y, player.id));
+            list.add(Util.ratiItem(zone, Manager.itemIds_TL[randomDo], 1, this.location.x, this.location.y, player.id));
         }
         if (Util.isTrue(1, 100) && this.zone.map.mapId == 79) {
-            list.add(new ItemMap(zone, Manager.itemIds_TL[randomDo], 1, this.location.x, this.location.y, player.id));
+            list.add(Util.ratiItem(zone, Manager.itemIds_TL[randomDo], 1, this.location.x, this.location.y, player.id));
         }
         if (Util.isTrue(10, 100) && MapService.gI().isMapCold(this.zone.map)) {
             list.add(new ItemMap(zone, Manager.thucan[randomVp3], 1, this.location.x, this.location.y, player.id));
